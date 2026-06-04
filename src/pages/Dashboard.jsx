@@ -17,14 +17,14 @@ export default function Dashboard() {
 
   if (!data) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center h-screen bg-[#f8f9fa] text-[#212529]">
         Loading...
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-[#f5f6f7]">
+    <div className="flex min-h-screen bg-[#f8f9fa] text-[#212529]">
       <Sidebar
         openSidebar={openSidebar}
         setOpenSidebar={setOpenSidebar}
@@ -32,25 +32,24 @@ export default function Dashboard() {
 
       <main
         className={`
-          flex-1 p-12 transition-all duration-300
+          flex-1 min-h-screen px-12 py-10 transition-all duration-300
           ${openSidebar ? "ml-64" : "ml-20"}
         `}
       >
-        <h1 className="text-4xl font-bold">
-          Welcome back, Revanth
-        </h1>
+        <header className="mb-10">
+          <h1 className="text-[32px] leading-[40px] font-bold tracking-[-0.01em] text-[#230804]">
+            Welcome back, Revanth
+          </h1>
 
-        <p className="mt-4 text-gray-500 text-lg">
-          Practice. Analyze. Improve.
-          Repeat...
-        </p>
+          <p className="mt-2 text-[18px] leading-[28px] text-[#6c757d]">
+            Practice. Analyze. Improve. Repeat...
+          </p>
+        </header>
 
-        <div className="grid grid-cols-2 gap-6 mt-10">
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
           <StatCard
             title="Total Interviews Completed"
-            value={
-              data.total_interviews_completed
-            }
+            value={data.total_interviews_completed}
             message="Keep up the good work!"
             type="interviews"
           />
@@ -58,30 +57,24 @@ export default function Dashboard() {
           <StatCard
             title="Average Performance Score"
             value={`${data.average_performance_score}%`}
-            message={
-              data.performance_message
-            }
+            message={data.performance_message}
             type="performance"
           />
-        </div>
+        </section>
 
-        <div className="grid grid-cols-4 gap-6 mt-10">
-
-          <div className="col-span-3">
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          <div className="lg:col-span-8">
             <InterviewTable
-              interviews={
-                data.recently_completed_interviews
-              }
+              interviews={data.recently_completed_interviews}
             />
           </div>
-          <div className="col-span-1">
+
+          <div className="lg:col-span-4">
             <AnalyticsPanel
-              analytics={
-                data.performance_analytics
-              }
+              analytics={data.performance_analytics}
             />
           </div>
-        </div>
+        </section>
       </main>
     </div>
   );
