@@ -8,3 +8,17 @@ body {
   background: #f8f9fa;
   color: #212529;
 }
+
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&display=swap");
+
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  display: inline-block;
+  white-space: nowrap;
+  direction: ltr;
+  font-feature-settings: "liga";
+}
