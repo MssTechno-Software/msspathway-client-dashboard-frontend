@@ -7,42 +7,54 @@ function StatCard({
   type = "interviews",
 }) {
   return (
-    <div
-      className="bg-white rounded-lg border-l-4 border-l-green-800 p-8"
-    >
+    <div className="bg-white border border-[#dee2e6] rounded-xl shadow-sm p-8">
       <div className="flex items-start gap-6">
         {/* Icon */}
         <div
-          className="w-18 h-18 rounded-2xl flex items-center justify-center bg-green-50"
+          className={`
+            w-16 h-16 rounded-2xl flex items-center justify-center
+            ${
+              type === "performance"
+                ? "bg-[#eff4ff]"
+                : "bg-green-50"
+            }
+          `}
         >
           {type === "performance" ? (
             <TrendingUp
-              size={38}
-              strokeWidth={2.5}
-              className="text-green-800"
+              size={32}
+              strokeWidth={2.25}
+              className="text-[#3b6934]"
             />
           ) : (
             <Briefcase
-              size={38}
-              strokeWidth={2.5}
-              className="text-green-800"
+              size={32}
+              strokeWidth={2.25}
+              className="text-[#2d5a27]"
             />
           )}
         </div>
 
         {/* Content */}
-        <div>
-          <p className="uppercase text-xs tracking-[4px] text-gray-500 font-semibold">
+        <div className="flex flex-col">
+          <span className="text-[11px] uppercase tracking-[0.15em] font-bold text-[#6c757d] mb-1">
             {title}
-          </p>
+          </span>
 
-          <h2
-            className="mt-3 text-5xl font-light"
-          >
+          <h2 className="text-[64px] leading-none font-bold text-[#230804]">
             {value}
           </h2>
 
-          <p className="mt-4 text-green-800 font-medium">
+          <p
+            className={`
+              mt-2 text-sm font-semibold
+              ${
+                type === "performance"
+                  ? "text-[#3b6934]"
+                  : "text-[#2d5a27]"
+              }
+            `}
+          >
             {message}
           </p>
         </div>
