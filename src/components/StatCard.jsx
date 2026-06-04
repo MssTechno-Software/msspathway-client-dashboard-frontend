@@ -1,5 +1,3 @@
-import { Briefcase, TrendingUp } from "lucide-react";
-
 function StatCard({ title, value, message, type = "interviews" }) {
   return (
     <div className="bg-white border border-[#dee2e6] rounded-xl shadow-sm p-8">
@@ -11,17 +9,19 @@ function StatCard({ title, value, message, type = "interviews" }) {
           `}
         >
           {type === "performance" ? (
-            <TrendingUp
-              size={32}
-              strokeWidth={2}
-              className="text-[#3b6934] shrink-0"
-            />
+            <span
+              className="material-symbols-outlined text-[#3b6934] text-[36px] leading-none"
+              style={{ fontVariationSettings: "'FILL' 1" }}
+            >
+              monitoring
+            </span>
           ) : (
-            <Briefcase
-              size={32}
-              strokeWidth={2}
-              className="text-[#2d5a27] shrink-0"
-            />
+            <span
+              className="material-symbols-outlined text-[#2d5a27] text-[36px] leading-none"
+              style={{ fontVariationSettings: "'FILL' 1" }}
+            >
+              work
+            </span>
           )}
         </div>
 
