@@ -1,20 +1,11 @@
-import {
-  User,
-  LayoutDashboard,
-  MessageSquare,
-  Calendar,
-  ClipboardCheck,
-  LogOut,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const menuItems = [
-  { icon: User, label: "My Profile" },
-  { icon: LayoutDashboard, label: "Dashboard", active: true },
-  { icon: MessageSquare, label: "Interview Modes" },
-  { icon: Calendar, label: "Scheduled for you" },
-  { icon: ClipboardCheck, label: "Scorecards" },
+  { icon: "person", label: "My Profile" },
+  { icon: "home", label: "Dashboard", active: true },
+  { icon: "video_chat", label: "Interview Modes" },
+  { icon: "calendar_today", label: "Scheduled for you" },
+  { icon: "fact_check", label: "Scorecards" },
 ];
 
 function Sidebar({ openSidebar, setOpenSidebar }) {
@@ -69,30 +60,32 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
       </div>
 
       <nav className="flex-1 flex flex-col gap-1">
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-
-          return (
-            <button
-              key={item.label}
-              className={`
-                w-full flex items-center
-                ${openSidebar ? "justify-start gap-3" : "justify-center"}
-                px-4 py-3 rounded
-                text-[12px] leading-[16px] uppercase tracking-[0.05em]
-                transition-all duration-150 active:scale-95 cursor-pointer
-                ${
-                  item.active
-                    ? "bg-[#2d5a27] text-white font-bold shadow-sm"
-                    : "text-white/80 hover:bg-white/10 font-semibold"
-                }
-              `}
+        {menuItems.map((item) => (
+          <button
+            key={item.label}
+            className={`
+              w-full flex items-center
+              ${openSidebar ? "justify-start gap-3" : "justify-center"}
+              px-4 py-3 rounded
+              text-[12px] leading-[16px] uppercase tracking-[0.05em]
+              transition-all duration-150 active:scale-95 cursor-pointer
+              ${
+                item.active
+                  ? "bg-[#2d5a27] text-white font-bold shadow-sm"
+                  : "text-white/80 hover:bg-white/10 font-semibold"
+              }
+            `}
+          >
+            <span
+              className="material-symbols-outlined shrink-0 text-[24px] leading-none"
+              style={{ fontVariationSettings: "'FILL' 1" }}
             >
-              <Icon size={22} strokeWidth={2} className="shrink-0" />
-              {openSidebar && <span>{item.label}</span>}
-            </button>
-          );
-        })}
+              {item.icon}
+            </span>
+
+            {openSidebar && <span>{item.label}</span>}
+          </button>
+        ))}
       </nav>
 
       <div className="pt-4 border-t border-white/10">
@@ -107,7 +100,13 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
             font-bold transition-all duration-150 active:scale-95 cursor-pointer
           `}
         >
-          <LogOut size={22} strokeWidth={2} className="shrink-0" />
+          <span
+            className="material-symbols-outlined shrink-0 text-[24px] leading-none"
+            style={{ fontVariationSettings: "'FILL' 1" }}
+          >
+            logout
+          </span>
+
           {openSidebar && <span>Logout</span>}
         </button>
       </div>
