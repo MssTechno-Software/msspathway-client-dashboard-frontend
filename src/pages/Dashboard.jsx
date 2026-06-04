@@ -64,15 +64,11 @@ export default function Dashboard() {
 
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           <div className="lg:col-span-8">
-            <InterviewTable
-              interviews={data.recently_completed_interviews}
-            />
+            <InterviewTable interviews={data.recently_completed_interviews} />
           </div>
 
           <div className="lg:col-span-4">
-            <AnalyticsPanel
-              analytics={data.performance_analytics}
-            />
+            <AnalyticsPanel analytics={data.performance_analytics} />
           </div>
         </section>
       </main>
