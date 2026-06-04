@@ -1,47 +1,51 @@
 import { ChartColumnIncreasing } from "lucide-react";
+
 function AnalyticsPanel({ analytics }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6">
+    <div className="bg-white border border-[#dee2e6] rounded-xl p-6 shadow-sm">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
-        <div className="w-11 h-11 bg-green-50 rounded flex items-center justify-center">
+      <div className="flex items-center gap-3 mb-8">
+        <div className="w-10 h-10 bg-[#eff4ff] rounded-lg flex items-center justify-center">
           <ChartColumnIncreasing
-            size={22}
+            size={20}
             strokeWidth={2}
-            className="text-green-700"
+            className="text-[#3b6934]"
           />
         </div>
 
-        <h2 className="font-bold text-xl">
+        <h2 className="text-[20px] leading-[28px] font-bold text-[#230804]">
           Performance Analytics
         </h2>
       </div>
-      {Object.entries(analytics).map(
-        ([key, value]) => (
-          <div
-            key={key}
-            className="mb-6 last:mb-3"
-          >
-            <div className="flex justify-between mb-2">
-              <span className="uppercase text-xs">
-                {key.replaceAll("_", " ")}
-              </span>
 
-              <span>{value}%</span>
-            </div>
+      <div className="flex flex-col gap-8">
+        {Object.entries(analytics).map(
+          ([key, value]) => (
+            <div key={key}>
+              <div className="flex justify-between mb-3">
+                <span className="uppercase text-[10px] tracking-wider font-bold text-[#6c757d]">
+                  {key.replaceAll("_", " ")}
+                </span>
 
-            <div className="h-2 bg-gray-200 rounded">
-              <div
-                className="h-2 bg-green-700 rounded"
-                style={{
-                  width: `${value}%`,
-                }}
-              />
+                <span className="font-bold text-[#230804] text-sm">
+                  {value}%
+                </span>
+              </div>
+
+              <div className="w-full h-2 bg-[#e9ecef] rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#2d5a27] rounded-full"
+                  style={{
+                    width: `${value}%`,
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        )
-      )}
+          )
+        )}
+      </div>
     </div>
   );
 }
+
 export default AnalyticsPanel;
