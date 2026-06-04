@@ -1,71 +1,90 @@
 import { ExternalLink, FileText } from "lucide-react";
+
 function InterviewTable({ interviews }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl">
-      <div className="p-6 border-b border-gray-200 flex items-center gap-4">
-        <div className="w-11 h-11 bg-green-50 rounded flex items-center justify-center">
+    <div className="bg-white border border-[#dee2e6] rounded-xl shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="px-6 py-5 border-b border-[#dee2e6] flex items-center gap-3">
+        <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
           <FileText
-            size={22}
+            size={20}
             strokeWidth={2}
-            className="text-green-700"
+            className="text-[#2d5a27]"
           />
         </div>
 
-        <h2 className="font-bold text-xl">
+        <h2 className="text-[20px] leading-[28px] font-bold text-[#230804]">
           Recently Completed Interviews
         </h2>
       </div>
 
-      <table className="w-full">
-        <thead>
-          <tr className="text-left text-sm text-gray-500 uppercase bg-gray-50">
-            <th className="p-4">Date</th>
-            <th className="p-4">Mode</th>
-            <th className="p-4">Score</th>
-            <th className="p-4">Insights</th>
-          </tr>
-        </thead>
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-[#f8f9fa]">
+              <th className="px-6 py-4 text-left text-[11px] uppercase tracking-widest font-bold text-[#6c757d]">
+                Date
+              </th>
 
-        <tbody>
-          {interviews.map((item) => (
-            <tr
-              key={item.date}
-              className="border-t border-gray-200"
-            >
-              <td className="p-4.5 font-bold">{item.date}</td>
+              <th className="px-6 py-4 text-left text-[11px] uppercase tracking-widest font-bold text-[#6c757d]">
+                Mode
+              </th>
 
-              <td className="p-4.5">
-                {item.mode}
-              </td>
+              <th className="px-6 py-4 text-left text-[11px] uppercase tracking-widest font-bold text-[#6c757d]">
+                Score
+              </th>
 
-              <td className="p-4.5">
-                <span
-                  className={`px-3 py-1 rounded border border-gray-200
-                  ${item.score >= 70
-                      ? "bg-green-50 text-green-800 border-green-200 rounded-full"
-                      : "bg-red-50 text-red-800 border-red-200 rounded-full"
-                    }`}
-                >
-                  {item.score}/100
-                </span>
-              </td>
-
-              <td className="p-4.5">
-                <a
-                  href={item.insights_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-green-800 font-medium flex items-center gap-1 hover:underline"
-                >
-                  View Insights
-                  <ExternalLink size={16} />
-                </a>
-              </td>
+              <th className="px-6 py-4 text-right text-[11px] uppercase tracking-widest font-bold text-[#6c757d]">
+                Insights
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {interviews.map((item) => (
+              <tr
+                key={item.date}
+                className="border-t border-[#dee2e6] hover:bg-[#f8f9fa] transition-colors"
+              >
+                <td className="px-6 py-5 font-semibold text-[#230804] text-[16px]">
+                  {item.date}
+                </td>
+
+                <td className="px-6 py-5 text-[#6c757d] text-[16px]">
+                  {item.mode}
+                </td>
+
+                <td className="px-6 py-5">
+                  <span
+                    className={`px-3 py-1 text-xs font-bold border rounded-sm
+                      ${
+                        item.score >= 70
+                          ? "bg-green-50 text-[#2d5a27] border-green-200"
+                          : "bg-red-50 text-red-700 border-red-200"
+                      }`}
+                  >
+                    {item.score}/100
+                  </span>
+                </td>
+
+                <td className="px-6 py-5 text-right">
+                  <a
+                    href={item.insights_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[#2d5a27] font-bold text-sm hover:underline"
+                  >
+                    View Insights
+                    <ExternalLink size={14} />
+                  </a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
+
 export default InterviewTable;
