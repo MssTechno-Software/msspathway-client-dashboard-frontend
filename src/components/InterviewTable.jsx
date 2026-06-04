@@ -1,15 +1,14 @@
-import { ExternalLink, FileText } from "lucide-react";
-
 function InterviewTable({ interviews }) {
   return (
     <div className="bg-white border border-[#dee2e6] rounded-xl shadow-sm overflow-hidden">
       <div className="px-6 py-5 border-b border-[#dee2e6] flex items-center gap-3">
         <div className="w-10 h-10 shrink-0 bg-green-50 rounded-lg flex items-center justify-center">
-          <FileText
-            size={20}
-            strokeWidth={2}
-            className="text-[#2d5a27] shrink-0"
-          />
+          <span
+            className="material-symbols-outlined text-[#2d5a27] text-[24px] leading-none"
+            style={{ fontVariationSettings: "'FILL' 1" }}
+          >
+            assignment
+          </span>
         </div>
 
         <h2 className="text-[20px] leading-[28px] font-bold text-[#230804]">
@@ -73,7 +72,12 @@ function InterviewTable({ interviews }) {
                     className="inline-flex items-center gap-1 text-[#2d5a27] font-bold text-sm hover:underline"
                   >
                     View Insights
-                    <ExternalLink size={14} className="shrink-0" />
+                    <span
+                      className="material-symbols-outlined text-[16px] leading-none"
+                      style={{ fontVariationSettings: "'FILL' 0" }}
+                    >
+                      open_in_new
+                    </span>
                   </a>
                 </td>
               </tr>
