@@ -51,7 +51,7 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
           <img
             src="/title_mss_logo.png"
             alt="logo"
-            className="w-10 h-10 object-contain rounded"
+            className="w-10 h-10 object-contain rounded shrink-0"
           />
 
           {openSidebar && (
@@ -88,8 +88,7 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
                 }
               `}
             >
-              <Icon size={22} />
-
+              <Icon size={22} strokeWidth={2} className="shrink-0" />
               {openSidebar && <span>{item.label}</span>}
             </button>
           );
@@ -108,8 +107,7 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
             font-bold transition-all duration-150 active:scale-95 cursor-pointer
           `}
         >
-          <LogOut size={22} />
-
+          <LogOut size={22} strokeWidth={2} className="shrink-0" />
           {openSidebar && <span>Logout</span>}
         </button>
       </div>
