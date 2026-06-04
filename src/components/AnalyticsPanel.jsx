@@ -11,7 +11,7 @@ function AnalyticsPanel({ analytics }) {
           </span>
         </div>
 
-        <h2 className="text-[20px] leading-[28px] font-bold text-[#230804]">
+        <h2 className="text-[20px] leading-7 font-bold text-[#230804]">
           Performance Analytics
         </h2>
       </div>

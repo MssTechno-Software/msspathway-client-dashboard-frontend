@@ -1,6 +1,6 @@
 function StatCard({ title, value, message, type = "interviews" }) {
   return (
-    <div className="bg-white border border-[#dee2e6] rounded-xl shadow-sm p-8">
+    <div className="bg-white border-l-4 border-green-800 rounded-xl shadow-sm p-8">
       <div className="flex items-start gap-6">
         <div
           className={`

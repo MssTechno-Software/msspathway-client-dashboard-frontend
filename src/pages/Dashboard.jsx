@@ -37,11 +37,11 @@ export default function Dashboard() {
         `}
       >
         <header className="mb-10">
-          <h1 className="text-[32px] leading-[40px] font-bold tracking-[-0.01em] text-[#230804]">
+          <h1 className="text-[32px] leading-10 font-bold tracking-[-0.01em] text-[#230804]">
             Welcome back, Revanth
           </h1>
 
-          <p className="mt-2 text-[18px] leading-[28px] text-[#6c757d]">
+          <p className="mt-2 text-[18px] leading-7 text-[#6c757d]">
             Practice. Analyze. Improve. Repeat...
           </p>
         </header>

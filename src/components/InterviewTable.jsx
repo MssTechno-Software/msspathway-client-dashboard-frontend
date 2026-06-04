@@ -11,7 +11,7 @@ function InterviewTable({ interviews }) {
           </span>
         </div>
 
-        <h2 className="text-[20px] leading-[28px] font-bold text-[#230804]">
+        <h2 className="text-[20px] leading-7 font-bold text-[#230804]">
           Recently Completed Interviews
         </h2>
       </div>
@@ -29,7 +29,7 @@ function InterviewTable({ interviews }) {
               <th className="px-6 py-4 text-left text-[11px] uppercase tracking-widest font-bold text-[#6c757d]">
                 Score
               </th>
-              <th className="px-6 py-4 text-right text-[11px] uppercase tracking-widest font-bold text-[#6c757d]">
+              <th className="px-6 py-4 text-left text-[11px] uppercase tracking-widest font-bold text-[#6c757d]">
                 Insights
               </th>
             </tr>
@@ -64,7 +64,7 @@ function InterviewTable({ interviews }) {
                   </span>
                 </td>
 
-                <td className="px-6 py-5 text-right">
+                <td className="px-6 py-5 text-left">
                   <a
                     href={item.insights_url}
                     target="_blank"

@@ -29,7 +29,7 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
         className="
           absolute top-5 -right-4
           w-8 h-8 rounded-full
-          bg-[#2d5a27] text-white
+          bg-green-800 text-white
           flex items-center justify-center
           shadow-lg cursor-pointer
         "
@@ -47,11 +47,11 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
 
           {openSidebar && (
             <div>
-              <h2 className="text-[20px] leading-[28px] font-bold text-white">
+              <h2 className="text-[20px] leading-7 font-bold text-white">
                 MSS Techno
               </h2>
 
-              <p className="text-[12px] leading-[16px] uppercase tracking-[0.05em] text-white/60">
+              <p className="text-[12px] leading-4 tracking-wider text-white/60">
                 Client Dashboard
               </p>
             </div>
@@ -66,12 +66,12 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
             className={`
               w-full flex items-center
               ${openSidebar ? "justify-start gap-3" : "justify-center"}
-              px-4 py-3 rounded
-              text-[12px] leading-[16px] uppercase tracking-[0.05em]
+              px-4 py-3 rounded-xl
+              text-[12px] leading-4 uppercase tracking-wider
               transition-all duration-150 active:scale-95 cursor-pointer
               ${
                 item.active
-                  ? "bg-[#2d5a27] text-white font-bold shadow-sm"
+                  ? "bg-green-800 text-white font-bold shadow-sm"
                   : "text-white/80 hover:bg-white/10 font-semibold"
               }
             `}
@@ -92,16 +92,14 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
         <button
           onClick={handleLogout}
           className={`
-            w-full flex items-center
-            ${openSidebar ? "justify-start gap-3" : "justify-center"}
-            px-4 py-3 rounded
-            bg-[#2d5a27] hover:bg-[#23501e]
-            text-[12px] leading-[16px] uppercase tracking-[0.05em]
-            font-bold transition-all duration-150 active:scale-95 cursor-pointer
-          `}
+            w-full flex items-center justify-center
+            px-4 py-3 rounded-xl
+            bg-green-800 hover:bg-green-700
+            text-[12px] leading-4 uppercase tracking-wider 
+            font-bold transition-all duration-150 active:scale-95 cursor-pointer`}
         >
           <span
-            className="material-symbols-outlined shrink-0 text-[24px] leading-none"
+            className="material-symbols-outlined shrink-0 text-[12px] leading-none"
             style={{ fontVariationSettings: "'FILL' 1" }}
           >
             logout
@@ -109,6 +107,9 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
 
           {openSidebar && <span>Logout</span>}
         </button>
+        <p className="mt-4 text-sm text-white/60 text-center">
+          &copy; {new Date().getFullYear()} version 1.0.0
+        </p>
       </div>
     </aside>
   );
