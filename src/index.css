@@ -1,15 +1,13 @@
-/* @import "tailwindcss"; */
 @import url("https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap");
- 
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&display=swap");
+
 @import "tailwindcss";
- 
+
 body {
   font-family: "Hanken Grotesk", sans-serif;
   background: #f8f9fa;
   color: #212529;
 }
-
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&display=swap");
 
 .material-symbols-outlined {
   font-family: "Material Symbols Outlined";
