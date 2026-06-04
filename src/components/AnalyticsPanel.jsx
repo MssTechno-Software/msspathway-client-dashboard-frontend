@@ -1,15 +1,14 @@
-import { ChartColumnIncreasing } from "lucide-react";
-
 function AnalyticsPanel({ analytics }) {
   return (
     <div className="bg-white border border-[#dee2e6] rounded-xl p-6 shadow-sm">
       <div className="flex items-center gap-3 mb-8">
         <div className="w-10 h-10 shrink-0 bg-[#eff4ff] rounded-lg flex items-center justify-center">
-          <ChartColumnIncreasing
-            size={20}
-            strokeWidth={2}
-            className="text-[#3b6934] shrink-0"
-          />
+          <span
+            className="material-symbols-outlined text-[#3b6934] text-[24px] leading-none"
+            style={{ fontVariationSettings: "'FILL' 1" }}
+          >
+            bar_chart
+          </span>
         </div>
 
         <h2 className="text-[20px] leading-[28px] font-bold text-[#230804]">
