@@ -1,6 +1,6 @@
 function InterviewTable({ interviews }) {
   return (
-    <div className="bg-white border border-[#dee2e6] rounded-xl shadow-sm overflow-hidden">
+    <div className="bg-white border border-[#dee2e6] shadow-sm overflow-hidden">
       <div className="px-6 py-5 border-b border-[#dee2e6] flex items-center gap-3">
         <div className="w-10 h-10 shrink-0 bg-green-50 rounded-lg flex items-center justify-center">
           <span

@@ -1,4 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { FiHome, FiCalendar, FiUser, FiVideo, FiCheckSquare, FiLogOut} from "react-icons/fi";
 
 const menuItems = [
   { icon: "person", label: "My Profile" },
@@ -67,7 +68,7 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
               w-full flex items-center
               ${openSidebar ? "justify-start gap-3" : "justify-center"}
               px-4 py-3 rounded-xl
-              text-[12px] leading-4 uppercase tracking-wider
+              text-[12px] leading-4 tracking-wider
               transition-all duration-150 active:scale-95 cursor-pointer
               ${
                 item.active
@@ -78,7 +79,6 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
           >
             <span
               className="material-symbols-outlined shrink-0 text-[24px] leading-none"
-              style={{ fontVariationSettings: "'FILL' 1" }}
             >
               {item.icon}
             </span>
@@ -100,7 +100,6 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
         >
           <span
             className="material-symbols-outlined shrink-0 text-[12px] leading-none"
-            style={{ fontVariationSettings: "'FILL' 1" }}
           >
             logout
           </span>

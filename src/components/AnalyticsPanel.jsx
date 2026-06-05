@@ -1,6 +1,6 @@
 function AnalyticsPanel({ analytics }) {
   return (
-    <div className="bg-white border border-[#dee2e6] rounded-xl p-6 shadow-sm">
+    <div className="bg-white border border-[#dee2e6] p-6 shadow-sm">
       <div className="flex items-center gap-3 mb-8">
         <div className="w-10 h-10 shrink-0 bg-[#eff4ff] rounded-lg flex items-center justify-center">
           <span

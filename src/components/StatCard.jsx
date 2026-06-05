@@ -1,6 +1,6 @@
 function StatCard({ title, value, message, type = "interviews" }) {
   return (
-    <div className="bg-white border-l-4 border-green-800 rounded-xl shadow-sm p-8">
+    <div className="bg-white border-l-4 border-green-800 shadow-sm p-8">
       <div className="flex items-start gap-6">
         <div
           className={`
@@ -11,14 +11,12 @@ function StatCard({ title, value, message, type = "interviews" }) {
           {type === "performance" ? (
             <span
               className="material-symbols-outlined text-[#3b6934] text-[36px] leading-none"
-              style={{ fontVariationSettings: "'FILL' 1" }}
             >
               monitoring
             </span>
           ) : (
             <span
               className="material-symbols-outlined text-[#2d5a27] text-[36px] leading-none"
-              style={{ fontVariationSettings: "'FILL' 1" }}
             >
               work
             </span>
