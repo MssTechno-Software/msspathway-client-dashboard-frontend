@@ -1,6 +1,6 @@
 function AnalyticsPanel({ analytics }) {
   return (
-    <div className="bg-white border border-[#dee2e6] p-6 shadow-sm">
+    <div className="bg-white border border-[#dee2e6] p-6 shadow-sm h-full flex flex-col">
       <div className="flex items-center gap-3 mb-8">
         <div className="w-10 h-10 shrink-0 bg-[#eff4ff] rounded-lg flex items-center justify-center">
           <span
@@ -16,7 +16,7 @@ function AnalyticsPanel({ analytics }) {
         </h2>
       </div>
 
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col justify-between flex-1">
         {Object.entries(analytics).map(([key, value]) => (
           <div key={key}>
             <div className="flex justify-between mb-3">

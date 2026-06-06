@@ -50,19 +50,19 @@ export default function Dashboard() {
           <StatCard
             title="Total Interviews Completed"
             value={data.total_interviews_completed}
-            message="Keep up the good work!"
+            message="Keep up the good work! ❤  ፁ"
             type="interviews"
           />
 
           <StatCard
             title="Average Performance Score"
             value={`${data.average_performance_score}%`}
-            message={data.performance_message}
+            message="You're performing great! ✨"
             type="performance"
           />
         </section>
 
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-stretch">
           <div className="lg:col-span-8">
             <InterviewTable interviews={data.recently_completed_interviews} />
           </div>

@@ -1,6 +1,11 @@
 function StatCard({ title, value, message, type = "interviews" }) {
   return (
-    <div className="bg-white border-l-4 border-green-800 shadow-sm p-8">
+    <div
+      className={`
+        bg-white border border-[#dee2e6] shadow-sm p-8
+        ${type === "performance" ? "border-l-4 border-l-[#2d5a27]" : ""}
+      `}
+    >
       <div className="flex items-start gap-6">
         <div
           className={`
@@ -24,19 +29,28 @@ function StatCard({ title, value, message, type = "interviews" }) {
         </div>
 
         <div className="flex flex-col">
-          <span className="text-[11px] uppercase tracking-[0.15em] font-bold text-[#6c757d] mb-1">
+          <span className="text-[11px] uppercase tracking-[0.15em] font-bold text-[#6c757d]">
             {title}
           </span>
 
-          <h2 className="text-[64px] leading-none font-bold text-[#230804]">
+          <h2
+            className={`
+              text-[64px] leading-18
+              font-light
+              ${type === "performance" ? "text-[#3b6934]" : "text-[#230804]"}
+            `}
+          >
             {value}
           </h2>
 
           <p
-            className={`
-              mt-2 text-sm font-semibold
-              ${type === "performance" ? "text-[#3b6934]" : "text-[#2d5a27]"}
-            `}
+            className="
+              mt-2
+              text-[14px]
+              leading-5
+              font-semibold
+              text-[#3b6934]
+            "
           >
             {message}
           </p>

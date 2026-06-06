@@ -1,6 +1,6 @@
 function InterviewTable({ interviews }) {
   return (
-    <div className="bg-white border border-[#dee2e6] shadow-sm overflow-hidden">
+    <div className="bg-white border border-[#dee2e6] shadow-sm overflow-hidden h-full flex flex-col">
       <div className="px-6 py-5 border-b border-[#dee2e6] flex items-center gap-3">
         <div className="w-10 h-10 shrink-0 bg-green-50 rounded-lg flex items-center justify-center">
           <span
@@ -20,16 +20,16 @@ function InterviewTable({ interviews }) {
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-[#f8f9fa]">
-              <th className="px-6 py-4 text-left text-[11px] uppercase tracking-widest font-bold text-[#6c757d]">
+              <th className="px-6 py-4 text-left text-[12px] uppercase tracking-widest font-bold text-[#6c757d]">
                 Date
               </th>
-              <th className="px-6 py-4 text-left text-[11px] uppercase tracking-widest font-bold text-[#6c757d]">
+              <th className="px-6 py-4 text-left text-[12px] uppercase tracking-widest font-bold text-[#6c757d]">
                 Mode
               </th>
-              <th className="px-6 py-4 text-left text-[11px] uppercase tracking-widest font-bold text-[#6c757d]">
+              <th className="px-6 py-4 text-left text-[12px] uppercase tracking-widest font-bold text-[#6c757d]">
                 Score
               </th>
-              <th className="px-6 py-4 text-left text-[11px] uppercase tracking-widest font-bold text-[#6c757d]">
+              <th className="px-6 py-4 text-left text-[12px] uppercase tracking-widest font-bold text-[#6c757d]">
                 Insights
               </th>
             </tr>
