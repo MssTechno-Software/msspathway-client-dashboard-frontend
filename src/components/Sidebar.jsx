@@ -1,12 +1,32 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { FiHome, FiCalendar, FiUser, FiVideo, FiCheckSquare, FiLogOut} from "react-icons/fi";
-
+import { NavLink } from "react-router-dom";
 const menuItems = [
-  { icon: "person", label: "My Profile" },
-  { icon: "home", label: "Dashboard", active: true },
-  { icon: "video_chat", label: "Interview Modes" },
-  { icon: "calendar_today", label: "Scheduled for you" },
-  { icon: "fact_check", label: "Scorecards" },
+  {
+    icon: "person",
+    label: "My Profile",
+    path: "/profile"
+  },
+  {
+    icon: "home",
+    label: "Dashboard",
+    path: "/dashboard",
+    active: true
+  },
+  {
+    icon: "video_chat",
+    label: "Interview Modes",
+    path: "/interview-modes"
+  },
+  {
+    icon: "calendar_today",
+    label: "Scheduled for you",
+    path: "/scheduled"
+  },
+  {
+    icon: "fact_check",
+    label: "Scorecards",
+    path: "/scorecards"
+  },
 ];
 
 function Sidebar({ openSidebar, setOpenSidebar }) {
@@ -62,20 +82,21 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
 
       <nav className="flex-1 flex flex-col gap-1">
         {menuItems.map((item) => (
-          <button
+          <NavLink
             key={item.label}
-            className={`
-              w-full flex items-center
-              ${openSidebar ? "justify-start gap-3" : "justify-center"}
-              px-4 py-3 rounded-xl
-              text-[12px] leading-4 tracking-wider
-              transition-all duration-150 active:scale-95 cursor-pointer
-              ${
-                item.active
-                  ? "bg-green-800 text-white font-bold shadow-sm"
-                  : "text-white/80 hover:bg-white/10 font-semibold"
-              }
-            `}
+            to={item.path}
+            className={({ isActive }) =>
+              `
+                w-full flex items-center
+                ${openSidebar ? "justify-start gap-3" : "justify-center"}
+                px-4 py-3 rounded-xl
+                text-[12px] tracking-wider transition-all
+                ${isActive
+                  ? "bg-green-800 text-white font-bold"
+                  : "text-white/80 hover:bg-white/10"
+                }
+              `
+            }
           >
             <span
               className="material-symbols-outlined shrink-0 text-[24px] leading-none"
@@ -84,7 +105,7 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
             </span>
 
             {openSidebar && <span>{item.label}</span>}
-          </button>
+          </NavLink>
         ))}
       </nav>
 
