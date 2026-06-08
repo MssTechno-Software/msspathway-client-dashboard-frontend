@@ -34,7 +34,7 @@ function InterviewModes() {
       <div className="grid lg:grid-cols-3 gap-8">
         <ModeCard
           icon={
-            <span className="material-symbols-outlined text-[32px]">
+            <span className="material-symbols-outlined text-[32px] text-[#2d5a27] transition-colors duration-300 group-hover:text-white">
               record_voice_over
             </span>
           }
@@ -44,7 +44,7 @@ function InterviewModes() {
 
         <ModeCard
           icon={
-            <span className="material-symbols-outlined text-[32px]">
+            <span className="material-symbols-outlined text-[32px] text-[#2d5a27] transition-colors duration-300 group-hover:text-white">
               psychology
             </span>
           }
@@ -54,7 +54,7 @@ function InterviewModes() {
 
         <ModeCard
           icon={
-            <span className="material-symbols-outlined text-[32px]">
+            <span className="material-symbols-outlined text-[32px] text-[#2d5a27] transition-colors duration-300 group-hover:text-white">
               terminal
             </span>
           }
