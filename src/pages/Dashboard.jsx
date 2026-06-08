@@ -38,7 +38,7 @@ export default function Dashboard() {
         <StatCard
           title="Total Interviews Completed"
           value={data.total_interviews_completed}
-          message="Keep up the good work! ❤"
+          message="Keep up the good work! ❤ ፁ"
           type="interviews"
         />
 

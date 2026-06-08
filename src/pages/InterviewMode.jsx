@@ -69,6 +69,21 @@ function InterviewModes() {
           <h4 className="uppercase tracking-widest text-sm font-bold text-gray-500">
             Executive Summary
           </h4>
+          <div className="flex items-center gap-5">
+            <p className="text-[14px] text-[#514441]">
+              Last session: <span className="text-[#230804]">2 days ago</span>
+            </p>
+
+            <div className="w-px h-5 bg-[#dee2e6]" />
+
+            <div className="flex items-center gap-2">
+              <div className="w-2.5 h-2.5 rounded-full bg-[#2d5a27]" />
+
+              <span className="text-[14px] font-semibold text-[#2d5a27]">
+                Live System Status
+              </span>
+            </div>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-4 gap-10 p-10">
@@ -91,7 +106,7 @@ function InterviewModes() {
             </p>
 
             <h3 className="text-4xl font-bold text-green-700 mt-2">
-              82%
+              82%.
             </h3>
           </div>
 
