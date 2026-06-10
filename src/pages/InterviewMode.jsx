@@ -3,9 +3,14 @@ import {
   BrainCircuit,
   TerminalSquare,
 } from "lucide-react";
+import { useState } from "react";
 import ModeCard from "../components/ModeCard";
+import { useNavigate } from "react-router-dom";
 
 function InterviewModes() {
+  const [showBeginAssessmentModal, setShowBeginAssessmentModal] = useState(false);
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-[#FDFDFF] px-12 py-12">
       {/* Header */}
@@ -40,6 +45,13 @@ function InterviewModes() {
           }
           title="Self-Introduction Evaluation"
           description="Pitch yourself to AI scouts and receive deep impact scores on communication and presence."
+          onBeginAssessment={() =>
+            navigate("/self-introduction", {
+              state: {
+                showBeginAssessmentModal: true,
+              },
+            })
+          }
         />
 
         <ModeCard
@@ -64,76 +76,73 @@ function InterviewModes() {
       </div>
 
       {/* Executive Summary */}
-      <div className="mt-10 bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-        <div className="px-8 py-5 border-b border-gray-200 flex justify-between items-center">
-          <h4 className="uppercase tracking-widest text-sm font-bold text-gray-500">
+      <div className="mt-10 bg-white rounded-xl border border-[#dee2e6] overflow-hidden shadow-sm">
+        {/* Header */}
+        <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-5 border-b border-[#dee2e6]">
+          <h4 className="uppercase tracking-[0.15em] text-[11px] sm:text-xs font-semibold text-[#6c757d]">
             Executive Summary
           </h4>
-          <div className="flex items-center gap-5">
-            <p className="text-[14px] text-[#514441]">
-              Last session: <span className="text-[#230804]">2 days ago</span>
-            </p>
-
-            <div className="w-px h-5 bg-[#dee2e6]" />
-
-            <div className="flex items-center gap-2">
-              <div className="w-2.5 h-2.5 rounded-full bg-[#2d5a27]" />
-
-              <span className="text-[14px] font-semibold text-[#2d5a27]">
-                Live System Status
-              </span>
-            </div>
-          </div>
         </div>
 
-        <div className="grid md:grid-cols-4 gap-10 p-10">
+        {/* Content */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 lg:gap-8 p-4 sm:p-6 lg:p-8">
+
+          {/* Total Interviews */}
           <div>
-            <p className="text-xs uppercase text-gray-500 font-bold">
+            <p className="text-[11px] uppercase tracking-wider text-[#6c757d] font-semibold">
               Total Interviews
             </p>
 
-            <div className="flex items-end gap-2 mt-2">
-              <h3 className="text-4xl font-bold">24</h3>
-              <span className="text-green-700 font-semibold">
+            <div className="flex flex-wrap items-end gap-2 mt-2">
+              <h3 className="text-4xl lg:text-5xl font-bold text-[#230804]">
+                24
+              </h3>
+
+              <span className="text-sm text-[#2d5a27] font-semibold">
                 +2 this week
               </span>
             </div>
           </div>
 
+          {/* Impact Score */}
           <div>
-            <p className="text-xs uppercase text-gray-500 font-bold">
+            <p className="text-[11px] uppercase tracking-wider text-[#6c757d] font-semibold">
               Avg. Impact Score
             </p>
 
-            <h3 className="text-4xl font-bold text-green-700 mt-2">
-              82%.
+            <h3 className="text-4xl lg:text-5xl font-bold text-[#2d5a27] mt-2">
+              82%
             </h3>
           </div>
 
-          <div>
-            <p className="text-xs uppercase text-gray-500 font-bold">
-              Skills Verified
+          {/* Mock Session */}
+          <div className="bg-[#f8f9fa] border border-[#dee2e6] p-4 lg:p-5 rounded-xl">
+            <p className="uppercase text-[11px] tracking-wider text-black/60 font-semibold">
+              Next Mockup Session
             </p>
 
-            <h3 className="text-4xl font-bold mt-2">
-              12
-              <span className="text-base text-gray-500">
-                {" "}
-                /18 Target
-              </span>
+            <h3 className="text-xl lg:text-2xl font-bold mt-2 text-[#230804]">
+              Tomorrow, 10AM
             </h3>
+
+            <p className="text-sm lg:text-base text-black/80 mt-2">
+              Resume Based
+            </p>
           </div>
 
-          <div className="bg-[#230804] text-white p-5 rounded-xl">
-            <p className="uppercase text-xs text-white/60 font-bold">
-              Next Session
+          {/* Next Session */}
+          <div className="bg-[#230804] text-white p-4 lg:p-5 rounded-xl">
+            <p className="uppercase text-[11px] tracking-wider text-white/60 font-semibold">
+              Next REAL TIME Session
             </p>
 
-            <h3 className="text-3xl font-bold mt-2">
+            <h3 className="text-xl lg:text-2xl font-bold mt-2">
               Today, 2PM
             </h3>
 
-            <p className="text-white/80 mt-2">Infosys</p>
+            <p className="text-sm lg:text-base text-white/80 mt-2">
+              Infosys
+            </p>
           </div>
         </div>
       </div>

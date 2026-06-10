@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import axios from "axios";
 const menuItems = [
   {
     icon: "person",
@@ -30,9 +31,36 @@ const menuItems = [
 ];
 
 function Sidebar({ openSidebar, setOpenSidebar }) {
-  const handleLogout = () => {
-    localStorage.clear();
-    window.location.href = "/login";
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await axios.post(
+        "https://uat-msspathway-software-backend-81057313575.asia-south1.run.app/auth/logout",
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Logout Success:", response.data);
+    } catch (error) {
+      console.error(
+        "Logout Error:",
+        error.response?.data || error.message
+      );
+    } finally {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user_id");
+      localStorage.removeItem("employee_id");
+      localStorage.removeItem("role");
+
+      navigate("/login");
+    }
   };
 
   return (
@@ -92,9 +120,9 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
                 px-4 py-3 rounded-xl
                 text-[12px] tracking-wider transition-all
                 ${isActive
-                  ? "bg-green-800 text-white font-bold"
-                  : "text-white/80 hover:bg-white/10"
-                }
+                ? "bg-green-800 text-white font-bold"
+                : "text-white/80 hover:bg-white/10"
+              }
               `
             }
           >

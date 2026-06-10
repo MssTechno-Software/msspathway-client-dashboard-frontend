@@ -1,5 +1,6 @@
-import {FiCode, FiArrowRight} from "react-icons/fi";
-function ModeCard({ icon, title, description }) {
+import { useState } from "react";
+import { FiCode, FiArrowRight } from "react-icons/fi";
+function ModeCard({ icon, title, description, onBeginAssessment }) {
   return (
     <div className="group border border-[#d5c2bf] rounded-xl p-8 bg-white min-h-110 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition-all">
       <div>
@@ -16,7 +17,9 @@ function ModeCard({ icon, title, description }) {
         </p>
       </div>
 
-      <button className="mt-8 bg-[#2d5a27] hover:bg-[#23501e] text-white rounded-full py-4 font-bold flex items-center justify-center gap-2 cursor-pointer">
+      <button
+        onClick={onBeginAssessment}
+        className="mt-8 bg-[#2d5a27] hover:bg-[#23501e] text-white rounded-full py-4 font-bold flex items-center justify-center gap-2 cursor-pointer">
         BEGIN ASSESSMENT
         <FiArrowRight />
       </button>
