@@ -5,6 +5,7 @@ import {
   Navigate,
 } from "react-router-dom";
 
+import ProtectedRoute from "./components/ProtectedRoute";
 import AppLayout from "./pages/AppLayout";
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
@@ -18,11 +19,20 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Login Routes */}
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/login" element={<LoginPage />} />
+        <Route
+          path="/"
+          element={
+            localStorage.getItem("token")
+              ? <Navigate to="/dashboard" replace />
+              : <Navigate to="/login" replace />
+          }
+        />
 
-        {/* Protected Routes */}
+        <Route
+          path="/login"
+          element={<LoginPage />}
+        />
+
         <Route
           element={
             token ? (
@@ -33,31 +43,42 @@ function App() {
           }
         >
           <Route
-            path="/dashboard"
-            element={<Dashboard />}
+            path="/client-dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["client"]}>
+                <Dashboard />
+              </ProtectedRoute>
+            }
           />
 
           <Route
             path="/interview-modes"
-            element={<InterviewMode />}
+            element={
+              <ProtectedRoute allowedRoles={["client"]}>
+                <InterviewMode />
+              </ProtectedRoute>
+            }
           />
 
           <Route
             path="/self-introduction"
-            element={<SelfIntroductionQuestion />}
+            element={
+              <ProtectedRoute allowedRoles={["client"]}>
+                <SelfIntroductionQuestion />
+              </ProtectedRoute>
+            }
           />
 
           <Route
             path="/feedback"
-            element={<FeedbackPage />}
+            element={
+              <ProtectedRoute allowedRoles={["client"]}>
+                <FeedbackPage />
+              </ProtectedRoute>
+            }
           />
         </Route>
 
-        {/* Fallback */}
-        <Route
-          path="*"
-          element={<Navigate to="/" replace />}
-        />
       </Routes>
     </BrowserRouter>
   );

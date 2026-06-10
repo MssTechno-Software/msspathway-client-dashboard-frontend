@@ -10,7 +10,7 @@ const menuItems = [
   {
     icon: "home",
     label: "Dashboard",
-    path: "/dashboard",
+    path: "/client-dashboard",
     active: true
   },
   {

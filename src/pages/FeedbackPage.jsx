@@ -113,7 +113,7 @@ function FeedbackPage() {
 
           {/* RIGHT SECTION */}
           <div className="xl:col-span-5">
-            <div className="bg-white border border-[#d5c2bf] rounded-xl shadow-sm min-h-[650px] flex flex-col p-6">
+            <div className="bg-white border border-[#d5c2bf] rounded-xl shadow-sm min-h-162.5 flex flex-col p-6">
 
               <div className="flex items-center gap-3 mb-6">
                 <span className="w-2 h-2 rounded-full bg-[#3b6934]"></span>

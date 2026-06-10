@@ -101,20 +101,6 @@ function Login() {
         localStorage.setItem("user_id", userId);
       }
 
-      // Store employee_id (IMPORTANT FIX)
-      const empId =
-        response.data.employee_id ||
-        response.data.user?.employee_id ||
-        response.data.data?.employee_id;
-
-      console.log("Saving employee_id:", empId);
-
-      if (empId) {
-        localStorage.setItem("employee_id", empId);
-      } else {
-        console.error("employee_id NOT FOUND in response");
-      }
-
       // Store role
       const role =
         response.data.role ||
@@ -133,10 +119,10 @@ function Login() {
       setPageLoading(true);
       setTimeout(() => {
         const formattedRole = role?.toLowerCase()?.trim();
-        if (formattedRole === "employee") {
-          navigate("/employee-dashboard");
+        if (formattedRole === "client") {
+          navigate("/client-dashboard");
         } else {
-          navigate("/dashboard");
+          navigate("/login");
         }
       }, 500);
     } catch (error) {
