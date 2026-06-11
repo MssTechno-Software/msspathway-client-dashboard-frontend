@@ -22,9 +22,7 @@ function App() {
         <Route
           path="/"
           element={
-            localStorage.getItem("token")
-              ? <Navigate to="/client-dashboard" replace />
-              : <Navigate to="/login" replace />
+            <Navigate to="/login" replace />
           }
         />
 
