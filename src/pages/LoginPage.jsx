@@ -65,10 +65,9 @@ function Login() {
       );
 
       console.log("FULL RESPONSE:", response.data);
+      console.log("Client ID:", response.data.client_id);
 
       localStorage.removeItem("token");
-      localStorage.removeItem("user_id");
-      localStorage.removeItem("employee_id");
 
       // Store token
       const accessToken =

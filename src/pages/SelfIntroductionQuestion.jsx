@@ -21,7 +21,7 @@ function SelfIntroductionQuestion() {
     const navigate = useNavigate();
     const [isRecording, setIsRecording] = useState(false);
     const [waveScale, setWaveScale] = useState(1);
-    const [timeLeft, setTimeLeft] = useState(105);
+    const [timeLeft, setTimeLeft] = useState(119);
 
     const {
         transcript,
@@ -84,13 +84,21 @@ function SelfIntroductionQuestion() {
         setIsRecording(false);
     };
 
+    useEffect(() => {
+        if (location.state?.retry) {
+            resetTranscript();
+            setTimeLeft(119);
+            setIsRecording(false);
+        }
+    }, [location.state]);
+
     const Waveform = () => {
         if (!isRecording) return null;
 
         const bars = [28, 40, 22, 34, 18, 30, 42];
 
         return (
-            <div className="flex items-center justify-center gap-[4px] mt-8 h-[60px]">
+            <div className="flex items-center justify-center gap-1 mt-8 h-15">
                 {bars.map((height, index) => (
                     <div
                         key={index}
@@ -118,11 +126,11 @@ function SelfIntroductionQuestion() {
                         Interview Modes
                     </span>
                     <span>›</span>
-                    <span className="text-[#3b6934]">
+                    <span>
                         Self Introduction
                     </span>
                     <span>›</span>
-                    <span>Question 1</span>
+                    <span className="text-[#3b6934]">Question 1</span>
                 </div>
             </div>
 
@@ -132,7 +140,7 @@ function SelfIntroductionQuestion() {
                     {/* LEFT SECTION */}
                     <div className="xl:col-span-7">
                         {/* Interview Card */}
-                        <div className="bg-white border border-[#d5c2bf] rounded-xl shadow-sm min-h-[650px] flex flex-col items-center justify-center relative overflow-hidden">
+                        <div className="bg-white border border-[#d5c2bf] rounded-xl shadow-sm min-h-162.5 flex flex-col items-center justify-center relative overflow-hidden">
 
                             {/* Avatar */}
                             <div className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-xl border-4 border-[#bcf1ad] p-1 bg-white">

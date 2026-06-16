@@ -68,7 +68,15 @@ function FeedbackPage() {
                   </div>
                 </div>
 
-                <button className="w-full sm:w-auto border border-[#3b6934] text-[#3b6934] px-4 sm:px-8 py-3 sm:py-4 rounded-lg font-bold uppercase flex items-center justify-center gap-2 hover:bg-[#3b6934]/5 transition">
+                <button 
+                  onClick={() => 
+                    navigate("/self-introduction",
+                      {
+                        state: {retry : true},
+                      }
+                    )
+                  }
+                  className="w-full sm:w-auto border border-[#3b6934] text-[#3b6934] px-4 sm:px-8 py-3 sm:py-4 rounded-lg font-bold uppercase flex items-center justify-center gap-2 hover:bg-[#3b6934]/5 transition">
                   <RefreshCw size={18} />
                   Retry Question
                 </button>
