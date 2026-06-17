@@ -5,10 +5,16 @@ import {
   TrendingUp,
   Lightbulb,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function FeedbackPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const feedbackData = location.state?.feedbackData;
+  const transcript = location.state?.transcript;
+  const question = location.state?.question;
+  const currentQuestionIndex = location.state?.currentQuestionIndex;
+  const questions = location.state?.questions;
 
   return (
     <div className="bg-white min-h-screen">
@@ -63,18 +69,20 @@ function FeedbackPage() {
                     />
 
                     <h2 className="text-2xl sm:text-3xl lg:text-[42px] font-bold text-[#3b6934]">
-                      85 <span className="text-[28px] text-[#514441]">/100</span>
+                      {feedbackData?.evaluation?.overall_score || 0} <span className="text-[28px] text-[#514441]">/100</span>
                     </h2>
                   </div>
                 </div>
 
-                <button 
-                  onClick={() => 
-                    navigate("/self-introduction",
-                      {
-                        state: {retry : true},
-                      }
-                    )
+                <button
+                  onClick={() =>
+                    navigate("/self-introduction", {
+                      state: {
+                        retry: true,
+                        retryQuestionIndex: currentQuestionIndex,
+                        questions: questions || [],
+                      },
+                    })
                   }
                   className="w-full sm:w-auto border border-[#3b6934] text-[#3b6934] px-4 sm:px-8 py-3 sm:py-4 rounded-lg font-bold uppercase flex items-center justify-center gap-2 hover:bg-[#3b6934]/5 transition">
                   <RefreshCw size={18} />
@@ -91,26 +99,35 @@ function FeedbackPage() {
                   Comprehensive Strengths
                 </h3>
 
-                <ul className="space-y-4 sm:space-y-5 text-[#0b1c30] text-sm sm:text-base lg:text-lg">
-                  <li>
-                    • Clear articulation and professional tone throughout the response.
-                  </li>
+                <ul>
+                  {feedbackData?.evaluation?.strengths?.map((strength, index) => (
+                    <li key={index}>• {strength}</li>
+                  ))}
+                </ul>
+              </div>
 
-                  <li>
-                    • Relevant executive experience mentioned, specifically focusing on leadership milestones.
-                  </li>
+              {/* Overall Feedback */}
+              <div className="mt-8 p-4 bg-[#f8f9ff] rounded-lg border border-[#d5c2bf]">
+                <h3 className="font-bold mb-2 text-[#3b6934]">
+                  Overall Feedback
+                </h3>
 
-                  <li>
-                    • Strong use of industry-specific terminology which demonstrates domain expertise.
-                  </li>
+                <p className="text-[#514441] leading-7">
+                  {feedbackData?.evaluation?.overall_feedback}
+                </p>
+              </div>
 
-                  <li>
-                    • Excellent pacing and vocal clarity maintained during the entire session.
-                  </li>
+              {/* Improvement Areas */}
+              <div className="mt-6">
+                <h3 className="text-red-600 font-bold uppercase flex items-center gap-2 mb-4">
+                  <Lightbulb size={18} />
+                  Improvement Areas
+                </h3>
 
-                  <li>
-                    • Effective structuring of the narrative from early career to current leadership roles.
-                  </li>
+                <ul className="space-y-3 text-[#0b1c30]">
+                  {feedbackData?.evaluation?.improvement_areas?.map((item, index) => (
+                    <li key={index}>• {item}</li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -136,26 +153,14 @@ function FeedbackPage() {
                 {/* AI Prompt */}
                 <div className="bg-[#f1f4f9] border-l-4 border-[#3b6934] p-4 mb-8">
                   <p className="italic text-[#514441] text-sm sm:text-base leading-7 sm:leading-8">
-                    AI: Tell us about your professional background
-                    and the key milestones that have shaped your
-                    career.
+                    AI: {question}
                   </p>
                 </div>
 
                 {/* Transcript */}
                 <div className="space-y-8">
                   <p className="text-[#0b1c30] text-sm sm:text-base lg:text-lg leading-7 lg:leading-10">
-                    Vertical scaling, or scaling up, involves adding
-                    more power—like CPU, RAM, or storage—to an
-                    existing server. The main advantage is simplicity,
-                    as it doesn't require changes to the application
-                    architecture...
-                  </p>
-
-                  <p className="text-[#3b6934] text-lg">
-                    Throughout my fifteen-year career in technology
-                    leadership, I've focused on building resilient
-                    systems and high-performing teams.
+                    {transcript}
                   </p>
                 </div>
               </div>
@@ -172,7 +177,7 @@ function FeedbackPage() {
           Next Question
         </button>
       </div>
-    </div>
+    </div >
   );
 }
 

@@ -1,10 +1,5 @@
-import {
-    Mic,
-    SkipForward,
-    CheckCircle,
-    Timer,
-    Square,
-} from "lucide-react";
+import BASE_URL from "../config/api";
+import { Mic, SkipForward, CheckCircle, Timer, Square } from "lucide-react";
 
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -23,11 +18,20 @@ function SelfIntroductionQuestion() {
     const [waveScale, setWaveScale] = useState(1);
     const [timeLeft, setTimeLeft] = useState(119);
 
+    const [questions, setQuestions] = useState([]);
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+
     const {
         transcript,
         resetTranscript,
         browserSupportsSpeechRecognition,
     } = useSpeechRecognition();
+
+    useEffect(() => {
+        if (location.state?.questions) {
+            setQuestions(location.state.questions);
+        }
+    }, [location.state]);
 
     useEffect(() => {
         if (location.state?.showBeginAssessmentModal) {
@@ -84,14 +88,22 @@ function SelfIntroductionQuestion() {
         setIsRecording(false);
     };
 
+    //retry useEffect
     useEffect(() => {
         if (location.state?.retry) {
+            stopRecording();
             resetTranscript();
             setTimeLeft(119);
-            setIsRecording(false);
+
+            if (location.state?.retryQuestionIndex !== undefined) {
+                setCurrentQuestionIndex(
+                    location.state.retryQuestionIndex
+                );
+            }
         }
     }, [location.state]);
 
+    //wave component
     const Waveform = () => {
         if (!isRecording) return null;
 
@@ -114,6 +126,73 @@ function SelfIntroductionQuestion() {
         );
     };
 
+    //get question api call
+    const handleStartInterview = async () => {
+        try {
+            const response = await fetch(
+                `${BASE_URL}/questions/self-introduction-questions`
+            );
+            console.log("Self Intrpduction Questions fetched");
+            const data = await response.json();
+
+            setQuestions(data.questions || []);
+            setCurrentQuestionIndex(0);
+
+            setShowModal(false);
+        } catch (error) {
+            console.error("Failed to fetch questions:", error);
+        }
+    };
+
+    //skip question logic
+    const handleSkipQuestion = () => {
+        stopRecording();
+        resetTranscript();
+        setTimeLeft(119);
+
+        if (currentQuestionIndex < questions.length - 1) {
+            setCurrentQuestionIndex((prev) => prev + 1);
+        } else {
+            navigate("/feedback");
+        }
+    };
+
+    //submit answer api call
+    const handleSubmitAnswer = async () => {
+        try {
+            const currentQuestion = questions[currentQuestionIndex];
+
+            const response = await fetch(
+                `${BASE_URL}/questions/clients/1/questions/${currentQuestion.id}/submit-answer`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        answer_text: transcript,
+                    }),
+                }
+            );
+
+            const data = await response.json();
+
+            console.log("Submit Response:", data);
+
+            navigate("/feedback", {
+                state: {
+                    feedbackData: data,
+                    transcript,
+                    question: currentQuestion.question_text,
+                    questions,
+                    currentQuestionIndex,
+                },
+            });
+        } catch (error) {
+            console.error("Submit failed:", error);
+        }
+    };
+
     return (
         <div className="bg-white min-h-screen">
             {/* Header */}
@@ -130,7 +209,7 @@ function SelfIntroductionQuestion() {
                         Self Introduction
                     </span>
                     <span>›</span>
-                    <span className="text-[#3b6934]">Question 1</span>
+                    <span className="text-[#3b6934]">Question {currentQuestionIndex + 1}</span>
                 </div>
             </div>
 
@@ -188,9 +267,8 @@ function SelfIntroductionQuestion() {
                                 </p>
 
                                 <h2 className="text-xl sm:text-2xl lg:text-[28px] leading-8 sm:leading-10 font-bold">
-                                    Tell us about your professional
-                                    background and the key milestones
-                                    that have shaped your career.
+                                    {questions[currentQuestionIndex]?.question_text ||
+                                        "Loading question..."}
                                 </h2>
                             </div>
                         </div>
@@ -222,13 +300,15 @@ function SelfIntroductionQuestion() {
                                 )}
                             </button>
 
-                            <button className="w-full flex-1 border-2 border-[#3b6934] text-[#3b6934] py-4 rounded-lg flex items-center justify-center gap-2 font-bold uppercase hover:bg-[#3b6934]/5">
+                            <button
+                                onClick={handleSkipQuestion}
+                                className="w-full flex-1 border-2 border-[#3b6934] text-[#3b6934] py-4 rounded-lg flex items-center justify-center gap-2 font-bold uppercase hover:bg-[#3b6934]/5">
                                 <SkipForward size={18} />
                                 Skip Question
                             </button>
 
                             <button
-                                onClick={() => navigate("/feedback")}
+                                onClick={handleSubmitAnswer}
                                 className="w-full flex-1 bg-[#3b6934] hover:bg-[#2f5a29] text-white py-4 rounded-lg flex items-center justify-center gap-2 font-bold uppercase">
                                 <CheckCircle size={18} />
                                 Submit Answer
@@ -255,9 +335,7 @@ function SelfIntroductionQuestion() {
                                 {/* AI Prompt */}
                                 <div className="bg-[#f1f4f9] border-l-4 border-[#3b6934] p-4 mb-8">
                                     <p className="italic text-[#514441] text-[16px] leading-8">
-                                        AI: Tell us about your professional
-                                        background and the key milestones
-                                        that have shaped your career.
+                                        AI: {questions[currentQuestionIndex]?.question_text}
                                     </p>
                                 </div>
 
@@ -282,10 +360,7 @@ function SelfIntroductionQuestion() {
             <BeginAssessmentModal
                 open={showModal}
                 onClose={() => setShowModal(false)}
-                onProceed={() => {
-                    setShowModal(false);
-                    console.log("Interview Started");
-                }}
+                onProceed={handleStartInterview}
             />
         </div>
     );
