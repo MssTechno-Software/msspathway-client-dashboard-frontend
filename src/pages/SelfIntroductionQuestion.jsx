@@ -140,10 +140,14 @@ function SelfIntroductionQuestion() {
 
             console.log("Self Introduction Questions fetched", data);
 
-            setQuestions(data.questions || []);
+            const enabledQuestions = (data.questions || []).filter(
+                (question) => question.status === "enabled"
+            );
+
+            setQuestions(enabledQuestions);
 
             const firstUnattemptedIndex =
-                data.questions.findIndex(
+                enabledQuestions.findIndex(
                     (q) => q.attempted_status === false
                 );
 

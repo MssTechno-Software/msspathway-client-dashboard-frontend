@@ -27,18 +27,18 @@ function FeedbackPage() {
           >
             Interview Modes
           </span>
-
           <span>›</span>
-
           <span
             onClick={() => navigate("/self-introduction")}
             className="cursor-pointer hover:text-[#3b6934]"
           >
             Self Introduction
           </span>
-
           <span>›</span>
-
+          <span>
+            Question {questions?.[currentQuestionIndex]?.question_id || currentQuestionIndex + 1}
+          </span>
+          <span>›</span>
           <span className="text-[#3b6934]">
             Feedback
           </span>
