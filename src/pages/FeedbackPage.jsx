@@ -172,9 +172,25 @@ function FeedbackPage() {
           </div>
         </div>
         {/* Next Question */}
-        <button className="mt-6 w-full bg-[#3b6934] hover:bg-[#2f5a29] text-white py-4 sm:py-5 rounded-lg flex items-center justify-center gap-3 font-bold uppercase transition">
+        <button
+          onClick={() => {
+            if (currentQuestionIndex < questions.length - 1) {
+              navigate("/self-introduction", {
+                state: {
+                  questions,
+                  nextQuestionIndex: currentQuestionIndex + 1,
+                },
+              });
+            } else {
+              navigate("/interview-modes");
+            }
+          }}
+          className="mt-6 w-full bg-[#3b6934] hover:bg-[#2f5a29] text-white py-4 sm:py-5 rounded-lg flex items-center justify-center gap-3 font-bold uppercase transition"
+        >
           <ArrowRight size={20} />
-          Next Question
+          {currentQuestionIndex < questions.length - 1
+            ? "Next Question"
+            : "Finish Interview"}
         </button>
       </div>
     </div >

@@ -103,6 +103,23 @@ function SelfIntroductionQuestion() {
         }
     }, [location.state]);
 
+    //next question useEffect
+    useEffect(() => {
+        if (
+            location.state?.nextQuestionIndex !== undefined
+        ) {
+            setQuestions(location.state.questions || []);
+
+            setCurrentQuestionIndex(
+                location.state.nextQuestionIndex
+            );
+
+            resetTranscript();
+            setTimeLeft(119);
+            stopRecording();
+        }
+    }, [location.state]);
+
     //wave component
     const Waveform = () => {
         if (!isRecording) return null;
