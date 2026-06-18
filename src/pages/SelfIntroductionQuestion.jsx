@@ -20,6 +20,7 @@ function SelfIntroductionQuestion() {
 
     const [questions, setQuestions] = useState([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    const currentQuestion = questions[currentQuestionIndex];
 
     const {
         transcript,
@@ -338,7 +339,14 @@ function SelfIntroductionQuestion() {
 
                             <button
                                 onClick={handleSkipQuestion}
-                                className="w-full flex-1 border-2 border-[#3b6934] text-[#3b6934] py-4 rounded-lg flex items-center justify-center gap-2 font-bold uppercase hover:bg-[#3b6934]/5">
+                                disabled={currentQuestion?.attempted_status}
+                                className={`w-full flex-1 py-4 rounded-lg flex items-center justify-center gap-2 font-bold uppercase transition
+                                    ${currentQuestion?.attempted_status
+                                        ? "bg-gray-200 text-gray-500 cursor-not-allowed border-2 border-gray-300"
+                                        : "border-2 border-[#3b6934] text-[#3b6934] hover:bg-[#3b6934]/5"
+                                    }
+                                `}
+                            >
                                 <SkipForward size={18} />
                                 Skip Question
                             </button>
