@@ -126,17 +126,32 @@ function SelfIntroductionQuestion() {
         );
     };
 
-    //get question api call
+    //get question by client_id api call
+    const clientId = localStorage.getItem("client_id");
+    console.log("Client ID:", clientId);
+
     const handleStartInterview = async () => {
         try {
             const response = await fetch(
-                `${BASE_URL}/questions/self-introduction-questions`
+                `${BASE_URL}/questions/clients/${clientId}/self-introduction-questions`
             );
-            console.log("Self Intrpduction Questions fetched");
+
             const data = await response.json();
 
+            console.log("Self Introduction Questions fetched", data);
+
             setQuestions(data.questions || []);
-            setCurrentQuestionIndex(0);
+
+            const firstUnattemptedIndex =
+                data.questions.findIndex(
+                    (q) => q.attempted_status === false
+                );
+
+            setCurrentQuestionIndex(
+                firstUnattemptedIndex !== -1
+                    ? firstUnattemptedIndex
+                    : 0
+            );
 
             setShowModal(false);
         } catch (error) {

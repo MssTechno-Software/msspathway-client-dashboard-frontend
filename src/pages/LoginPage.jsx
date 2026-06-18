@@ -67,6 +67,15 @@ function Login() {
       console.log("FULL RESPONSE:", response.data);
       console.log("Client ID:", response.data.client_id);
 
+      const clientId =
+        response.data.client_id ||
+        response.data.user?.client_id ||
+        response.data.data?.client_id;
+
+      if (clientId) {
+        localStorage.setItem("client_id", clientId);
+      }
+
       localStorage.removeItem("token");
 
       // Store token
