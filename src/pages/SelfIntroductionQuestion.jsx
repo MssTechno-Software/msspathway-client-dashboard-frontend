@@ -145,13 +145,12 @@ function SelfIntroductionQuestion() {
     };
 
     //get question by client_id api call
-    const clientId = localStorage.getItem("client_id");
-    console.log("Client ID:", clientId);
+    const client_id = localStorage.getItem("client_id");
 
     const handleStartInterview = async () => {
         try {
             const response = await fetch(
-                `${BASE_URL}/questions/clients/${clientId}/self-introduction-questions`
+                `${BASE_URL}/questions/clients/${client_id}/self-introduction-questions`
             );
 
             const data = await response.json();
@@ -198,9 +197,11 @@ function SelfIntroductionQuestion() {
     const handleSubmitAnswer = async () => {
         try {
             const currentQuestion = questions[currentQuestionIndex];
+            console.log("Current Question:", currentQuestion);
+            console.log("Question ID:", currentQuestion?.question_id);
 
             const response = await fetch(
-                `${BASE_URL}/questions/clients/1/questions/${currentQuestion.id}/submit-answer`,
+                `${BASE_URL}/questions/clients/${client_id}/questions/${currentQuestion.question_id}/submit-answer`,
                 {
                     method: "POST",
                     headers: {
