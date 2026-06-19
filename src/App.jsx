@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import InterviewMode from "./pages/InterviewMode";
 import SelfIntroductionQuestion from "./pages/SelfIntroductionQuestion";
 import FeedbackPage from "./pages/FeedbackPage";
+import ScheduledInterviewPage from "./pages/ScheduledInterviewPage"
 
 function App() {
   const token = localStorage.getItem("token");
@@ -75,8 +76,16 @@ function App() {
               </ProtectedRoute>
             }
           />
-        </Route>
 
+          <Route 
+            path="/scheduled-Interview"
+            element={
+              <ProtectedRoute allowedRoles={["client"]}>
+                <ScheduledInterviewPage />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

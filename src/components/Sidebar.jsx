@@ -21,7 +21,7 @@ const menuItems = [
   {
     icon: "calendar_today",
     label: "Scheduled for you",
-    path: "/scheduled"
+    path: "/scheduled-Interview"
   },
   {
     icon: "fact_check",
