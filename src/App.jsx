@@ -14,6 +14,7 @@ import SelfIntroductionQuestion from "./pages/SelfIntroductionQuestion";
 import FeedbackPage from "./pages/FeedbackPage";
 import TheoryTopic from "./pages/TheoryTopic";
 import SubTopic from "./pages/SubTopicPage";
+import TheoryStartModule from "./pages/TheoryStartModule";
 import ScheduledInterviewPage from "./pages/ScheduledInterviewPage";
 
 function App() {
@@ -101,7 +102,7 @@ function App() {
             path="/theory-interview-start-module"
             element={
               <ProtectedRoute allowedRoles={["client"]}>
-                <SubTopic />
+                <TheoryStartModule />
               </ProtectedRoute>
             }
           />

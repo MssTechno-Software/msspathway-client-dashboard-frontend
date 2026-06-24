@@ -2,12 +2,15 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FiLoader } from "react-icons/fi";
 
-function TheoryConfiguration() {
+function TheoryStartModule() {
     const navigate = useNavigate();
     const { state } = useLocation();
 
     const topic = state?.topic || "";
     const subTopic = state?.subTopic || "";
+
+    console.log(topic);
+    console.log(subTopic);
 
     const [loading, setLoading] = useState(false);
     const [difficulty, setDifficulty] = useState("Easy");
@@ -26,11 +29,21 @@ function TheoryConfiguration() {
             )}
 
             {/* Breadcrumb */}
-            <div className="h-16 border-b border-[#d5c2bf] flex items-center px-12">
-                <div className="flex items-center gap-2 text-xs uppercase font-bold text-[#514441]">
-                    <span>Interview Modes</span>
+            <div className="h-auto min-h-16 border-b border-[#d5c2bf] flex items-center px-4 sm:px-6 lg:px-12 py-4">
+                <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm font-bold uppercase text-[#514441]">
+                    <span
+                        onClick={() => navigate("/interview-modes")}
+                        className="cursor-pointer hover:text-[#3b6934]"
+                    >
+                        Interview Modes
+                    </span>
                     <span>›</span>
-                    <span>Theory Topic</span>
+                    <span
+                        onClick={() => navigate("/theory-topic")}
+                        className="cursor-pointer hover:text-[#3b6934]"
+                    >
+                        Coding Topic
+                    </span>
                     <span>›</span>
                     <span>{topic}</span>
                     <span>›</span>
@@ -75,11 +88,10 @@ function TheoryConfiguration() {
                                 <div
                                     onClick={() => setDifficulty("Easy")}
                                     className={`cursor-pointer border rounded-lg p-5 transition
-                                    ${
-                                        difficulty === "Easy"
+                                    ${difficulty === "Easy"
                                             ? "border-2 border-[#3b6934] bg-[#eff4ff]"
                                             : "border-[#d5c2bf]"
-                                    }`}
+                                        }`}
                                 >
                                     <div className="flex justify-between mb-4">
                                         <span className="material-symbols-outlined text-[#3b6934]">
@@ -145,11 +157,23 @@ function TheoryConfiguration() {
                                 Environment Preview
                             </h3>
 
-                            <img
-                                src="/interview-preview.png"
-                                alt="preview"
-                                className="rounded-lg w-full h-44 object-cover"
-                            />
+                            <div className="relative w-full h-56 overflow-hidden rounded-lg">
+                                <img
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDy8mY4x9bAwlXONIEjO2lz6JnpfBxga_PH_aJZpauK8XAAbbB4P7MNbN-kIub0GqnEXYmQRY8A7YRy_wGl6ug0Pz_NN6-MCSsauobw8jNmhPtQGiMvuhCFWIB4OpfOfm2Y-PVnrTuFBmM3SMOnCrDO1BVnnlZuHhVe0K6-4Z4qw_aXq6_8Be0QubTJxAyyxHxykpAsCrpkwdRk1Skj8kcy623Lzuv2BXlA6DWebdP-DhodYhPMdDdkfg4IoYy7rd1v5Q62TfAOtI-B"
+                                    alt="Interview Preview"
+                                    className="w-full h-full object-cover grayscale opacity-70"
+                                />
+
+                                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent flex items-end p-4">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+
+                                        <span className="text-white text-xs uppercase tracking-wider font-semibold">
+                                            AI System Ready
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
 
                             <div className="bg-[#eff4ff] p-4 rounded-lg mt-4">
                                 <p className="italic text-center text-sm text-[#514441]">
@@ -193,4 +217,4 @@ function TheoryConfiguration() {
     );
 }
 
-export default TheoryConfiguration;
+export default TheoryStartModule;
