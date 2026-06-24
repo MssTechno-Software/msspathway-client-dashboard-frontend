@@ -1,57 +1,66 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Code2, FileCode, Braces, Atom, Coffee, Brain, CheckCircle, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { FiLoader } from "react-icons/fi";
 
-const topics = [
-    {
-        id: 1,
-        name: "HTML",
-        icon: <Code2 size={22} />,
-        description:
-            "Covers System Architecture, Design Patterns, and the Software Development Life Cycle (SDLC).",
-    },
-    {
-        id: 2,
-        name: "CSS",
-        icon: <FileCode size={22} />,
-        description:
-            "CI/CD pipelines, containerization with Kubernetes, infrastructure as code, and site reliability.",
-    },
-    {
-        id: 3,
-        name: "JavaScript",
-        icon: <Braces size={22} />,
-        description:
-            "Statistical analysis, data modeling, big data architectures, and advanced predictive analytics.",
-    },
-    {
-        id: 4,
-        name: "React",
-        icon: <Atom size={22} />,
-        description:
-            "Threat modeling, encryption standards, network security protocols, and incident response.",
-    },
-    {
-        id: 5,
-        name: "Java",
-        icon: <Coffee size={22} />,
-        description:
-            "AWS/Azure/GCP service ecosystems, serverless paradigms, and cloud-native scaling strategies.",
-    },
-    {
-        id: 6,
-        name: "Python",
-        icon: <Brain size={22} />,
-        description:
-            "Neural networks, LLM fine-tuning, ethics in AI, and reinforcement learning frameworks.",
-    },
-];
-
 function TheoryTopic() {
-    const [selectedTopic, setSelectedTopic] = useState("HTML");
+    const [topics, setTopics] = useState([]);
+    const [selectedTopic, setSelectedTopic] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const [popup, setPopup] = useState({
+        show: false,
+        message: "",
+        type: "", // success | error
+    });
+
+    useEffect(() => {
+        fetchTechnologies();
+    }, []);
+
+    const fetchTechnologies = async () => {
+        try {
+            setLoading(true);
+
+            const response = await fetch(
+                "https://uat-msspathway-software-backend-81057313575.asia-south1.run.app/Topic_based/clients/1/technologies"
+            );
+
+            const data = await response.json();
+
+            if (data?.technologies) {
+                const sortedTopics = data.technologies.sort(
+                    (a, b) => a.display_order - b.display_order
+                );
+
+                setTopics(sortedTopics);
+
+                if (sortedTopics.length > 0) {
+                    setSelectedTopic(sortedTopics[0].technology_name);
+                }
+                setPopup({
+                    show: true,
+                    message:
+                        data.message ||
+                        data.detail ||
+                        "Technologies loaded successfully",
+                    type: "success",
+                });
+            }
+        } catch (error) {
+            console.error("Error fetching technologies:", error);
+            setPopup({
+                show: true,
+                message:
+                    error.message ||
+                    error.detail ||
+                    "Failed to load technologies",
+                type: "error",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="bg-white min-h-screen">
@@ -102,15 +111,15 @@ function TheoryTopic() {
                 <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {topics.map((topic) => (
                         <div
-                            key={topic.id}
-                            onClick={() => setSelectedTopic(topic.name)}
+                            key={topic.technology_id}
+                            onClick={() => setSelectedTopic(topic.technology_name)}
                             className={`relative bg-white rounded-lg p-6 cursor-pointer transition-all duration-300 hover:-translate-y-2 shadow-md
-                                ${selectedTopic === topic.name
+                                ${selectedTopic === topic.technology_name
                                     ? "border-2 border-[#3B6934]"
                                     : "border border-gray-200"
                                 }`}
                         >
-                            {selectedTopic === topic.name && (
+                            {selectedTopic === topic.technology_name && (
                                 <div className="absolute top-4 right-4 text-[#3B6934]">
                                     <span
                                         className="material-symbols-outlined"
@@ -125,21 +134,25 @@ function TheoryTopic() {
                             )}
 
                             <div
-                                className={`w-12 h-12 rounded-md flex items-center justify-center mb-4 transition-all duration-300
-                                    ${selectedTopic === topic.name
-                                        ? "bg-[#BCF1AD] text-[#3B6934]"
-                                        : "bg-[#EEF4FF] text-[#3B6934] group-hover:bg-[#BCF1AD]"
+                                className={`w-12 h-12 rounded-md flex items-center justify-center mb-4
+                                    ${selectedTopic === topic.technology_name
+                                        ? "bg-[#BCF1AD]"
+                                        : "bg-[#EEF4FF]"
                                     }`}
                             >
-                                {topic.icon}
+                                <img
+                                    src={topic.icon}
+                                    alt={topic.technology_name}
+                                    className="w-7 h-7"
+                                />
                             </div>
 
                             <h3 className="text-lg font-semibold text-[#0B1C30] mb-2">
-                                {topic.name}
+                                {topic.technology_name}
                             </h3>
 
                             <p className="text-sm text-[#514441] leading-relaxed">
-                                {topic.description}
+                                {topic.technology_description}
                             </p>
                         </div>
                     ))}
@@ -149,6 +162,16 @@ function TheoryTopic() {
                 <div className="mt-12 pt-8 border-t border-gray-200 flex justify-end">
                     <button
                         onClick={() => {
+                            if (!selectedTopic) {
+                                setPopup({
+                                    show: true,
+                                    message: "Please select a technology",
+                                    type: "error",
+                                });
+
+                                return;
+                            }
+
                             setLoading(true);
 
                             setTimeout(() => {
@@ -166,6 +189,36 @@ function TheoryTopic() {
                     </button>
                 </div>
             </div>
+
+            {popup.show && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50 px-2">
+                    <div className="bg-white rounded-xl shadow-lg p-6 w-80 text-center">
+                        <p
+                            className={`text-lg font-semibold mb-4
+                                ${popup.type === "success"
+                                    ? "text-green-800"
+                                    : "text-red-600"
+                                }
+                                `}
+                        >
+                            {popup.message}
+                        </p>
+
+                        <button
+                            onClick={() =>
+                                setPopup({
+                                    show: false,
+                                    message: "",
+                                    type: "",
+                                })
+                            }
+                            className="px-4 py-2 bg-green-800 text-white rounded-full hover:bg-green-700 cursor-pointer"
+                        >
+                            OK
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

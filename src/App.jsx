@@ -15,6 +15,7 @@ import FeedbackPage from "./pages/FeedbackPage";
 import TheoryTopic from "./pages/TheoryTopic";
 import SubTopic from "./pages/SubTopicPage";
 import TheoryStartModule from "./pages/TheoryStartModule";
+import TheoryAIInterview from "./pages/TheoryAIInterview";
 import ScheduledInterviewPage from "./pages/ScheduledInterviewPage";
 
 function App() {
@@ -103,6 +104,15 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["client"]}>
                 <TheoryStartModule />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/theory-interview"
+            element={
+              <ProtectedRoute allowedRoles={["client"]}>
+                <TheoryAIInterview />
               </ProtectedRoute>
             }
           />

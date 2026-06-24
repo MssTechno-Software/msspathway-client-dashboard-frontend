@@ -182,22 +182,13 @@ function SelfIntroductionQuestion() {
 
             console.log("Self Introduction Questions fetched", data);
 
-            const enabledQuestions = (data.questions || []).filter(
-                (question) => question.status === "enabled"
-            );
+            const enabledQuestions = (data.questions || [])
+                .filter((question) => question.status === "enabled")
+                .sort((a, b) => a.display_order - b.display_order);
 
             setQuestions(enabledQuestions);
 
-            const firstUnattemptedIndex =
-                enabledQuestions.findIndex(
-                    (q) => q.attempted_status === false
-                );
-
-            setCurrentQuestionIndex(
-                firstUnattemptedIndex !== -1
-                    ? firstUnattemptedIndex
-                    : 0
-            );
+            setCurrentQuestionIndex(0);
 
             setShowModal(false);
             setPopup({
@@ -225,6 +216,7 @@ function SelfIntroductionQuestion() {
 
     //skip question logic
     const handleSkipQuestion = () => {
+        if (!currentQuestion?.attempted_status) return;
         stopRecording();
         resetTranscript();
         setTimeLeft(119);
@@ -425,11 +417,11 @@ function SelfIntroductionQuestion() {
 
                             <button
                                 onClick={handleSkipQuestion}
-                                disabled={currentQuestion?.attempted_status}
+                                disabled={!currentQuestion?.attempted_status}
                                 className={`w-full flex-1 py-4 rounded-lg flex items-center justify-center gap-2 font-bold uppercase transition
                                     ${currentQuestion?.attempted_status
-                                        ? "bg-gray-200 text-gray-500 cursor-not-allowed border-2 border-gray-300"
-                                        : "border-2 border-[#3b6934] text-[#3b6934] hover:bg-[#3b6934]/5"
+                                        ? "border-2 border-[#3b6934] text-[#3b6934] hover:bg-[#3b6934]/5"
+                                        : "bg-gray-200 text-gray-500 cursor-not-allowed border-2 border-gray-300"
                                     }
                                 `}
                             >
@@ -493,37 +485,39 @@ function SelfIntroductionQuestion() {
                 onProceed={handleStartInterview}
                 loading={loading}
             />
-            {popup.show && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50 px-2">
-                    <div className="bg-white rounded-xl shadow-lg p-6 w-80 text-center">
+            {
+                popup.show && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50 px-2">
+                        <div className="bg-white rounded-xl shadow-lg p-6 w-80 text-center">
 
-                        <p
-                            className={`text-lg font-semibold mb-4
+                            <p
+                                className={`text-lg font-semibold mb-4
                     ${popup.type === "success" &&
-                                "text-green-800"}
+                                    "text-green-800"}
                     ${popup.type === "error" &&
-                                "text-red-600"}
+                                    "text-red-600"}
                 `}
-                        >
-                            {popup.message}
-                        </p>
+                            >
+                                {popup.message}
+                            </p>
 
-                        <button
-                            onClick={() =>
-                                setPopup({
-                                    show: false,
-                                    message: "",
-                                    type: "",
-                                })
-                            }
-                            className="px-4 py-2 bg-green-800 text-white rounded-full hover:bg-green-700 cursor-pointer"
-                        >
-                            OK
-                        </button>
+                            <button
+                                onClick={() =>
+                                    setPopup({
+                                        show: false,
+                                        message: "",
+                                        type: "",
+                                    })
+                                }
+                                className="px-4 py-2 bg-green-800 text-white rounded-full hover:bg-green-700 cursor-pointer"
+                            >
+                                OK
+                            </button>
+                        </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 }
 
