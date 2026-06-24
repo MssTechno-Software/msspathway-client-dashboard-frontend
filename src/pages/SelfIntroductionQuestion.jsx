@@ -3,6 +3,7 @@ import { Mic, SkipForward, CheckCircle, Timer, Square } from "lucide-react";
 
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { FiLoader } from "react-icons/fi";
 
 import SpeechRecognition, {
     useSpeechRecognition,
@@ -17,11 +18,17 @@ function SelfIntroductionQuestion() {
     const [isRecording, setIsRecording] = useState(false);
     const [waveScale, setWaveScale] = useState(1);
     const [timeLeft, setTimeLeft] = useState(119);
-
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [questions, setQuestions] = useState([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const currentQuestion = questions[currentQuestionIndex];
+    const [loading, setLoading] = useState(false);
 
+    const [popup, setPopup] = useState({
+        show: false,
+        message: "",
+        type: "", // success | error
+    });
     const {
         transcript,
         resetTranscript,
@@ -60,7 +67,16 @@ function SelfIntroductionQuestion() {
         const timer = setInterval(() => {
             setTimeLeft((prev) => {
                 if (prev <= 1) {
-                    stopRecording();
+                    clearInterval(timer);
+
+                    SpeechRecognition.stopListening();
+                    setIsRecording(false);
+
+                    // Auto submit when time ends
+                    setTimeout(() => {
+                        handleSubmitAnswer();
+                    }, 500);
+
                     return 0;
                 }
                 return prev - 1;
@@ -149,11 +165,20 @@ function SelfIntroductionQuestion() {
 
     const handleStartInterview = async () => {
         try {
+            setLoading(true);
             const response = await fetch(
                 `${BASE_URL}/questions/clients/${client_id}/self-introduction-questions`
             );
 
             const data = await response.json();
+            if (!response.ok) {
+                throw new Error(
+                    data.message ||
+                    data.error ||
+                    data.detail ||
+                    "Failed to fetch questions"
+                );
+            }
 
             console.log("Self Introduction Questions fetched", data);
 
@@ -175,8 +200,26 @@ function SelfIntroductionQuestion() {
             );
 
             setShowModal(false);
+            setPopup({
+                show: true,
+                message:
+                    data.message ||
+                    data.error ||
+                    data.detail ||
+                    "Questions loaded successfully",
+                type: "success",
+            });
         } catch (error) {
             console.error("Failed to fetch questions:", error);
+            setPopup({
+                show: true,
+                message:
+                    error.message ||
+                    "Failed to fetch questions",
+                type: "error",
+            });
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -195,6 +238,9 @@ function SelfIntroductionQuestion() {
 
     //submit answer api call
     const handleSubmitAnswer = async () => {
+        if (isSubmitting) return;
+        setIsSubmitting(true);
+        setLoading(true);
         try {
             const currentQuestion = questions[currentQuestionIndex];
             console.log("Current Question:", currentQuestion);
@@ -216,23 +262,62 @@ function SelfIntroductionQuestion() {
             const data = await response.json();
 
             console.log("Submit Response:", data);
+            if (!response.ok) {
+                setPopup({
+                    show: true,
+                    message:
+                        data.message ||
+                        data.error ||
+                        data.detail ||
+                        "Failed to submit answer",
+                    type: "error",
+                });
 
-            navigate("/feedback", {
-                state: {
-                    feedbackData: data,
-                    transcript,
-                    question: currentQuestion.question_text,
-                    questions,
-                    currentQuestionIndex,
-                },
+                return;
+            }
+
+            setPopup({
+                show: true,
+                message:
+                    data.message ||
+                    data.error ||
+                    data.detail ||
+                    "Answer submitted successfully",
+                type: "success",
             });
+            setTimeout(() => {
+                navigate("/feedback", {
+                    state: {
+                        feedbackData: data,
+                        transcript,
+                        question: currentQuestion.question_text,
+                        questions,
+                        currentQuestionIndex,
+                    },
+                });
+            }, 1000);
         } catch (error) {
             console.error("Submit failed:", error);
+        } finally {
+            setLoading(false);
+            setIsSubmitting(false);
         }
     };
 
     return (
         <div className="bg-white min-h-screen">
+            {/*Loader*/}
+            {loading && (
+                <div className="fixed inset-0 bg-black/40 z-9999 flex items-center justify-center">
+                    <div className="p-6 flex flex-col items-center gap-3">
+                        <FiLoader className="animate-spin text-4xl text-green-800" />
+
+                        <p className="text-gray-800 font-medium">
+                            Please wait...
+                        </p>
+                    </div>
+                </div>
+            )}
             {/* Header */}
             <div className="h-auto min-h-16 border-b border-[#d5c2bf] flex items-center px-4 sm:px-6 lg:px-12 py-4">
                 <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm font-bold uppercase text-[#514441]">
@@ -406,7 +491,38 @@ function SelfIntroductionQuestion() {
                 open={showModal}
                 onClose={() => setShowModal(false)}
                 onProceed={handleStartInterview}
+                loading={loading}
             />
+            {popup.show && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50 px-2">
+                    <div className="bg-white rounded-xl shadow-lg p-6 w-80 text-center">
+
+                        <p
+                            className={`text-lg font-semibold mb-4
+                    ${popup.type === "success" &&
+                                "text-green-800"}
+                    ${popup.type === "error" &&
+                                "text-red-600"}
+                `}
+                        >
+                            {popup.message}
+                        </p>
+
+                        <button
+                            onClick={() =>
+                                setPopup({
+                                    show: false,
+                                    message: "",
+                                    type: "",
+                                })
+                            }
+                            className="px-4 py-2 bg-green-800 text-white rounded-full hover:bg-green-700 cursor-pointer"
+                        >
+                            OK
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

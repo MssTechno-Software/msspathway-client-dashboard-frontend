@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
-function BeginAssessmentModal({ open, onClose, onProceed }) {
+import { FiLoader } from "react-icons/fi";
+function BeginAssessmentModal({ open, onClose, onProceed, loading }) {
   const navigate = useNavigate();
   if (!open) return null;
   return (
@@ -40,9 +41,17 @@ function BeginAssessmentModal({ open, onClose, onProceed }) {
 
           <button
             onClick={onProceed}
-            className="bg-[#3B6934] text-white px-8 py-3 rounded-lg uppercase font-semibold hover:bg-[#2d5a27] transition-all cursor-pointer"
+            disabled={loading}
+            className="bg-[#3B6934] text-white px-8 py-3 rounded-lg uppercase font-semibold hover:bg-[#2d5a27] transition-all cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            Proceed To Interview
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <FiLoader className="animate-spin" />
+                Loading...
+              </span>
+            ) : (
+              "Proceed To Interview"
+            )}
           </button>
         </div>
       </div>

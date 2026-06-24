@@ -4,15 +4,29 @@ import {
   TerminalSquare,
 } from "lucide-react";
 import { useState } from "react";
+import { FiLoader } from "react-icons/fi";
 import ModeCard from "../components/ModeCard";
 import { useNavigate } from "react-router-dom";
 
 function InterviewModes() {
   const [showBeginAssessmentModal, setShowBeginAssessmentModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-[#FDFDFF] px-12 py-12">
+      {/*Loader*/}
+      {loading && (
+        <div className="fixed inset-0 bg-black/40 z-9999 flex items-center justify-center">
+          <div className="p-6 flex flex-col items-center gap-3">
+            <FiLoader className="animate-spin text-4xl text-green-800" />
+
+            <p className="text-gray-800 font-medium">
+              Please wait...
+            </p>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div className="mb-10">
         <h1 className="text-[48px] font-bold text-[#230804]">
@@ -45,13 +59,16 @@ function InterviewModes() {
           }
           title="Self-Introduction Evaluation"
           description="Pitch yourself to AI scouts and receive deep impact scores on communication and presence."
-          onBeginAssessment={() =>
-            navigate("/self-introduction", {
-              state: {
-                showBeginAssessmentModal: true,
-              },
-            })
-          }
+          onBeginAssessment={() => {
+            setLoading(true);
+            setTimeout(() => {
+              navigate("/self-introduction", {
+                state: {
+                  showBeginAssessmentModal: true,
+                },
+              });
+            }, 500);
+          }}
         />
 
         <ModeCard
@@ -62,6 +79,12 @@ function InterviewModes() {
           }
           title="Topic-Specific Theory"
           description="Deep dive into your specific area of expertise and niche domain skills with domain-expert AI."
+          onBeginAssessment={() => {
+            setLoading(true);
+            setTimeout(() => {
+              navigate("/theory-topic");
+            }, 500);
+          }}
         />
 
         <ModeCard

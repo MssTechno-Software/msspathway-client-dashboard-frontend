@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { FiLoader } from "react-icons/fi";
 import StatCard from "../components/StatCard";
 import InterviewTable from "../components/InterviewTable";
 import AnalyticsPanel from "../components/AnalyticsPanel";
@@ -7,15 +8,37 @@ import { getDashboardData } from "../api/dashboardApi";
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
-    getDashboardData().then(setData);
+    const fetchDashboard = async () => {
+      try {
+        setLoading(true);
+
+        const response = await getDashboardData();
+        setData(response);
+      } catch (error) {
+        console.error(
+          "Dashboard Error:",
+          error.response?.data || error.message
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboard();
   }, []);
 
-  if (!data) {
+  if (loading || !data) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[#f8f9fa] text-[#212529]">
-        Loading...
+      <div className="fixed inset-0 bg-black/40 z-9999 flex items-center justify-center">
+        <div className="p-6 flex flex-col items-center gap-3">
+          <FiLoader className="animate-spin text-4xl text-green-800" />
+
+          <p className="text-gray-800 font-medium">
+            Please wait...
+          </p>
+        </div>
       </div>
     );
   }

@@ -6,6 +6,8 @@ import {
   Lightbulb,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { FiLoader } from "react-icons/fi";
 
 function FeedbackPage() {
   const navigate = useNavigate();
@@ -15,9 +17,22 @@ function FeedbackPage() {
   const question = location.state?.question;
   const currentQuestionIndex = location.state?.currentQuestionIndex;
   const questions = location.state?.questions;
+  const [loading, setLoading] = useState(false);
 
   return (
     <div className="bg-white min-h-screen">
+      {/*Loader*/}
+      {loading && (
+        <div className="fixed inset-0 bg-black/40 z-9999 flex items-center justify-center">
+          <div className="p-6 flex flex-col items-center gap-3">
+            <FiLoader className="animate-spin text-4xl text-green-800" />
+
+            <p className="text-gray-800 font-medium">
+              Please wait...
+            </p>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div className="min-h-16 border-b border-[#d5c2bf] flex items-center px-4 sm:px-6 lg:px-12 py-4">
         <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm font-bold uppercase">
@@ -75,15 +90,18 @@ function FeedbackPage() {
                 </div>
 
                 <button
-                  onClick={() =>
-                    navigate("/self-introduction", {
-                      state: {
-                        retry: true,
-                        retryQuestionIndex: currentQuestionIndex,
-                        questions: questions || [],
-                      },
-                    })
-                  }
+                  onClick={() => {
+                    setLoading(true);
+                    setTimeout(() => {
+                      navigate("/self-introduction", {
+                        state: {
+                          retry: true,
+                          retryQuestionIndex: currentQuestionIndex,
+                          questions: questions || [],
+                        },
+                      });
+                    }, 500);
+                  }}
                   className="w-full sm:w-auto border border-[#3b6934] text-[#3b6934] px-4 sm:px-8 py-3 sm:py-4 rounded-lg font-bold uppercase flex items-center justify-center gap-2 hover:bg-[#3b6934]/5 transition">
                   <RefreshCw size={18} />
                   Retry Question
@@ -174,16 +192,20 @@ function FeedbackPage() {
         {/* Next Question */}
         <button
           onClick={() => {
-            if (currentQuestionIndex < questions.length - 1) {
-              navigate("/self-introduction", {
-                state: {
-                  questions,
-                  nextQuestionIndex: currentQuestionIndex + 1,
-                },
-              });
-            } else {
-              navigate("/interview-modes");
-            }
+            setLoading(true);
+
+            setTimeout(() => {
+              if (currentQuestionIndex < questions.length - 1) {
+                navigate("/self-introduction", {
+                  state: {
+                    questions,
+                    nextQuestionIndex: currentQuestionIndex + 1,
+                  },
+                });
+              } else {
+                navigate("/interview-modes");
+              }
+            }, 500);
           }}
           className="mt-6 w-full bg-[#3b6934] hover:bg-[#2f5a29] text-white py-4 sm:py-5 rounded-lg flex items-center justify-center gap-3 font-bold uppercase transition"
         >

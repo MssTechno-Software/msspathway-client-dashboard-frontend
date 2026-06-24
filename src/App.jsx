@@ -12,7 +12,9 @@ import Dashboard from "./pages/Dashboard";
 import InterviewMode from "./pages/InterviewMode";
 import SelfIntroductionQuestion from "./pages/SelfIntroductionQuestion";
 import FeedbackPage from "./pages/FeedbackPage";
-import ScheduledInterviewPage from "./pages/ScheduledInterviewPage"
+import TheoryTopic from "./pages/TheoryTopic";
+import SubTopic from "./pages/SubTopicPage";
+import ScheduledInterviewPage from "./pages/ScheduledInterviewPage";
 
 function App() {
   const token = localStorage.getItem("token");
@@ -77,7 +79,34 @@ function App() {
             }
           />
 
-          <Route 
+          <Route
+            path="/theory-topic"
+            element={
+              <ProtectedRoute allowedRoles={["client"]}>
+                <TheoryTopic />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/sub-topic"
+            element={
+              <ProtectedRoute allowedRoles={["client"]}>
+                <SubTopic />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/theory-interview-start-module"
+            element={
+              <ProtectedRoute allowedRoles={["client"]}>
+                <SubTopic />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/scheduled-Interview"
             element={
               <ProtectedRoute allowedRoles={["client"]}>
