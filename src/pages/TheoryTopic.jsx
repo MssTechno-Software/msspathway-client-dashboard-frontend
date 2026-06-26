@@ -72,6 +72,16 @@ function TheoryTopic() {
         }
     };
 
+    const handleTechnologyDoubleClick = (topic) => {
+        navigate("/sub-topic", {
+            state: {
+                client_id: clientId,
+                topic: topic.technology_name,
+                technology_id: topic.technology_id,
+            },
+        });
+    };
+
     return (
         <div className="bg-white min-h-screen">
             {/* Loader */}
@@ -97,10 +107,6 @@ function TheoryTopic() {
                     </span>
                     <span>›</span>
                     <span>Coding Topic</span>
-                    {/* <span>›</span>
-                    <span className="text-[#3b6934]">
-                        {selectedTopic}
-                    </span> */}
                 </div>
             </div>
 
@@ -123,6 +129,7 @@ function TheoryTopic() {
                         <div
                             key={topic.technology_id}
                             onClick={() => setSelectedTopic(topic.technology_name)}
+                            onDoubleClick={() => handleTechnologyDoubleClick(topic)}
                             className={`relative bg-white rounded-lg p-6 cursor-pointer transition-all duration-300 hover:-translate-y-2 shadow-md
                                 ${selectedTopic === topic.technology_name
                                     ? "border-2 border-[#3B6934]"
@@ -166,47 +173,6 @@ function TheoryTopic() {
                             </p>
                         </div>
                     ))}
-                </div>
-
-                {/* Footer Button */}
-                <div className="mt-12 pt-8 border-t border-gray-200 flex justify-end">
-                    <button
-                        onClick={() => {
-                            if (!selectedTopic) {
-                                setPopup({
-                                    show: true,
-                                    message: "Please select a technology",
-                                    type: "error",
-                                });
-
-                                return;
-                            }
-
-                            const selectedTechnology = topics.find(
-                                (item) => item.technology_name === selectedTopic
-                            );
-
-                            setLoading(true);
-                            console.log({
-                                clientId,
-                                technologyId: selectedTechnology.technology_id,
-                            });
-
-                            setTimeout(() => {
-                                navigate("/sub-topic", {
-                                    state: {
-                                        client_id: clientId,
-                                        topic: selectedTopic,
-                                        technology_id: selectedTechnology.technology_id,
-                                    },
-                                });
-                            }, 500);
-                        }}
-                        className="bg-[#3B6934] hover:bg-[#2f552a] text-white px-8 py-3 rounded-md uppercase font-semibold tracking-wider flex items-center gap-2 transition"
-                    >
-                        Continue
-                        <ArrowRight size={18} />
-                    </button>
                 </div>
             </div>
 

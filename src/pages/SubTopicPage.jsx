@@ -67,6 +67,18 @@ function SubTopic() {
         }
     };
 
+    const handleSubTopicDoubleClick = (item) => {
+        navigate("/theory-interview-start-module", {
+            state: {
+                topic,
+                subTopic: item.subtopic_name,
+                subtopic_id: item.subtopic_id,
+                technology_id,
+                client_id,
+            },
+        });
+    };
+
     /*Progress*/
     const getProgressColor = (status) => {
         switch (status?.toLowerCase()) {
@@ -128,14 +140,24 @@ function SubTopic() {
                     </span>
                     <span>›</span>
                     <span>{topic}</span>
-                    {/* <span>›</span>
-                    <span className="text-[#3b6934]">Select Sub-Topic</span> */}
                 </div>
             </div>
 
             <div className="p-4 sm:p-6 lg:p-8 xl:p-12">
-
                 <div className="mb-10">
+                    <button
+                        onClick={() => {
+                            setLoading(true);
+                            setTimeout(() => {
+                                navigate(-1);
+                            }, 500);
+                        }}
+                        className="inline-flex items-center gap-2 mb-6 text-sm font-semibold text-[#514441] uppercase hover:text-[#3b6934] transition-colors"
+                    >
+                        <ArrowLeft size={18} />
+                        Change Topic
+                    </button>
+
                     <h1 className="text-3xl sm:text-4xl lg:text-[40px] font-semibold text-[#0B1C30]">
                         Refine Your Focus
                     </h1>
@@ -153,6 +175,7 @@ function SubTopic() {
                         <div
                             key={item.subtopic_id}
                             onClick={() => setSelectedSubTopic(item)}
+                            onDoubleClick={() => handleSubTopicDoubleClick(item)}
                             className={`cursor-pointer rounded-xl border p-4 sm:p-5 lg:p-6 transition-all hover:shadow-md
                                 ${selectedSubTopic?.subtopic_id === item.subtopic_id
                                     ? "bg-[#eff4ff] border-[#3b6934]"
@@ -207,47 +230,34 @@ function SubTopic() {
                         </div>
                     ))}
                 </div>
-
-                <div className="mt-12 pt-8 border-t border-[#d5c2bf] flex flex-col sm:flex-row gap-4 sm:gap-0 justify-between items-center">
-
-                    <button
-                        onClick={() => {
-                            setLoading(true);
-                            setTimeout(() => {
-                                navigate(-1);
-                            }, 500);
-                        }}
-                        className="flex items-center gap-2 text-xs sm:text-sm font-semibold uppercase text-[#514441]"
-                    >
-                        <ArrowLeft size={16} />
-                        Change Topic
-                    </button>
-
-                    <button
-                        onClick={() => {
-                            if (!selectedSubTopic) return;
-                            setLoading(true);
-
-                            setTimeout(() => {
-                                navigate("/theory-interview-start-module", {
-                                    state: {
-                                        topic,
-                                        subTopic: selectedSubTopic.subtopic_name,
-                                        subtopic_id: selectedSubTopic.subtopic_id,
-                                        technology_id,
-                                        client_id,
-                                    },
-                                });
-                            }, 500);
-                        }}
-                        className="w-full sm:w-auto bg-[#3b6934] hover:bg-[#2f552a] text-white px-6 sm:px-8 py-3 rounded-lg flex items-center justify-center gap-2 uppercase font-semibold transition"
-                    >
-                        Continue
-                        <ArrowRight size={18} />
-                    </button>
-
-                </div>
             </div>
+            {popup.show && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50 px-2">
+                    <div className="bg-white rounded-xl shadow-lg p-6 w-80 text-center">
+                        <p
+                            className={`text-lg font-semibold mb-4 ${popup.type === "success"
+                                    ? "text-green-800"
+                                    : "text-red-600"
+                                }`}
+                        >
+                            {popup.message}
+                        </p>
+
+                        <button
+                            onClick={() =>
+                                setPopup({
+                                    show: false,
+                                    message: "",
+                                    type: "",
+                                })
+                            }
+                            className="px-4 py-2 bg-green-800 text-white rounded-full hover:bg-green-700"
+                        >
+                            OK
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
