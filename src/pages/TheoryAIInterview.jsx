@@ -38,16 +38,31 @@ function TheoryAIInterview() {
         browserSupportsSpeechRecognition,
     } = useSpeechRecognition();
 
-    /*count down*/
+    /*timer*/
     useEffect(() => {
-        if (timeLeft <= 0) return;
+        if (!isRecording) return;
 
         const timer = setInterval(() => {
-            setTimeLeft((prev) => prev - 1);
+            setTimeLeft((prev) => {
+                if (prev <= 1) {
+                    clearInterval(timer);
+
+                    SpeechRecognition.stopListening();
+                    setIsRecording(false);
+
+                    setTimeout(() => {
+                        handleSubmitAnswer();
+                    }, 500);
+
+                    return 0;
+                }
+
+                return prev - 1;
+            });
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [timeLeft]);
+    }, [isRecording]);
 
     useEffect(() => {
         if (client_id && technology_id && subtopic_id) {
@@ -71,6 +86,7 @@ function TheoryAIInterview() {
 
     const startRecording = () => {
         resetTranscript();
+        setTimeLeft(119);
 
         SpeechRecognition.startListening({
             continuous: true,
@@ -132,8 +148,19 @@ function TheoryAIInterview() {
                 currentIndex !== -1 ? currentIndex : 0
             );
 
+            setPopup({
+                show: true,
+                message: "Interview started successfully.",
+                type: "success",
+            });
+
         } catch (err) {
             console.log(err);
+            setPopup({
+                show: true,
+                message: err.message || "Failed to load interview questions.",
+                type: "error",
+            });
         } finally {
             setLoading(false);
         }
@@ -144,12 +171,18 @@ function TheoryAIInterview() {
 
         const question = questions[currentQuestionIndex];
         try {
-            await fetch(
+            setLoading(true);
+            const response = await fetch(
                 `${BASE_URL}/Topic_based/clients/${client_id}/subtopic-questions/${question.question_id}/skip`,
                 {
                     method: "POST"
                 }
             );
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.detail || data.message || "Failed to skip question");
+            }
             const updatedQuestions = [...questions];
             updatedQuestions[currentQuestionIndex].attempted_status = "skipped";
 
@@ -158,21 +191,47 @@ function TheoryAIInterview() {
                     "current";
                 setQuestions(updatedQuestions);
                 setCurrentQuestionIndex(prev => prev + 1);
+                stopRecording();
                 resetTranscript();
                 setTimeLeft(119);
+                setPopup({
+                    show: true,
+                    message: data.message || "Question skipped successfully.",
+                    type: "success",
+                });
             }
 
         } catch (err) {
             console.log(err);
+            setPopup({
+                show: true,
+                message: err.message || "Unable to skip question.",
+                type: "error",
+            });
+        } finally {
+            setLoading(false);
         }
     };
 
     /*submit answer*/
     const handleSubmitAnswer = async () => {
-        const question = questions[currentQuestionIndex];
+        if (isSubmitting) return;
+
+        if (!transcript.trim()) {
+            setPopup({
+                show: true,
+                message: "Please speak before submitting.",
+                type: "error",
+            });
+            return;
+        }
+
+        setIsSubmitting(true);
+        setLoading(true);
+        const currentQuestion = questions[currentQuestionIndex];
         try {
             const response = await fetch(
-                `${BASE_URL}/Topic_based/clients/${client_id}/subtopic-questions/${question.question_id}/submit-answer`,
+                `${BASE_URL}/Topic_based/clients/${client_id}/subtopic-questions/${currentQuestion.question_id}/submit-answer`,
                 {
                     method: "POST",
                     headers: {
@@ -188,28 +247,73 @@ function TheoryAIInterview() {
 
             console.log(data);
 
-            setQuestions(data.question_stepper);
+            if (data.question_stepper) {
+                setQuestions(data.question_stepper);
 
-            const current = data.question_stepper.findIndex(
-                q => q.attempted_status === "current"
-            );
+                const current = data.question_stepper.findIndex(
+                    q => q.attempted_status === "current"
+                );
 
-            if (current !== -1) {
-                setCurrentQuestionIndex(current);
-                resetTranscript();
-                setTimeLeft(119);
+                if (current !== -1) {
+                    setCurrentQuestionIndex(current);
+                    stopRecording();
+                    resetTranscript();
+                    setTimeLeft(119);
+                } else {
+                    navigate("/theory-feedback", {
+                        state: {
+                            feedbackData: data,
+                            transcript,
+                            question: currentQuestion.question_text,
+                            questions: data.question_stepper || questions,
+                            currentQuestionIndex,
+                            topic,
+                            subTopic,
+                        },
+                    });
+                }
             } else {
                 navigate("/theory-feedback", {
-                    state: data,
+                    state: {
+                        feedbackData: data,
+                        transcript,
+                        question: currentQuestion.question_text,
+                        questions,
+                        currentQuestionIndex,
+                    },
                 });
             }
+            setPopup({
+                show: true,
+                message: data.message || data.detail || "Answer submitted successfully",
+                type: "success",
+            });
         } catch (err) {
             console.log(err);
+            setPopup({
+                show: true,
+                message: err.message || "Something went wrong",
+                type: "error",
+            });
+        } finally {
+            setLoading(false);
+            setIsSubmitting(false);
         }
     };
 
     return (
         <div className="bg-white min-h-screen">
+            {/*loader*/}
+            {loading && (
+                <div className="fixed inset-0 bg-black/40 z-9999 flex items-center justify-center">
+                    <div className="p-6 flex flex-col items-center gap-3">
+                        <FiLoader className="animate-spin text-4xl text-green-800" />
+                        <p className="text-gray-800 font-medium">
+                            Please wait...
+                        </p>
+                    </div>
+                </div>
+            )}
 
             {/* Breadcrumb */}
             <div className="h-auto min-h-16 border-b border-[#d5c2bf] flex items-center px-4 sm:px-6 lg:px-12 py-4">
@@ -235,27 +339,30 @@ function TheoryAIInterview() {
                     <span className="text-[#3b6934]">
                         {subTopic}
                     </span>
+                    <span>›</span>
+                    <span>
+                        Question {(currentQuestionIndex ?? 0) + 1}
+                    </span>
                 </div>
             </div>
-            <div className="p-6">
-
-                {/* Progress */}
-                <div className="border border-gray-300 rounded-xl p-4 mb-6">
-                    <div className="flex justify-center items-center gap-4">
-
-                        {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
-                            <div
-                                key={num}
-                                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
-                                ${num === 1
+            <div className="border border-gray-300 rounded-xl p-4 mb-6">
+                <div className="flex justify-center items-center gap-4 flex-wrap">
+                    {questions.map((q, index) => (
+                        <div
+                            key={q.question_id}
+                            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
+                            ${q.attempted_status === "answered"
+                                    ? "bg-green-700 text-white"
+                                    : q.attempted_status === "current"
                                         ? "bg-[#3b6934] text-white"
-                                        : "border border-gray-300 text-gray-400"
-                                    }`}
-                            >
-                                {num}
-                            </div>
-                        ))}
-                    </div>
+                                        : q.attempted_status === "skipped"
+                                            ? "bg-yellow-500 text-white"
+                                            : "border border-gray-300 text-gray-400"
+                                }`}
+                        >
+                            {index + 1}
+                        </div>
+                    ))}
                 </div>
                 {/* Main Content */}
                 <div className="p-4 sm:p-6 lg:p-8 xl:p-12">
@@ -346,7 +453,7 @@ function TheoryAIInterview() {
 
                                 <button
                                     onClick={handleSkipQuestion}
-                                    disabled={!currentQuestion?.attempted_status}
+                                    disabled={currentQuestion?.attempted_status !== "current"}
                                     className={`w-full flex-1 py-4 rounded-lg flex items-center justify-center gap-2 font-bold uppercase transition
                                     ${currentQuestion?.attempted_status
                                             ? "border-2 border-[#3b6934] text-[#3b6934] hover:bg-[#3b6934]/5"
@@ -409,7 +516,36 @@ function TheoryAIInterview() {
                     </div>
                 </div>
             </div>
-        </div>
+            {popup.show && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+                    <div className="bg-white rounded-xl shadow-lg p-6 w-80 text-center">
+
+                        <p
+                            className={`text-lg font-semibold mb-4 ${popup.type === "success"
+                                ? "text-green-700"
+                                : "text-red-600"
+                                }`}
+                        >
+                            {popup.message}
+                        </p>
+
+                        <button
+                            onClick={() =>
+                                setPopup({
+                                    show: false,
+                                    message: "",
+                                    type: "",
+                                })
+                            }
+                            className="px-5 py-2 bg-green-800 text-white rounded-full hover:bg-green-700"
+                        >
+                            OK
+                        </button>
+
+                    </div>
+                </div>
+            )}
+        </div >
     );
 }
 

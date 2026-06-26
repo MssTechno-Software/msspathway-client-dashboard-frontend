@@ -12,12 +12,18 @@ import { FiLoader } from "react-icons/fi";
 function TheoryFeedbackPage() {
     const navigate = useNavigate();
     const location = useLocation();
+    const topic = location.state?.topic || "";
+    const subTopic = location.state?.subTopic || "";
     const feedbackData = location.state?.feedbackData;
     const transcript = location.state?.transcript;
     const question = location.state?.question;
     const currentQuestionIndex = location.state?.currentQuestionIndex;
     const questions = location.state?.questions;
     const [loading, setLoading] = useState(false);
+    if (!feedbackData) {
+        navigate("/theory-interview");
+        return null;
+    }
 
     return (
         <div className="bg-white min-h-screen">
@@ -35,7 +41,7 @@ function TheoryFeedbackPage() {
             )}
             {/* Header */}
             <div className="min-h-16 border-b border-[#d5c2bf] flex items-center px-4 sm:px-6 lg:px-12 py-4">
-                <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm font-bold uppercase">
+                <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm font-bold uppercase text-[#514441]">
                     <span
                         onClick={() => navigate("/interview-modes")}
                         className="cursor-pointer hover:text-[#3b6934]"
@@ -44,14 +50,21 @@ function TheoryFeedbackPage() {
                     </span>
                     <span>›</span>
                     <span
-                        onClick={() => navigate("/self-introduction")}
+                        onClick={() => navigate("/theory-topic")}
                         className="cursor-pointer hover:text-[#3b6934]"
                     >
-                        Self Introduction
+                        Coding Topic
                     </span>
                     <span>›</span>
                     <span>
-                        Question {questions?.[currentQuestionIndex]?.question_id || currentQuestionIndex + 1}
+                        {topic}
+                    </span>
+                    <span>›</span>
+                    <span className="text-[#3b6934]">
+                        {subTopic}
+                    </span>
+                    <span>
+                        Question {(currentQuestionIndex ?? 0) + 1}
                     </span>
                     <span>›</span>
                     <span className="text-[#3b6934]">
@@ -113,7 +126,7 @@ function TheoryFeedbackPage() {
                                         />
 
                                         <h2 className="text-2xl sm:text-3xl lg:text-[42px] font-bold text-[#3b6934]">
-                                            {feedbackData?.evaluation?.overall_score || 0} <span className="text-[28px] text-[#514441]">/100</span>
+                                            {feedbackData?.overall_score || 0} <span className="text-[28px] text-[#514441]">/100</span>
                                         </h2>
                                     </div>
                                 </div>
@@ -127,6 +140,8 @@ function TheoryFeedbackPage() {
                                                     retry: true,
                                                     retryQuestionIndex: currentQuestionIndex,
                                                     questions: questions || [],
+                                                    topic,
+                                                    subTopic,
                                                 },
                                             });
                                         }, 500);
@@ -147,9 +162,11 @@ function TheoryFeedbackPage() {
                                 </h3>
 
                                 <ul>
-                                    {feedbackData?.evaluation?.strengths?.map((strength, index) => (
-                                        <li key={index}>• {strength}</li>
-                                    ))}
+                                    {
+                                        feedbackData?.comprehensive_strengths?.map((item, index) => (
+                                            <li key={index}>• {item}</li>
+                                        ))
+                                    }
                                 </ul>
                             </div>
 
@@ -160,7 +177,7 @@ function TheoryFeedbackPage() {
                                 </h3>
 
                                 <p className="text-[#514441] leading-7">
-                                    {feedbackData?.evaluation?.overall_feedback}
+                                    {feedbackData?.client_answer}
                                 </p>
                             </div>
 
@@ -172,7 +189,7 @@ function TheoryFeedbackPage() {
                                 </h3>
 
                                 <ul className="space-y-3 text-[#0b1c30]">
-                                    {feedbackData?.evaluation?.improvement_areas?.map((item, index) => (
+                                    {feedbackData?.strategic_improvements?.map((item, index) => (
                                         <li key={index}>• {item}</li>
                                     ))}
                                 </ul>
@@ -225,10 +242,12 @@ function TheoryFeedbackPage() {
 
                         setTimeout(() => {
                             if (currentQuestionIndex < questions.length - 1) {
-                                navigate("/self-introduction", {
+                                navigate("/theory-interview", {
                                     state: {
                                         questions,
                                         nextQuestionIndex: currentQuestionIndex + 1,
+                                        topic,
+                                        subTopic,
                                     },
                                 });
                             } else {
