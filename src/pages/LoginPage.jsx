@@ -67,13 +67,13 @@ function Login() {
       console.log("FULL RESPONSE:", response.data);
       console.log("Client ID:", response.data.client_id);
 
-      const clientId =
+      const client_id =
         response.data.client_id ||
         response.data.user?.client_id ||
         response.data.data?.client_id;
 
-      if (clientId) {
-        localStorage.setItem("client_id", clientId);
+      if (client_id) {
+        localStorage.setItem("client_id", client_id);
       }
 
       localStorage.removeItem("token");

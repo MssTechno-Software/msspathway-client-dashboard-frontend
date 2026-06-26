@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Code2, FileCode, Braces, Atom, Coffee, Brain, CheckCircle, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { FiLoader } from "react-icons/fi";
+import BASE_URL from "../config/api";
 
 function TheoryTopic() {
     const [topics, setTopics] = useState([]);
@@ -13,6 +14,7 @@ function TheoryTopic() {
         message: "",
         type: "", // success | error
     });
+    const clientId = localStorage.getItem("client_id");
 
     useEffect(() => {
         fetchTechnologies();
@@ -23,20 +25,28 @@ function TheoryTopic() {
             setLoading(true);
 
             const response = await fetch(
-                "https://uat-msspathway-software-backend-81057313575.asia-south1.run.app/Topic_based/clients/1/technologies"
+                `${BASE_URL}/Topic_based/clients/${clientId}/technologies`
             );
 
             const data = await response.json();
 
             if (data?.technologies) {
-                const sortedTopics = data.technologies.sort(
-                    (a, b) => a.display_order - b.display_order
-                );
+                const activeTopics = data.technologies
+                    .filter(
+                        (topic) =>
+                            topic.status?.toLowerCase() === "active"
+                    )
+                    .sort(
+                        (a, b) =>
+                            a.display_order - b.display_order
+                    );
 
-                setTopics(sortedTopics);
+                setTopics(activeTopics);
 
-                if (sortedTopics.length > 0) {
-                    setSelectedTopic(sortedTopics[0].technology_name);
+                if (activeTopics.length > 0) {
+                    setSelectedTopic(
+                        activeTopics[0].technology_name
+                    );
                 }
                 setPopup({
                     show: true,
@@ -172,12 +182,22 @@ function TheoryTopic() {
                                 return;
                             }
 
+                            const selectedTechnology = topics.find(
+                                (item) => item.technology_name === selectedTopic
+                            );
+
                             setLoading(true);
+                            console.log({
+                                clientId,
+                                technologyId: selectedTechnology.technology_id,
+                            });
 
                             setTimeout(() => {
                                 navigate("/sub-topic", {
                                     state: {
+                                        client_id: clientId,
                                         topic: selectedTopic,
+                                        technology_id: selectedTechnology.technology_id,
                                     },
                                 });
                             }, 500);

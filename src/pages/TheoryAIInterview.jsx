@@ -2,19 +2,25 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Mic, SkipForward, CheckCircle, Timer, Square } from "lucide-react";
 import { FiLoader } from "react-icons/fi";
-
+import BASE_URL from "../config/api";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 
 function TheoryAIInterview() {
     const { state } = useLocation();
     const navigate = useNavigate();
     const location = useLocation();
-    const topic = state?.topic || "Python";
-    const subTopic = state?.subTopic || "Loops & Iterations";
+    const topic = state?.topic || "";
+    const subTopic = state?.subTopic || "";
+    const client_id = state?.client_id;
+    const technology_id = state?.technology_id;
+    const subtopic_id = state?.subtopic_id;
+    const difficulty_level = state?.difficulty_level;
 
     const [isRecording, setIsRecording] = useState(false);
     const [waveScale, setWaveScale] = useState(1);
     const [timeLeft, setTimeLeft] = useState(119);
+    const minutes = String(Math.floor(timeLeft / 60)).padStart(2, "0");
+    const seconds = String(timeLeft % 60).padStart(2, "0");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [questions, setQuestions] = useState([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -32,6 +38,23 @@ function TheoryAIInterview() {
         browserSupportsSpeechRecognition,
     } = useSpeechRecognition();
 
+    /*count down*/
+    useEffect(() => {
+        if (timeLeft <= 0) return;
+
+        const timer = setInterval(() => {
+            setTimeLeft((prev) => prev - 1);
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [timeLeft]);
+
+    useEffect(() => {
+        if (client_id && technology_id && subtopic_id) {
+            handleStartInterview();
+        }
+    }, [client_id, technology_id, subtopic_id]);
+
     useEffect(() => {
         let interval;
 
@@ -45,6 +68,22 @@ function TheoryAIInterview() {
 
         return () => clearInterval(interval);
     }, [isRecording]);
+
+    const startRecording = () => {
+        resetTranscript();
+
+        SpeechRecognition.startListening({
+            continuous: true,
+            language: "en-US",
+        });
+
+        setIsRecording(true);
+    };
+
+    const stopRecording = () => {
+        SpeechRecognition.stopListening();
+        setIsRecording(false);
+    };
 
     const Waveform = () => {
         if (!isRecording) return null;
@@ -67,6 +106,108 @@ function TheoryAIInterview() {
             </div>
         );
     };
+
+    /*start interview*/
+    const handleStartInterview = async () => {
+        try {
+            setLoading(true);
+
+            const response = await fetch(
+                `${BASE_URL}/Topic_based/clients/${client_id}/interview-questions?technology_id=${technology_id}&subtopic_id=${subtopic_id}&difficulty_level=${difficulty_level}`
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.detail || "Failed");
+            }
+
+            setQuestions(data);
+
+            const currentIndex = data.findIndex(
+                q => q.attempted_status === "current"
+            );
+
+            setCurrentQuestionIndex(
+                currentIndex !== -1 ? currentIndex : 0
+            );
+
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    /*skip question*/
+    const handleSkipQuestion = async () => {
+
+        const question = questions[currentQuestionIndex];
+        try {
+            await fetch(
+                `${BASE_URL}/Topic_based/clients/${client_id}/subtopic-questions/${question.question_id}/skip`,
+                {
+                    method: "POST"
+                }
+            );
+            const updatedQuestions = [...questions];
+            updatedQuestions[currentQuestionIndex].attempted_status = "skipped";
+
+            if (currentQuestionIndex < updatedQuestions.length - 1) {
+                updatedQuestions[currentQuestionIndex + 1].attempted_status =
+                    "current";
+                setQuestions(updatedQuestions);
+                setCurrentQuestionIndex(prev => prev + 1);
+                resetTranscript();
+                setTimeLeft(119);
+            }
+
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    /*submit answer*/
+    const handleSubmitAnswer = async () => {
+        const question = questions[currentQuestionIndex];
+        try {
+            const response = await fetch(
+                `${BASE_URL}/Topic_based/clients/${client_id}/subtopic-questions/${question.question_id}/submit-answer`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        answer_text: transcript,
+                    }),
+                }
+            );
+
+            const data = await response.json();
+
+            console.log(data);
+
+            setQuestions(data.question_stepper);
+
+            const current = data.question_stepper.findIndex(
+                q => q.attempted_status === "current"
+            );
+
+            if (current !== -1) {
+                setCurrentQuestionIndex(current);
+                resetTranscript();
+                setTimeLeft(119);
+            } else {
+                navigate("/theory-feedback", {
+                    state: data,
+                });
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
     return (
         <div className="bg-white min-h-screen">
 
@@ -116,131 +257,156 @@ function TheoryAIInterview() {
                         ))}
                     </div>
                 </div>
+                {/* Main Content */}
+                <div className="p-4 sm:p-6 lg:p-8 xl:p-12">
+                    <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+                        {/* LEFT SECTION */}
+                        <div className="xl:col-span-7">
+                            {/* Interview Card */}
+                            <div className="bg-white border border-[#d5c2bf] rounded-xl shadow-sm min-h-162.5 flex flex-col items-center justify-center relative overflow-hidden">
 
-                <div className="grid lg:grid-cols-12 gap-6">
+                                {/* Avatar */}
+                                <div className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-xl border-4 border-[#bcf1ad] p-1 bg-white">
+                                    <img
+                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-d1mNhj1eejdH7s-lXg-ifQEp4vQ6reI7Px0jAwKT7mFZyoP3wTBW5DzAqjMGrTbFnX56HN0g-dT4x-9CrcUFCA23ir2F2E6RGtYNV5bT0Wfh287CJvbQt3MeGc6XLtkMJ2qeo61Dqli5FTPTekXwgXXl6qNfAQch8ZDn1gSb-vXKdxACoJJflpil6e5BDIEOBzjEqj0o8zRnLPJHnuJxv_EdW9jBF_7jKhoVcrreRH0De0HLrwk74OtGKHpJ95_T8cX0qRrP7RWH"
+                                        alt="AI Interviewer"
+                                        className="w-full h-full rounded-xl object-cover"
+                                    />
+                                </div>
 
-                    {/* Left */}
-                    <div className="lg:col-span-7">
+                                {/* Waveform */}
+                                <Waveform />
 
-                        <div className="border border-gray-300 rounded-xl min-h-150 flex flex-col items-center justify-center">
+                                {/* Timer */}
+                                <div className="mt-12 flex flex-col items-center">
+                                    <div className="flex flex-wrap justify-center items-center gap-2 mb-1 text-center">
+                                        <Timer
+                                            size={18}
+                                            className="text-[#3b6934]"
+                                        />
 
-                            <img
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-d1mNhj1eejdH7s-lXg-ifQEp4vQ6reI7Px0jAwKT7mFZyoP3wTBW5DzAqjMGrTbFnX56HN0g-dT4x-9CrcUFCA23ir2F2E6RGtYNV5bT0Wfh287CJvbQt3MeGc6XLtkMJ2qeo61Dqli5FTPTekXwgXXl6qNfAQch8ZDn1gSb-vXKdxACoJJflpil6e5BDIEOBzjEqj0o8zRnLPJHnuJxv_EdW9jBF_7jKhoVcrreRH0De0HLrwk74OtGKHpJ95_T8cX0qRrP7RWH"
-                                alt="AI"
-                                className="w-32 h-32 rounded-xl border-4 border-green-200"
-                            />
-
-                            {/* Wave */}
-                            <Waveform />
-
-                            <div className="mt-8 text-center">
-
-                                <div className="flex items-center justify-center gap-2 mb-4">
-                                    <span className="material-symbols-outlined text-[#3b6934] text-[18px]">
-                                        timer
-                                    </span>
-
-                                    <span className="uppercase text-sm font-bold">
-                                        Question Time Remaining:
-                                        <span className="text-[#3b6934] ml-1">
-                                            01:45
+                                        <span className="uppercase font-bold tracking-wider text-[#514441]">
+                                            Question Time Remaining:
                                         </span>
+
+                                        <span className="font-bold text-[#3b6934]">
+                                            {minutes}:{seconds}
+                                        </span>
+                                    </div>
+
+                                    <div className="w-32 h-1 bg-[#f1f4f9] rounded-full overflow-hidden">
+                                        <div
+                                            className="h-full bg-[#3b6934] transition-all duration-1000"
+                                            style={{
+                                                width: `${(timeLeft / 105) * 100}%`,
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Question */}
+                                <div className="text-center mt-8 lg:mt-10 px-4 sm:px-8 lg:px-12">
+                                    <p className="uppercase tracking-[2px] text-[#3b6934] font-bold mb-2">
+                                        Interviewer AI Active
+                                    </p>
+
+                                    <h2 className="text-xl sm:text-2xl lg:text-[28px] leading-8 sm:leading-10 font-bold">
+                                        {questions[currentQuestionIndex]?.question_text ||
+                                            "Loading question..."}
+                                    </h2>
+                                </div>
+                            </div>
+
+                            {/* Buttons */}
+                            <div className="flex flex-col sm:flex-row gap-4 mt-6">
+                                <button
+                                    onClick={() =>
+                                        isRecording
+                                            ? stopRecording()
+                                            : startRecording()
+                                    }
+                                    className={`flex-1 py-4 rounded-lg flex items-center justify-center gap-2 font-bold uppercase transition
+                                    ${isRecording
+                                            ? "bg-red-600 hover:bg-red-700 text-white"
+                                            : "bg-[#3b6934] hover:bg-[#2f5a29] text-white"
+                                        }`}
+                                >
+                                    {isRecording ? (
+                                        <>
+                                            <Square size={18} />
+                                            Recording...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Mic size={18} />
+                                            Speak Now
+                                        </>
+                                    )}
+                                </button>
+
+                                <button
+                                    onClick={handleSkipQuestion}
+                                    disabled={!currentQuestion?.attempted_status}
+                                    className={`w-full flex-1 py-4 rounded-lg flex items-center justify-center gap-2 font-bold uppercase transition
+                                    ${currentQuestion?.attempted_status
+                                            ? "border-2 border-[#3b6934] text-[#3b6934] hover:bg-[#3b6934]/5"
+                                            : "bg-gray-200 text-gray-500 cursor-not-allowed border-2 border-gray-300"
+                                        }
+                                `}
+                                >
+                                    <SkipForward size={18} />
+                                    Skip Question
+                                </button>
+
+                                <button
+                                    onClick={handleSubmitAnswer}
+                                    className="w-full flex-1 bg-[#3b6934] hover:bg-[#2f5a29] text-white py-4 rounded-lg flex items-center justify-center gap-2 font-bold uppercase">
+                                    <CheckCircle size={18} />
+                                    Submit Answer
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* RIGHT SECTION */}
+                        <div className="xl:col-span-5">
+                            <div className="bg-white border border-[#d5c2bf] rounded-xl shadow-sm h-162.5 flex flex-col p-6">
+
+                                {/* Header */}
+                                <div className="flex items-center gap-3 mb-6">
+                                    <span className="w-2 h-2 rounded-full bg-[#3b6934] animate-pulse"></span>
+
+                                    <span className="uppercase font-bold text-[15px] tracking-wide text-[#514441]">
+                                        Live Transcription
                                     </span>
                                 </div>
 
-                                <p className="uppercase text-xs tracking-widest text-[#3b6934] font-bold">
-                                    Interviewer AI Active
-                                </p>
+                                {/* Scroll Area */}
+                                <div className="flex-1 overflow-y-auto pr-2">
 
-                                <h2 className="text-2xl font-bold mt-3">
-                                    What is an Infinite Loop?
-                                </h2>
+                                    {/* AI Prompt */}
+                                    <div className="bg-[#f1f4f9] border-l-4 border-[#3b6934] p-4 mb-8">
+                                        <p className="italic text-[#514441] text-[16px] leading-8">
+                                            AI: {questions[currentQuestionIndex]?.question_text}
+                                        </p>
+                                    </div>
+
+                                    {/* Transcript */}
+                                    <div className="space-y-8">
+                                        <p className="text-[#3b6934] text-base sm:text-lg leading-7 sm:leading-9 border-b border-[#bcf1ad] pb-3">
+                                            {transcript || "Start speaking to see live transcription..."}
+
+                                            {isRecording && (
+                                                <span className="inline-block w-0.5 h-6 bg-[#3b6934] ml-1 animate-pulse align-middle"></span>
+                                            )}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Bottom Divider */}
+                                <div className="mt-6 border-t border-[#d5c2bf] pt-6"></div>
                             </div>
-                        </div>
-
-                        {/* Buttons */}
-                        <div className="flex items-center justify-between gap-3 mt-4">
-
-                            <button
-                                onClick={() => setIsRecording(!isRecording)}
-                                className={`flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2 font-semibold uppercase shadow-sm transition-all
-                                    ${isRecording
-                                        ? "bg-red-600 text-white"
-                                        : "bg-[#3b6934] hover:bg-[#2f552a] text-white"
-                                    }`}
-                            >
-                                <span className="material-symbols-outlined text-[20px]">
-                                    {isRecording ? "stop" : "mic"}
-                                </span>
-
-                                {isRecording ? "Recording..." : "Speak Now"}
-                            </button>
-
-                            <button
-                                className="flex-1 border-2 border-[#3b6934] text-[#3b6934]
-                                    hover:bg-[#eff4ff] py-3 px-4 rounded-lg
-                                    flex items-center justify-center gap-2 font-semibold uppercase"
-                            >
-                                <span className="material-symbols-outlined text-[20px]">
-                                    skip_next
-                                </span>
-
-                                Skip Question
-                            </button>
-
-                            <button
-                                className="flex-1 bg-[#3b6934] hover:bg-[#2f552a]
-                                    text-white py-3 px-4 rounded-lg
-                                    flex items-center justify-center gap-2 font-semibold uppercase"
-                            >
-                                <span className="material-symbols-outlined text-[20px]">
-                                    check_circle
-                                </span>
-
-                                Submit Answer
-                            </button>
-
                         </div>
                     </div>
-
-                    {/* Right */}
-                    <div className="lg:col-span-5">
-
-                        <div className="border border-gray-300 rounded-xl p-5 min-h-162.5">
-
-                            <div className="flex items-center gap-2 mb-5">
-                                <div className="w-2 h-2 bg-[#3b6934] rounded-full animate-pulse"></div>
-
-                                <h3 className="uppercase text-sm font-bold">
-                                    Live Transcription
-                                </h3>
-                            </div>
-
-                            <div className="bg-[#eff4ff] border-l-4 border-[#3b6934] p-4 rounded">
-
-                                <p className="italic text-sm">
-                                    AI: Tell us about your professional
-                                    background and the key milestones
-                                    that have shaped your career.
-                                </p>
-                            </div>
-
-                            <div className="mt-5 space-y-4 text-[#514441]">
-                                <p>
-                                    Vertical scaling involves adding
-                                    more power like CPU, RAM or storage
-                                    to an existing server...
-                                </p>
-
-                                <p className="text-[#3b6934]">
-                                    Throughout my career I have focused
-                                    on building scalable applications...
-                                </p>
-                            </div>
-
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>

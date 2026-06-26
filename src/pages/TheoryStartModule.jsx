@@ -5,9 +5,11 @@ import { FiLoader } from "react-icons/fi";
 function TheoryStartModule() {
     const navigate = useNavigate();
     const { state } = useLocation();
-
     const topic = state?.topic || "";
     const subTopic = state?.subTopic || "";
+    const technology_id = state?.technology_id;
+    const subtopic_id = state?.subtopic_id;
+    const client_id = localStorage.getItem("client_id");
 
     console.log(topic);
     console.log(subTopic);
@@ -190,9 +192,12 @@ function TheoryStartModule() {
                                     setTimeout(() => {
                                         navigate("/theory-interview", {
                                             state: {
+                                                client_id,
+                                                technology_id,
+                                                subtopic_id,
+                                                difficulty_level: difficulty.toLowerCase(),
                                                 topic,
                                                 subTopic,
-                                                difficulty,
                                             },
                                         });
                                     }, 500);

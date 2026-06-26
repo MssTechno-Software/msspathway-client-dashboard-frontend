@@ -1,151 +1,100 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FiLoader } from "react-icons/fi";
-import {
-    Repeat,
-    GitBranch,
-    Network,
-    List,
-    Database,
-    Puzzle,
-    CheckCircle,
-    ArrowRight,
-    ArrowLeft,
-} from "lucide-react";
+import { Repeat, GitBranch, Network, List, Database, Puzzle, CheckCircle, ArrowRight, ArrowLeft } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-
-const subTopics = {
-    HTML: [
-        {
-            name: "Forms",
-            description: "HTML forms and validation",
-            progress: 50,
-            icon: <List size={18} />,
-        },
-        {
-            name: "Semantic Tags",
-            description: "Semantic HTML elements",
-            progress: 80,
-            icon: <Database size={18} />,
-        },
-    ],
-
-    CSS: [
-        {
-            name: "Flexbox",
-            description: "Layout with Flexbox",
-            progress: 60,
-            icon: <Puzzle size={18} />,
-        },
-        {
-            name: "Grid",
-            description: "CSS Grid Layout",
-            progress: 70,
-            icon: <Network size={18} />,
-        },
-    ],
-
-    JavaScript: [
-        {
-            name: "ES6",
-            description: "Modern JavaScript features",
-            progress: 75,
-            icon: <GitBranch size={18} />,
-        },
-    ],
-
-    React: [
-        {
-            name: "Hooks",
-            description: "useState, useEffect, useRef",
-            progress: 90,
-            icon: <Repeat size={18} />,
-        },
-    ],
-
-    Java: [
-        {
-            name: "Collections",
-            description: "Java Collection Framework",
-            progress: 65,
-            icon: <Database size={18} />,
-        },
-    ],
-
-    Python: [
-        {
-            name: "Loops & Iterations",
-            description:
-                "Evaluation of for/while loops, range functions, and iterator protocols.",
-            progress: 33,
-            icon: <Repeat size={18} />,
-        },
-        {
-            name: "Conditional Statements",
-            description:
-                "Testing logic flow and conditional branching complexity.",
-            progress: 60,
-            icon: <GitBranch size={18} />,
-        },
-        {
-            name: "Arrays & Data Structures",
-            description:
-                "Memory management and complex data organization strategies.",
-            progress: 85,
-            icon: <Network size={18} />,
-        },
-        {
-            name: "Lists & Sequences",
-            description:
-                "List comprehensions, slicing, indexing and sequence manipulations.",
-            progress: 100,
-            icon: <List size={18} />,
-        },
-        {
-            name: "Dictionaries & Sets",
-            description:
-                "Hash maps, key-value pairs and set operations.",
-            progress: 0,
-            icon: <Database size={18} />,
-        },
-        {
-            name: "Functions & Modules",
-            description:
-                "Scope, modularity and reusable code design.",
-            progress: 45,
-            icon: <Puzzle size={18} />,
-        },
-    ],
-};
+import BASE_URL from "../config/api";
 
 function SubTopic() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { state } = useLocation();
+    const [subTopics, setSubTopics] = useState([]);
+    const [popup, setPopup] = useState({
+        show: false,
+        message: "",
+        type: "",
+    });
 
-    const topic = state?.topic || "Python";
-    const getProgressColor = (progress) => {
-        if (progress < 40) {
-            return {
-                text: "text-red-600",
-                bar: "bg-red-500",
-            };
+    const [selectedSubTopic, setSelectedSubTopic] = useState(null);
+
+    const topic = state?.topic || "";
+    const technology_id = state?.technology_id;
+    const client_id = state?.client_id;
+    useEffect(() => {
+        if (technology_id) {
+            fetchSubTopics();
         }
+    }, [technology_id]);
 
-        if (progress <= 60) {
-            return {
-                text: "text-yellow-600",
-                bar: "bg-yellow-500",
-            };
+    /*get subtopics bt technology_id*/
+    const fetchSubTopics = async () => {
+        try {
+            setLoading(true);
+
+            const response = await fetch(
+                `${BASE_URL}/Topic_based/clients/${client_id}/technologies/${technology_id}/subtopics`
+            );
+
+            const data = await response.json();
+
+            if (data?.subtopics) {
+                const sortedSubTopics = data.subtopics.sort(
+                    (a, b) => a.display_order - b.display_order
+                );
+
+                setSubTopics(sortedSubTopics);
+
+                setPopup({
+                    show: true,
+                    message:
+                        data.message ||
+                        data.detail ||
+                        "Subtopics loaded successfully",
+                    type: "success",
+                });
+            }
+        } catch (error) {
+            console.log("Error in fetching the data:", error);
+            setPopup({
+                show: true,
+                message:
+                    error.message || error.detail || "Failed to load subtopics",
+                type: "error",
+            });
+
+        } finally {
+            setLoading(false);
         }
-
-        return {
-            text: "text-[#3b6934]",
-            bar: "bg-[#3b6934]",
-        };
     };
 
-    const [selectedSubTopic, setSelectedSubTopic] =
-        useState();
+    /*Progress*/
+    const getProgressColor = (status) => {
+        switch (status?.toLowerCase()) {
+            case "red":
+                return {
+                    text: "text-red-600",
+                    bar: "bg-red-500",
+                };
+
+            case "yellow":
+                return {
+                    text: "text-yellow-600",
+                    bar: "bg-yellow-500",
+                };
+
+            case "green":
+                return {
+                    text: "text-[#3b6934]",
+                    bar: "bg-[#3b6934]",
+                };
+
+            default:
+                return {
+                    text: "text-gray-500",
+                    bar: "bg-gray-400",
+                };
+        }
+    };
 
     return (
         <div className="bg-white min-h-screen">
@@ -200,24 +149,28 @@ function SubTopic() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
 
-                    {subTopics[topic]?.map((item) => (
+                    {subTopics.map((item) => (
                         <div
-                            key={item.name}
-                            onClick={() => setSelectedSubTopic(item.name)}
+                            key={item.subtopic_id}
+                            onClick={() => setSelectedSubTopic(item)}
                             className={`cursor-pointer rounded-xl border p-4 sm:p-5 lg:p-6 transition-all hover:shadow-md
-                                ${selectedSubTopic === item.name
+                                ${selectedSubTopic?.subtopic_id === item.subtopic_id
                                     ? "bg-[#eff4ff] border-[#3b6934]"
                                     : "bg-white border-[#d5c2bf]"
                                 }`}
                         >
                             <div className="w-10 h-10 bg-[#eff4ff] rounded flex items-center justify-center text-[#3b6934]">
-                                {item.icon}
+                                <img
+                                    src={item.icon}
+                                    alt={item.subtopic_name}
+                                    className="w-6 h-6"
+                                />
                             </div>
 
                             <h3 className="font-semibold text-lg sm:text-xl mt-4 flex items-center gap-2">
-                                {item.name}
+                                {item.subtopic_name}
 
-                                {item.progress === 100 && (
+                                {item.is_completed && (
                                     <CheckCircle
                                         size={18}
                                         className="text-[#3b6934]"
@@ -226,7 +179,7 @@ function SubTopic() {
                             </h3>
 
                             <p className="text-sm sm:text-base text-[#514441] mt-3 leading-relaxed">
-                                {item.description}
+                                {item.subtopic_description}
                             </p>
 
                             <div className="mt-5">
@@ -236,17 +189,17 @@ function SubTopic() {
                                     </span>
 
                                     <span
-                                        className={`font-semibold text-sm ${getProgressColor(item.progress).text}`}
+                                        className={`font-semibold text-sm ${getProgressColor(item.progress_status).text}`}
                                     >
-                                        {item.progress}%
+                                        {item.progress_percentage}%
                                     </span>
                                 </div>
 
                                 <div className="h-1.5 bg-[#dce6f7] rounded-full">
                                     <div
-                                        className={`h-full rounded-full ${getProgressColor(item.progress).bar}`}
+                                        className={`h-full rounded-full ${getProgressColor(item.progress_status).bar}`}
                                         style={{
-                                            width: `${item.progress}%`,
+                                            width: `${item.progress_percentage}%`,
                                         }}
                                     />
                                 </div>
@@ -272,14 +225,17 @@ function SubTopic() {
 
                     <button
                         onClick={() => {
-                            if(!selectedSubTopic) return;
+                            if (!selectedSubTopic) return;
                             setLoading(true);
 
                             setTimeout(() => {
                                 navigate("/theory-interview-start-module", {
                                     state: {
                                         topic,
-                                        subTopic: selectedSubTopic,
+                                        subTopic: selectedSubTopic.subtopic_name,
+                                        subtopic_id: selectedSubTopic.subtopic_id,
+                                        technology_id,
+                                        client_id,
                                     },
                                 });
                             }, 500);
