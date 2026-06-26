@@ -74,42 +74,79 @@ function TheoryFeedbackPage() {
             </div>
 
             {/* Question Stepper */}
-            <div className="mt-6 flex justify-center">
-                <div className="flex items-center bg-white border border-[#d5c2bf] rounded-lg px-6 py-3 shadow-sm">
+            <div className="px-4 sm:px-6 lg:px-12 mt-6">
+                <div className="bg-white border border-[#d5c2bf] rounded-xl px-6 py-5 shadow-sm">
 
-                    {questions?.map((_, index) => (
-                        <div key={index} className="flex items-center">
+                    <div className="flex items-center">
 
-                            <div
-                                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold
-                                    ${index === currentQuestionIndex
-                                        ? "bg-[#3b6934] text-white"
-                                        : index < currentQuestionIndex
-                                            ? "bg-green-100 text-[#3b6934] border border-[#3b6934]"
-                                            : "bg-gray-100 text-gray-400"
-                                    }`}
-                            >
-                                {index + 1}
-                            </div>
+                        {/* Previous */}
+                        <button
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-[#6b5f5b] hover:bg-gray-100 transition"
+                        >
+                            &#8249;
+                        </button>
 
-                            {index !== questions.length - 1 && (
-                                <div className="w-8 h-px bg-gray-300"></div>
-                            )}
+                        {/* Steps */}
+                        <div className="flex-1 flex items-center px-4">
+
+                            {questions?.map((_, index) => (
+                                <div
+                                    key={index}
+                                    className="flex items-center flex-1 last:flex-none"
+                                >
+                                    <div
+                                        className={`
+                relative z-10
+                w-8 h-8 rounded-full
+                flex items-center justify-center
+                text-xs font-semibold
+                transition-all duration-300
+                ${index === currentQuestionIndex
+                                                ? "bg-[#3b6934] text-white shadow-md"
+                                                : index < currentQuestionIndex
+                                                    ? "bg-[#eef7ef] border border-[#3b6934] text-[#3b6934]"
+                                                    : "bg-white border border-gray-300 text-gray-400"
+                                            }
+              `}
+                                    >
+                                        {index + 1}
+                                    </div>
+
+                                    {index !== questions.length - 1 && (
+                                        <div className="flex-1 h-[2px] bg-gray-200 relative">
+                                            <div
+                                                className={`absolute left-0 top-0 h-full transition-all duration-300 ${index < currentQuestionIndex
+                                                        ? "w-full bg-[#3b6934]"
+                                                        : "w-0"
+                                                    }`}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
 
                         </div>
-                    ))}
+
+                        {/* Next */}
+                        <button
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-[#6b5f5b] hover:bg-gray-100 transition"
+                        >
+                            &#8250;
+                        </button>
+
+                    </div>
 
                 </div>
             </div>
 
             {/* Content */}
             <div className="px-4 sm:px-6 lg:px-12 py-6 lg:py-12">
-                <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-6 mt-8">
+                <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8">
 
                     {/* LEFT SIDE */}
                     <div className="xl:col-span-7 flex flex-col">
 
-                        <div className="bg-white border rounded-xl shadow-sm p-8 h-full">
+                        <div className="bg-gray-50 border border-[#d5c2bf] rounded-xl p-4 sm:p-6 lg:p-8 flex flex-col xl:min-h-162.5">
 
                             {/* Score Card */}
                             <div className="shadow-sm rounded-xl p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white">
@@ -124,10 +161,9 @@ function TheoryFeedbackPage() {
                                             size={32}
                                             className="text-[#3b6934]"
                                         />
-
-                                        <h2 className="text-2xl sm:text-3xl lg:text-[42px] font-bold text-[#3b6934]">
-                                            {feedbackData?.overall_score || 0} <span className="text-[28px] text-[#514441]">/100</span>
-                                        </h2>
+                                        <span className="text-2xl font-bold text-[#3b6934]">
+                                            {feedbackData.overall_score}/100
+                                        </span>
                                     </div>
                                 </div>
 
@@ -162,23 +198,10 @@ function TheoryFeedbackPage() {
                                 </h3>
 
                                 <ul>
-                                    {
-                                        feedbackData?.comprehensive_strengths?.map((item, index) => (
-                                            <li key={index}>• {item}</li>
-                                        ))
-                                    }
+                                    {feedbackData?.comprehensive_strengths?.map((item, index) => (
+                                        <li key={index}>• {item}</li>
+                                    ))}
                                 </ul>
-                            </div>
-
-                            {/* Overall Feedback */}
-                            <div className="mt-8 p-4 bg-[#f8f9ff] rounded-lg border border-[#d5c2bf]">
-                                <h3 className="font-bold mb-2 text-[#3b6934]">
-                                    Overall Feedback
-                                </h3>
-
-                                <p className="text-[#514441] leading-7">
-                                    {feedbackData?.client_answer}
-                                </p>
                             </div>
 
                             {/* Improvement Areas */}

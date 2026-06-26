@@ -336,33 +336,88 @@ function TheoryAIInterview() {
                         {topic}
                     </span>
                     <span>›</span>
-                    <span className="text-[#3b6934]">
+                    <span>
                         {subTopic}
                     </span>
                     <span>›</span>
-                    <span>
+                    <span className="text-[#3b6934]">
                         Question {(currentQuestionIndex ?? 0) + 1}
                     </span>
                 </div>
             </div>
             <div className="border border-gray-300 rounded-xl p-4 mb-6">
-                <div className="flex justify-center items-center gap-4 flex-wrap">
-                    {questions.map((q, index) => (
-                        <div
-                            key={q.question_id}
-                            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
-                            ${q.attempted_status === "answered"
-                                    ? "bg-green-700 text-white"
-                                    : q.attempted_status === "current"
-                                        ? "bg-[#3b6934] text-white"
-                                        : q.attempted_status === "skipped"
-                                            ? "bg-yellow-500 text-white"
-                                            : "border border-gray-300 text-gray-400"
-                                }`}
-                        >
-                            {index + 1}
+                {/* Question Stepper */}
+                <div className="px-4 sm:px-6 lg:px-12 mt-6">
+                    <div className="bg-white border border-[#d5c2bf] rounded-xl px-6 py-5 shadow-sm">
+
+                        <div className="flex items-center">
+
+                            {/* Previous */}
+                            <button
+                                disabled={currentQuestionIndex === 0}
+                                className="w-8 h-8 rounded-full flex items-center justify-center text-[#6b5f5b] hover:bg-gray-100 disabled:opacity-40"
+                            >
+                                &#8249;
+                            </button>
+
+                            {/* Steps */}
+                            <div className="flex-1 flex items-center px-4">
+
+                                {questions.map((q, index) => (
+                                    <div
+                                        key={q.question_id}
+                                        className="flex items-center flex-1 last:flex-none"
+                                    >
+
+                                        <div
+                                            className={`
+                                relative z-10
+                                w-8 h-8 rounded-full
+                                flex items-center justify-center
+                                text-xs font-semibold
+                                transition-all duration-300
+                                ${q.attempted_status === "answered"
+                                                    ? "bg-[#3b6934] text-white"
+                                                    : q.attempted_status === "current"
+                                                        ? "bg-[#3b6934] text-white shadow-md ring-4 ring-green-100"
+                                                        : q.attempted_status === "skipped"
+                                                            ? "bg-yellow-500 text-white"
+                                                            : "bg-white border border-gray-300 text-gray-400"
+                                                }
+                            `}
+                                        >
+                                            {index + 1}
+                                        </div>
+
+                                        {index !== questions.length - 1 && (
+                                            <div className="flex-1 h-[2px] bg-gray-200 relative">
+
+                                                <div
+                                                    className={`absolute left-0 top-0 h-full transition-all duration-300 ${index < currentQuestionIndex
+                                                            ? "w-full bg-[#3b6934]"
+                                                            : "w-0"
+                                                        }`}
+                                                />
+
+                                            </div>
+                                        )}
+
+                                    </div>
+                                ))}
+
+                            </div>
+
+                            {/* Next */}
+                            <button
+                                disabled={currentQuestionIndex === questions.length - 1}
+                                className="w-8 h-8 rounded-full flex items-center justify-center text-[#6b5f5b] hover:bg-gray-100 disabled:opacity-40"
+                            >
+                                &#8250;
+                            </button>
+
                         </div>
-                    ))}
+
+                    </div>
                 </div>
                 {/* Main Content */}
                 <div className="p-4 sm:p-6 lg:p-8 xl:p-12">
