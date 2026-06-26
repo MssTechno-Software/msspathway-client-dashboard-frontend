@@ -152,7 +152,7 @@ function SubTopic() {
                                 navigate(-1);
                             }, 500);
                         }}
-                        className="inline-flex items-center gap-2 mb-6 text-sm font-semibold text-[#514441] uppercase hover:text-[#3b6934] transition-colors"
+                        className="inline-flex items-center gap-2 mb-6 text-sm font-semibold text-[#514441] uppercase cursor-pointer hover:text-[#3b6934] transition-colors"
                     >
                         <ArrowLeft size={18} />
                         Change Topic

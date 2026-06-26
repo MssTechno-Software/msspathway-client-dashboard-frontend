@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FiLoader } from "react-icons/fi";
+import { ArrowLeft } from "lucide-react";
 
 function TheoryStartModule() {
     const navigate = useNavigate();
@@ -56,6 +57,25 @@ function TheoryStartModule() {
             </div>
 
             <div className="p-12">
+                <button
+                    onClick={() => {
+                        setLoading(true);
+
+                        setTimeout(() => {
+                            navigate("/sub-topic", {
+                                state: {
+                                    client_id,
+                                    technology_id,
+                                    topic,
+                                },
+                            });
+                        }, 500);
+                    }}
+                    className="inline-flex items-center gap-2 mb-6 text-sm font-semibold text-[#514441] uppercase cursor-pointer hover:text-[#3b6934] transition-colors"
+                >
+                    <ArrowLeft size={18} />
+                    Change Sub Topic
+                </button>
                 {/* Header */}
                 <div className="mb-10">
                     <h1 className="text-[40px] font-semibold text-[#0B1C30]">
