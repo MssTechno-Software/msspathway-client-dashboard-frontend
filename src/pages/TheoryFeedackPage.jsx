@@ -20,6 +20,10 @@ function TheoryFeedbackPage() {
     const currentQuestionIndex = location.state?.currentQuestionIndex;
     const questions = location.state?.questions;
     const [loading, setLoading] = useState(false);
+    const client_id = location.state?.client_id;
+    const technology_id = location.state?.technology_id;
+    const subtopic_id = location.state?.subtopic_id;
+    const difficulty_level = location.state?.difficulty_level;
     if (!feedbackData) {
         navigate("/theory-interview");
         return null;
@@ -96,18 +100,18 @@ function TheoryFeedbackPage() {
                                 >
                                     <div
                                         className={`
-                relative z-10
-                w-8 h-8 rounded-full
-                flex items-center justify-center
-                text-xs font-semibold
-                transition-all duration-300
-                ${index === currentQuestionIndex
+                                            relative z-10
+                                            w-8 h-8 rounded-full
+                                            flex items-center justify-center
+                                            text-xs font-semibold
+                                            transition-all duration-300
+                                            ${index === currentQuestionIndex
                                                 ? "bg-[#3b6934] text-white shadow-md"
                                                 : index < currentQuestionIndex
                                                     ? "bg-[#eef7ef] border border-[#3b6934] text-[#3b6934]"
                                                     : "bg-white border border-gray-300 text-gray-400"
                                             }
-              `}
+                                        `}
                                     >
                                         {index + 1}
                                     </div>
@@ -173,11 +177,14 @@ function TheoryFeedbackPage() {
                                         setTimeout(() => {
                                             navigate("/theory-interview", {
                                                 state: {
-                                                    retry: true,
-                                                    retryQuestionIndex: currentQuestionIndex,
-                                                    questions: questions || [],
+                                                    questions,
+                                                    nextQuestionIndex: currentQuestionIndex,
                                                     topic,
                                                     subTopic,
+                                                    client_id,
+                                                    technology_id,
+                                                    subtopic_id,
+                                                    difficulty_level,
                                                 },
                                             });
                                         }, 500);

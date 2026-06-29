@@ -66,18 +66,27 @@ function TheoryAIInterview() {
         return () => clearInterval(timer);
     }, [isRecording]);
 
+    // useEffect(() => {
+    //     // Returning from feedback page
+    //     if (existingQuestions?.length) {
+    //         setQuestions(existingQuestions);
+    //         setCurrentQuestionIndex(nextQuestionIndex ?? 0);
+    //         return;
+    //     }
+
+    //     // Fresh interview
+    //     if (client_id && technology_id && subtopic_id) {
+    //         handleStartInterview();
+    //     }
+    // }, []);
     useEffect(() => {
-        // Returning from feedback page
         if (existingQuestions?.length) {
             setQuestions(existingQuestions);
             setCurrentQuestionIndex(nextQuestionIndex ?? 0);
             return;
         }
 
-        // Fresh interview
-        if (client_id && technology_id && subtopic_id) {
-            handleStartInterview();
-        }
+        handleStartInterview();
     }, []);
 
     useEffect(() => {
@@ -223,7 +232,7 @@ function TheoryAIInterview() {
         }
     };
 
-    /*submit answer*/
+    /* submit answer */
     const handleSubmitAnswer = async () => {
         if (isSubmitting) return;
 
@@ -238,7 +247,9 @@ function TheoryAIInterview() {
 
         setIsSubmitting(true);
         setLoading(true);
+
         const currentQuestion = questions[currentQuestionIndex];
+
         try {
             const response = await fetch(
                 `${BASE_URL}/Topic_based/clients/${client_id}/subtopic-questions/${currentQuestion.question_id}/submit-answer`,
@@ -257,49 +268,39 @@ function TheoryAIInterview() {
 
             console.log(data);
 
-            if (data.question_stepper) {
-                setQuestions(data.question_stepper);
-
-                const current = data.question_stepper.findIndex(
-                    q => q.attempted_status === "current"
-                );
-
-                if (current !== -1) {
-                    setCurrentQuestionIndex(current);
-                    stopRecording();
-                    resetTranscript();
-                    setTimeLeft(119);
-                } else {
-                    navigate("/theory-feedback", {
-                        state: {
-                            feedbackData: data,
-                            transcript,
-                            question: currentQuestion.question_text,
-                            questions: data.question_stepper || questions,
-                            currentQuestionIndex,
-                            topic,
-                            subTopic,
-                        },
-                    });
-                }
-            } else {
-                navigate("/theory-feedback", {
-                    state: {
-                        feedbackData: data,
-                        transcript,
-                        question: currentQuestion.question_text,
-                        questions,
-                        currentQuestionIndex,
-                    },
-                });
+            if (!response.ok) {
+                throw new Error(data.detail || "Failed to submit answer");
             }
+
+            stopRecording();
+            resetTranscript();
+            setTimeLeft(119);
+
             setPopup({
                 show: true,
                 message: data.message || data.detail || "Answer submitted successfully",
                 type: "success",
             });
+
+            navigate("/theory-feedback", {
+                state: {
+                    feedbackData: data,
+                    transcript,
+                    question: currentQuestion.question_text,
+                    questions: data.question_stepper || questions,
+                    currentQuestionIndex,
+                    topic,
+                    subTopic,
+                    client_id,
+                    technology_id,
+                    subtopic_id,
+                    difficulty_level,
+                },
+            });
+
         } catch (err) {
             console.log(err);
+
             setPopup({
                 show: true,
                 message: err.message || "Something went wrong",
@@ -310,7 +311,6 @@ function TheoryAIInterview() {
             setIsSubmitting(false);
         }
     };
-
     return (
         <div className="bg-white min-h-screen">
             {/*loader*/}
