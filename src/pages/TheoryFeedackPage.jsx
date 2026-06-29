@@ -113,11 +113,11 @@ function TheoryFeedbackPage() {
                                     </div>
 
                                     {index !== questions.length - 1 && (
-                                        <div className="flex-1 h-[2px] bg-gray-200 relative">
+                                        <div className="flex-1 h-0.5 bg-gray-200 relative">
                                             <div
                                                 className={`absolute left-0 top-0 h-full transition-all duration-300 ${index < currentQuestionIndex
-                                                        ? "w-full bg-[#3b6934]"
-                                                        : "w-0"
+                                                    ? "w-full bg-[#3b6934]"
+                                                    : "w-0"
                                                     }`}
                                             />
                                         </div>
@@ -271,6 +271,10 @@ function TheoryFeedbackPage() {
                                         nextQuestionIndex: currentQuestionIndex + 1,
                                         topic,
                                         subTopic,
+                                        client_id,
+                                        technology_id,
+                                        subtopic_id,
+                                        difficulty_level,
                                     },
                                 });
                             } else {

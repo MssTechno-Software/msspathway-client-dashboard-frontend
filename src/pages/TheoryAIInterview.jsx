@@ -15,6 +15,8 @@ function TheoryAIInterview() {
     const technology_id = state?.technology_id;
     const subtopic_id = state?.subtopic_id;
     const difficulty_level = state?.difficulty_level;
+    const nextQuestionIndex = state?.nextQuestionIndex;
+    const existingQuestions = state?.questions;
 
     const [isRecording, setIsRecording] = useState(false);
     const [waveScale, setWaveScale] = useState(1);
@@ -65,10 +67,18 @@ function TheoryAIInterview() {
     }, [isRecording]);
 
     useEffect(() => {
+        // Returning from feedback page
+        if (existingQuestions?.length) {
+            setQuestions(existingQuestions);
+            setCurrentQuestionIndex(nextQuestionIndex ?? 0);
+            return;
+        }
+
+        // Fresh interview
         if (client_id && technology_id && subtopic_id) {
             handleStartInterview();
         }
-    }, [client_id, technology_id, subtopic_id]);
+    }, []);
 
     useEffect(() => {
         let interval;
@@ -371,12 +381,12 @@ function TheoryAIInterview() {
 
                                         <div
                                             className={`
-                                relative z-10
-                                w-8 h-8 rounded-full
-                                flex items-center justify-center
-                                text-xs font-semibold
-                                transition-all duration-300
-                                ${q.attempted_status === "answered"
+                                                relative z-10
+                                                w-8 h-8 rounded-full
+                                                flex items-center justify-center
+                                                text-xs font-semibold
+                                                transition-all duration-300
+                                                ${q.attempted_status === "answered"
                                                     ? "bg-[#3b6934] text-white"
                                                     : q.attempted_status === "current"
                                                         ? "bg-[#3b6934] text-white shadow-md ring-4 ring-green-100"
@@ -384,18 +394,18 @@ function TheoryAIInterview() {
                                                             ? "bg-yellow-500 text-white"
                                                             : "bg-white border border-gray-300 text-gray-400"
                                                 }
-                            `}
+                                            `}
                                         >
                                             {index + 1}
                                         </div>
 
                                         {index !== questions.length - 1 && (
-                                            <div className="flex-1 h-[2px] bg-gray-200 relative">
+                                            <div className="flex-1 h-0.5 bg-gray-200 relative">
 
                                                 <div
                                                     className={`absolute left-0 top-0 h-full transition-all duration-300 ${index < currentQuestionIndex
-                                                            ? "w-full bg-[#3b6934]"
-                                                            : "w-0"
+                                                        ? "w-full bg-[#3b6934]"
+                                                        : "w-0"
                                                         }`}
                                                 />
 
