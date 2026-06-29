@@ -18,6 +18,7 @@ import TheoryStartModule from "./pages/TheoryStartModule";
 import TheoryAIInterview from "./pages/TheoryAIInterview";
 import TheoryFeedbackPage from "./pages/TheoryFeedackPage";
 import ScheduledInterviewPage from "./pages/ScheduledInterviewPage";
+import ScoreCardPage from "./pages/ScoreCardPage";
 
 function App() {
   const token = localStorage.getItem("token");
@@ -132,6 +133,15 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["client"]}>
                 <ScheduledInterviewPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/scorecard"
+            element={
+              <ProtectedRoute allowedRoles={["client"]}>
+                <ScoreCardPage />
               </ProtectedRoute>
             }
           />

@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
+import { Check } from "lucide-react";
 import { FiLoader } from "react-icons/fi";
 
 function TheoryFeedbackPage() {
@@ -79,7 +80,7 @@ function TheoryFeedbackPage() {
 
             {/* Question Stepper */}
             <div className="px-4 sm:px-6 lg:px-12 mt-6">
-                <div className="bg-white border border-[#d5c2bf] rounded-xl px-6 py-5 shadow-sm">
+                <div className="bg-white border border-[#e7dbd6] rounded-xl px-5 py-4 shadow-sm">
 
                     <div className="flex items-center">
 
@@ -91,7 +92,7 @@ function TheoryFeedbackPage() {
                         </button>
 
                         {/* Steps */}
-                        <div className="flex-1 flex items-center px-4">
+                        <div className="flex-1 flex items-center px-3">
 
                             {questions?.map((_, index) => (
                                 <div
@@ -101,29 +102,42 @@ function TheoryFeedbackPage() {
                                     <div
                                         className={`
                                             relative z-10
-                                            w-8 h-8 rounded-full
+                                            w-7.5 h-7.5 rounded-xl
                                             flex items-center justify-center
                                             text-xs font-semibold
                                             transition-all duration-300
-                                            ${index === currentQuestionIndex
-                                                ? "bg-[#3b6934] text-white shadow-md"
-                                                : index < currentQuestionIndex
-                                                    ? "bg-[#eef7ef] border border-[#3b6934] text-[#3b6934]"
-                                                    : "bg-white border border-gray-300 text-gray-400"
+                                            ${questions[index]?.attempted_status === "completed"
+                                                ? "bg-[#3b6934] text-white"
+                                                : questions[index]?.attempted_status === "current"
+                                                    ? "bg-green-100 border-2 border-[#3b6934] text-[#3b6934]"
+                                                    : questions[index]?.attempted_status === "skipped"
+                                                        ? "bg-red-100 border-2 border-red-500 text-red-500"
+                                                        : "bg-white border border-[#dddddd] text-[#bcbcbc]"
                                             }
                                         `}
                                     >
                                         {index + 1}
+                                        {questions[index]?.attempted_status === "completed" && (
+                                            <div className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-white border-2 border-[#3b6934] flex items-center justify-center shadow-sm">
+                                                <Check
+                                                    size={10}
+                                                    strokeWidth={3}
+                                                    className="text-[#3b6934]"
+                                                />
+                                            </div>
+                                        )}
                                     </div>
 
                                     {index !== questions.length - 1 && (
-                                        <div className="flex-1 h-0.5 bg-gray-200 relative">
-                                            <div
-                                                className={`absolute left-0 top-0 h-full transition-all duration-300 ${index < currentQuestionIndex
-                                                    ? "w-full bg-[#3b6934]"
-                                                    : "w-0"
-                                                    }`}
-                                            />
+                                        <div className="flex-1 px-3">
+                                            <div className="relative h-0.5 bg-[#ececec]">
+                                                <div
+                                                    className={`absolute left-0 top-0 h-full transition-all duration-300 ${index < currentQuestionIndex
+                                                        ? "w-full bg-[#97b78c]"
+                                                        : "w-0"
+                                                        }`}
+                                                />
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -133,7 +147,7 @@ function TheoryFeedbackPage() {
 
                         {/* Next */}
                         <button
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-[#6b5f5b] hover:bg-gray-100 transition"
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-[#756965] hover:bg-gray-100 disabled:opacity-40"
                         >
                             &#8250;
                         </button>
