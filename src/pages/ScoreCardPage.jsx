@@ -20,14 +20,14 @@ function ScoreCardPage() {
     const [fromDate, setFromDate] = useState("");
     const [toDate, setToDate] = useState("");
 
-    const clientId = 1; // Replace with logged in user's client id
+    const client_id = localStorage.getItem("client_id");
 
     const getScorecards = async () => {
         try {
             setLoading(true);
 
             const response = await axios.get(
-                `${BASE_URL}/api/clients/${clientId}/scorecards`,
+                `${BASE_URL}/api/clients/${client_id}/scorecards`,
                 {
                     params: {
                         page,
