@@ -137,6 +137,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          
           <Route
             path="/scheduled-Interview-mode"
             element={
@@ -145,6 +146,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/scorecards"
             element={
@@ -153,8 +155,9 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
-            path="/InterviewPerformanceReport"
+            path="/Interview-Performance-Report"
             element={
               <ProtectedRoute allowedRoles={["client"]}>
                 <InterviewPerformanceReport />

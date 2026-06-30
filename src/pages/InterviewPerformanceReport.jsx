@@ -317,7 +317,7 @@ export default function InterviewPerformanceReport({ data = null }) {
                                 navigate("/scorecards");
                             }
                         }}
-                        className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors text-[#2d5a27]"
+                        className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
                     >
                         <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
                     </button>
@@ -406,7 +406,7 @@ export default function InterviewPerformanceReport({ data = null }) {
 
                     //  Overall Report Bento Grid 
                     <div>
-                        <h2 className="text-[28px] md:text-[32px] leading-[40px] font-bold text-[#230804] mb-8 font-sans tracking-tight">
+                        <h2 className="text-[28px] md:text-[32px] leading-10 font-bold text-[#230804] mb-8 font-sans tracking-tight">
                             Interview Performance Report
                         </h2>
 
@@ -441,9 +441,9 @@ export default function InterviewPerformanceReport({ data = null }) {
                                             strokeWidth="8"
                                         />
                                     </svg>
-                                    <span className="absolute text-[48px] leading-[56px] font-bold text-white">{scorecard.overall_score}</span>
+                                    <span className="absolute text-[48px] leading-14 font-bold text-white">{scorecard.overall_score}</span>
                                 </div>
-                                <p className="mt-4 text-white/70 text-sm max-w-[240px]">
+                                <p className="mt-4 text-white/70 text-sm max-w-60">
                                     {scorecard.score_summary}
                                 </p>
                             </section>
@@ -464,7 +464,7 @@ export default function InterviewPerformanceReport({ data = null }) {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                                     {/* Radar Chart SVG */}
-                                    <div className="relative w-full max-w-[300px] aspect-square mx-auto flex items-center justify-center">
+                                    <div className="relative w-full max-w-75 aspect-square mx-auto flex items-center justify-center">
                                         <svg className="w-full h-full" viewBox="-30 -20  260 240">
                                             {/* Radial Grid lines (Pentagons) */}
                                             <polygon
@@ -612,7 +612,7 @@ export default function InterviewPerformanceReport({ data = null }) {
                                 </div>
 
                                 {/* Scrollable list */}
-                                <div className="space-y-6 overflow-y-auto max-h-[380px] pr-2 flex-1 scrollbar-thin">
+                                <div className="space-y-6 overflow-y-auto max-h-95 pr-2 flex-1 scrollbar-thin">
                                     {scorecard.interview_highlights.map((highlight, index) => {
                                         const isEmotional = highlight.tag_type === "emotional";
                                         const isTech = highlight.tag_type === "tech";
@@ -653,14 +653,14 @@ export default function InterviewPerformanceReport({ data = null }) {
                     activeQuestion && (
                         <div>
                             {/* Selected Question Header Title */}
-                            <h2 className="text-[28px] md:text-[32px] leading-[40px] font-bold text-[#230804] mb-8 font-sans tracking-tight">
+                            <h2 className="text-[28px] md:text-[32px] leading-10 font-bold text-[#230804] mb-8 font-sans tracking-tight">
                                 Question {activeQuestion.id}: {activeQuestion.title}
                             </h2>
 
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
 
                                 {/* Column 1: Question Summary */}
-                                <section className="bg-white border border-[#dee2e6] rounded-xl p-6 shadow-sm flex flex-col justify-between min-h-[380px]">
+                                <section className="bg-white border border-[#dee2e6] rounded-xl p-6 shadow-sm flex flex-col justify-between min-h-95">
                                     <div>
                                         <div className="flex items-center gap-2 mb-6">
                                             <FileText className="w-5 h-5 text-[#2d5a27]" />
@@ -689,7 +689,7 @@ export default function InterviewPerformanceReport({ data = null }) {
                                 </section>
 
                                 {/* Column 2: Technical Analysis  */}
-                                <section className="bg-white border border-[#dee2e6] rounded-xl p-6 shadow-sm flex flex-col justify-between min-h-[380px]">
+                                <section className="bg-white border border-[#dee2e6] rounded-xl p-6 shadow-sm flex flex-col justify-between min-h-95">
                                     <div>
                                         <div className="flex items-center gap-2 mb-6">
                                             <Brain className="w-5 h-5 text-[#2d5a27]" />
@@ -702,7 +702,7 @@ export default function InterviewPerformanceReport({ data = null }) {
                                             Candidate Response
                                         </span>
 
-                                        <div className="bg-[#f8f9fa] border border-[#dee2e6]/60 p-4 rounded-lg text-sm text-[#212529] leading-relaxed max-h-[180px] overflow-y-auto scrollbar-thin">
+                                        <div className="bg-[#f8f9fa] border border-[#dee2e6]/60 p-4 rounded-lg text-sm text-[#212529] leading-relaxed max-h-45 overflow-y-auto scrollbar-thin">
                                             "{activeQuestion.candidate_answer}"
                                         </div>
                                     </div>
@@ -726,7 +726,7 @@ export default function InterviewPerformanceReport({ data = null }) {
                                 </section>
 
                                 {/* Column 3: Ideal Answer */}
-                                <section className="bg-white border border-[#dee2e6] rounded-xl p-6 shadow-sm flex flex-col justify-between min-h-[380px]">
+                                <section className="bg-white border border-[#dee2e6] rounded-xl p-6 shadow-sm flex flex-col justify-between min-h-95">
                                     <div>
                                         <div className="flex items-center gap-2 mb-6">
                                             <ClipboardCheck className="w-5 h-5 text-[#2d5a27]" />
@@ -739,7 +739,7 @@ export default function InterviewPerformanceReport({ data = null }) {
                                             Ideal Response
                                         </span>
 
-                                        <div className="bg-[#f8f9fa] border border-[#dee2e6]/60 p-4 rounded-lg text-sm text-[#212529] leading-relaxed max-h-[160px] overflow-y-auto scrollbar-thin mb-4">
+                                        <div className="bg-[#f8f9fa] border border-[#dee2e6]/60 p-4 rounded-lg text-sm text-[#212529] leading-relaxed max-h-40 overflow-y-auto scrollbar-thin mb-4">
                                             {activeQuestion.ideal_answer}
                                         </div>
                                     </div>
@@ -796,7 +796,7 @@ export default function InterviewPerformanceReport({ data = null }) {
                                                 {activeQuestion.correct_points.map((pt, index) => (
                                                     <li key={index} className="flex items-start gap-2">
                                                         <span className="text-[#2d5a27] font-bold mt-0.5">
-                                                            <Check className="w-4 h-4 text-[#2d5a27] stroke-[3]" />
+                                                            <Check className="w-4 h-4 text-[#2d5a27] stroke-3" />
                                                         </span>
                                                         <span>{pt}</span>
                                                     </li>

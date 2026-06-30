@@ -4,35 +4,76 @@ import {
     FiChevronRight,
     FiSearch,
     FiMapPin,
+    FiLoader,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import BASE_URL from "../config/api";
 function ScoreCardPage() {
     const navigate = useNavigate();
-    const scorecards = [
-        {
-            date: "Oct 20, 2023",
-            mode: "COMPANY BASED",
-            score: 85,
-        },
-        {
-            date: "Oct 15, 2023",
-            mode: "SELF-INTRODUCTION",
-            score: 74,
-        },
-        {
-            date: "Oct 12, 2023",
-            mode: "COMPANY-BASED",
-            score: 81,
-        },
-        {
-            date: "Oct 08, 2023",
-            mode: "RESUME-BASED",
-            score: 64,
-        },
-    ];
+    const [scorecards, setScorecards] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalRecords, setTotalRecords] = useState(0);
+    const [fromDate, setFromDate] = useState("");
+    const [toDate, setToDate] = useState("");
+
+    const clientId = 1; // Replace with logged in user's client id
+
+    const getScorecards = async () => {
+        try {
+            setLoading(true);
+
+            const response = await axios.get(
+                `${BASE_URL}/api/clients/${clientId}/scorecards`,
+                {
+                    params: {
+                        page,
+                        page_size: 10,
+                        from_date: fromDate || undefined,
+                        to_date: toDate || undefined,
+                    },
+                }
+            );
+
+            setScorecards(response.data.scorecards);
+            setTotalPages(response.data.pagination.total_pages);
+            setTotalRecords(response.data.pagination.total_records);
+        } catch (error) {
+            console.error(error);
+
+            setPopup({
+                show: true,
+                type: "error",
+                message:
+                    error.response?.data?.message ||
+                    "Something went wrong. Please try again.",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        getScorecards(page, fromDate, toDate);
+    }, [page]);
 
     return (
         <div className="bg-[#f8f8f8] min-h-screen p-8">
+            {/*Loader*/}
+            {loading && (
+                <div className="fixed inset-0 bg-black/40 z-9999 flex items-center justify-center">
+                    <div className="p-6 flex flex-col items-center gap-3">
+                        <FiLoader className="animate-spin text-4xl text-green-800" />
+
+                        <p className="text-gray-800 font-medium">
+                            Please wait...
+                        </p>
+                    </div>
+                </div>
+            )}
             {/* Header */}
             <div className="mb-8">
                 <h1 className="text-5xl font-bold text-[#1c0d05]">Scorecards</h1>
@@ -47,28 +88,50 @@ function ScoreCardPage() {
             <div className="flex justify-end items-center gap-3 mb-6">
                 <div className="relative">
                     <input
-                        type="text"
-                        placeholder="FROM  dd-mm-yyyy"
-                        className="w-44 h-10 border border-gray-200 rounded px-3 pr-10 text-sm outline-none bg-white"
+                        type="date"
+                        value={fromDate}
+                        onChange={(e) => setFromDate(e.target.value)}
+                        className="w-44 h-10 border border-gray-200 rounded px-3 cursor-pointer"
                     />
-                    <FiCalendar className="absolute right-3 top-3 text-gray-500" />
                 </div>
 
                 <div className="relative">
                     <input
-                        type="text"
-                        placeholder="TO  dd-mm-yyyy"
-                        className="w-44 h-10 border border-gray-200 rounded px-3 pr-10 text-sm outline-none bg-white"
+                        type="date"
+                        value={toDate}
+                        onChange={(e) => setToDate(e.target.value)}
+                        className="w-44 h-10 border border-gray-200 rounded px-3 cursor-pointer"
                     />
-                    <FiCalendar className="absolute right-3 top-3 text-gray-500" />
                 </div>
 
-                <button className="bg-[#2e5d2d] text-white h-10 px-6 rounded font-medium flex items-center gap-2 hover:bg-[#214b20]">
+                <button
+                    onClick={() => {
+                        if (fromDate && toDate && fromDate > toDate) {
+                            setPopup({
+                                show: true,
+                                type: "error",
+                                message: "From Date cannot be greater than To Date.",
+                            });
+                            return;
+                        }
+                        setPage(1);
+                        getScorecards(1, fromDate, toDate);
+                    }}
+                    className="bg-[#2e5d2d] text-white h-10 px-6 rounded font-medium flex items-center gap-2 cursor-pointer"
+                >
                     <FiSearch />
                     Search
                 </button>
 
-                <button className="h-10 px-5 border border-gray-200 rounded bg-white font-medium hover:bg-gray-50">
+                <button
+                    onClick={() => {
+                        setFromDate("");
+                        setToDate("");
+                        setPage(1);
+                        getScorecards();
+                    }}
+                    className="h-10 px-5 border border-gray-200 rounded bg-white cursor-pointer"
+                >
                     Clear
                 </button>
             </div>
@@ -94,69 +157,108 @@ function ScoreCardPage() {
                     </thead>
 
                     <tbody>
-                        {scorecards.map((item, index) => (
-                            <tr
-                                key={index}
-                                className="border-b border-gray-200 last:border-none hover:bg-gray-50"
-                            >
-                                <td className="px-6 py-7 text-gray-700">{item.date}</td>
-
-                                <td>
-                                    <span className="bg-gray-100 px-4 py-1 rounded-full text-[11px] font-semibold">
-                                        {item.mode}
-                                    </span>
-                                </td>
-
-                                <td>
-                                    <div className="w-40">
-                                        <div className="w-full h-2 bg-gray-200 rounded-full">
-                                            <div
-                                                className="h-2 rounded-full bg-[#2f6c2f]"
-                                                style={{ width: `${item.score}%` }}
-                                            ></div>
-                                        </div>
-
-                                        <p className="mt-2 text-sm font-semibold text-[#2f6c2f]">
-                                            {item.score}/100
-                                        </p>
-                                    </div>
-                                </td>
-
-                                <td>
-                                    <button
-                                        onClick={() =>
-                                            navigate("/InterviewPerformanceReport", {
-                                                state: {
-                                                    interview: item,
-                                                },
-                                            })
-                                        }
-                                        className="text-[#2f6c2f] font-semibold text-sm flex items-center gap-2 hover:underline"
-                                    >
-                                        <FiMapPin />
-                                        VIEW INSIGHTS & FEEDBACK
-                                    </button>
+                        {scorecards.length === 0 ? (
+                            <tr>
+                                <td colSpan={4} className="text-center py-8 text-gray-500">
+                                    No scorecards found
                                 </td>
                             </tr>
-                        ))}
+                        ) : (
+                            scorecards.map((item) => (
+                                <tr
+                                    key={item.id}
+                                    className="border-b border-gray-200 hover:bg-gray-50"
+                                >
+                                    <td className="px-6 py-7">
+                                        {new Date(item.submitted_at).toLocaleDateString()}
+                                    </td>
+
+                                    <td>
+                                        <span className="bg-gray-100 px-4 py-1 rounded-full text-[11px] font-semibold">
+                                            {item.interview_mode}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <div className="w-40">
+                                            <div className="w-full h-2 bg-gray-200 rounded-full">
+                                                <div
+                                                    className="h-2 rounded-full bg-[#2f6c2f]"
+                                                    style={{
+                                                        width: `${item.performance_score}%`,
+                                                    }}
+                                                />
+                                            </div>
+
+                                            <p className="mt-2 text-sm font-semibold text-[#2f6c2f]">
+                                                {item.performance_score}/100
+                                            </p>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <button
+                                            onClick={() =>
+                                                navigate("/Interview-Performance-Report", {
+                                                    state: {
+                                                        interview: item,
+                                                    },
+                                                })
+                                            }
+                                            className="text-[#2f6c2f] font-semibold text-sm flex items-center gap-2"
+                                        >
+                                            <FiMapPin />
+                                            VIEW INSIGHTS & FEEDBACK
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
                     </tbody>
                 </table>
 
                 {/* Footer */}
-                <div className="flex justify-between items-center px-6 py-5 border-t border-gray-200">
-
-                    <div className="flex items-center gap-3 text-sm">
-                        <button className="w-9 h-9 rounded bg-[#2e5d2d] text-white font-semibold">
-                            1
+                <div className="flex flex-col md:flex-row gap-3 justify-between items-center px-4 py-3 border-t border-gray-200 bg-gray-50">
+                    <div className="text-sm text-gray-500">
+                        Showing {scorecards.length} of {totalRecords} scorecards
+                    </div>
+                    <div className="flex items-center gap-2">
+                        {/* First Page */}
+                        <button
+                            disabled={page === 1}
+                            onClick={() => setPage(1)}
+                            className="px-3 py-1 border rounded disabled:opacity-40 hover:bg-gray-100 cursor-pointer"
+                        >
+                            {"<<"}
                         </button>
-
-                        <button className="hover:text-green-700">2</button>
-
-                        <button className="hover:text-green-700">3</button>
-
-                        <span>...</span>
-
-                        <button className="hover:text-green-700">12</button>
+                        {/* Previous */}
+                        <button
+                            disabled={page === 1}
+                            onClick={() => setPage(page - 1)}
+                            className="px-3 py-1 border rounded disabled:opacity-40 hover:bg-gray-100 cursor-pointer"
+                        >
+                            Previous
+                        </button>
+                        {/* Current Page */}
+                        <button className="bg-[#2f6f2f] text-white px-4 py-1 rounded">
+                            {page}
+                        </button>
+                        {/* Next */}
+                        <button
+                            disabled={page === totalPages}
+                            onClick={() => setPage(page + 1)}
+                            className="px-3 py-1 border rounded disabled:opacity-40 hover:bg-gray-100 cursor-pointer"
+                        >
+                            Next
+                        </button>
+                        {/* Last Page */}
+                        <button
+                            disabled={page === totalPages}
+                            onClick={() => setPage(totalPages)}
+                            className="px-3 py-1 border rounded disabled:opacity-40 hover:bg-gray-100 cursor-pointer"
+                        >
+                            {">>"}
+                        </button>
                     </div>
                 </div>
             </div>
