@@ -7,6 +7,7 @@ import BASE_URL from "../config/api";
 function SubTopic() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    
     const { state } = useLocation();
     const [subTopics, setSubTopics] = useState([]);
     const [popup, setPopup] = useState({

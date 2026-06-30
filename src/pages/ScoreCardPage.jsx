@@ -5,8 +5,9 @@ import {
     FiSearch,
     FiMapPin,
 } from "react-icons/fi";
-
+import { useNavigate } from "react-router-dom";
 function ScoreCardPage() {
+    const navigate = useNavigate();
     const scorecards = [
         {
             date: "Oct 20, 2023",
@@ -122,7 +123,16 @@ function ScoreCardPage() {
                                 </td>
 
                                 <td>
-                                    <button className="text-[#2f6c2f] font-semibold text-sm flex items-center gap-2 hover:underline">
+                                    <button
+                                        onClick={() =>
+                                            navigate("/InterviewPerformanceReport", {
+                                                state: {
+                                                    interview: item,
+                                                },
+                                            })
+                                        }
+                                        className="text-[#2f6c2f] font-semibold text-sm flex items-center gap-2 hover:underline"
+                                    >
                                         <FiMapPin />
                                         VIEW INSIGHTS & FEEDBACK
                                     </button>

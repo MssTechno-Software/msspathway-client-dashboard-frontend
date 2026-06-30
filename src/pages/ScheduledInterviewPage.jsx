@@ -448,7 +448,6 @@ function ScheduledInterviewPage() {
                                                             </span>
                                                         )}
                                                     </td>
-
                                                     <td className="text-center px-6">
                                                         <button className="bg-[#2d5a27] text-white px-3 py-2 text-sm font-semibold rounded">
                                                             START INTERVIEW
