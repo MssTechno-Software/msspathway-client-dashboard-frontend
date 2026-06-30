@@ -48,14 +48,6 @@ function TheoryTopic() {
                         activeTopics[0].technology_name
                     );
                 }
-                setPopup({
-                    show: true,
-                    message:
-                        data.message ||
-                        data.detail ||
-                        "Technologies loaded successfully",
-                    type: "success",
-                });
             }
         } catch (error) {
             console.error("Error fetching technologies:", error);
@@ -106,7 +98,7 @@ function TheoryTopic() {
                         Interview Modes
                     </span>
                     <span>›</span>
-                    <span>Coding Topic</span>
+                    <span>Technologies</span>
                 </div>
             </div>
 

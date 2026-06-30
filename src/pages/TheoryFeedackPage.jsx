@@ -58,7 +58,7 @@ function TheoryFeedbackPage() {
                         onClick={() => navigate("/theory-topic")}
                         className="cursor-pointer hover:text-[#3b6934]"
                     >
-                        Coding Topic
+                        Technologies
                     </span>
                     <span>›</span>
                     <span>

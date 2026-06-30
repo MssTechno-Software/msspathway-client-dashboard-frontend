@@ -73,7 +73,7 @@ function ScoreCardPage() {
             </div>
 
             {/* Table Card */}
-            <div className="bg-white rounded-md border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                 {/* Top */}
                 <div className="flex justify-between items-center px-6 py-5 border-b border-gray-200">
                     <h2 className="text-xl font-semibold text-[#230804]">
@@ -133,7 +133,7 @@ function ScoreCardPage() {
                 </table>
 
                 {/* Footer */}
-                <div className="flex justify-between items-center px-6 py-5 border-t">
+                <div className="flex justify-between items-center px-6 py-5 border-t border-gray-200">
 
                     <div className="flex items-center gap-3 text-sm">
                         <button className="w-9 h-9 rounded bg-[#2e5d2d] text-white font-semibold">

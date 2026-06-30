@@ -43,15 +43,6 @@ function SubTopic() {
                 );
 
                 setSubTopics(sortedSubTopics);
-
-                setPopup({
-                    show: true,
-                    message:
-                        data.message ||
-                        data.detail ||
-                        "Subtopics loaded successfully",
-                    type: "success",
-                });
             }
         } catch (error) {
             console.log("Error in fetching the data:", error);
@@ -136,7 +127,7 @@ function SubTopic() {
                         onClick={() => navigate("/theory-topic")}
                         className="cursor-pointer hover:text-[#3b6934]"
                     >
-                        Coding Topic
+                        Technologies
                     </span>
                     <span>›</span>
                     <span>{topic}</span>

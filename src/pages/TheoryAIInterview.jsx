@@ -163,13 +163,6 @@ function TheoryAIInterview() {
             setCurrentQuestionIndex(
                 currentIndex !== -1 ? currentIndex : 0
             );
-
-            setPopup({
-                show: true,
-                message: "Interview started successfully.",
-                type: "success",
-            });
-
         } catch (err) {
             console.log(err);
             setPopup({
@@ -336,7 +329,7 @@ function TheoryAIInterview() {
                         onClick={() => navigate("/theory-topic")}
                         className="cursor-pointer hover:text-[#3b6934]"
                     >
-                        Coding Topic
+                        Technologies
                     </span>
                     <span>›</span>
                     <span>
