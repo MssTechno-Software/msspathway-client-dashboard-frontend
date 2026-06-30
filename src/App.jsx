@@ -138,7 +138,7 @@ function App() {
           />
 
           <Route
-            path="/scorecard"
+            path="/scorecards"
             element={
               <ProtectedRoute allowedRoles={["client"]}>
                 <ScoreCardPage />

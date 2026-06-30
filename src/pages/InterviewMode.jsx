@@ -50,7 +50,7 @@ function InterviewModes() {
       </div>
 
       {/* Cards */}
-      <div className="grid lg:grid-cols-3 gap-8">
+      <div className="grid lg:grid-cols-2 gap-8">
         <ModeCard
           icon={
             <span className="material-symbols-outlined text-[32px] text-[#2d5a27] transition-colors duration-300 group-hover:text-white">
@@ -87,7 +87,7 @@ function InterviewModes() {
           }}
         />
 
-        <ModeCard
+        {/* <ModeCard
           icon={
             <span className="material-symbols-outlined text-[32px] text-[#2d5a27] transition-colors duration-300 group-hover:text-white">
               terminal
@@ -95,7 +95,7 @@ function InterviewModes() {
           }
           title="Code Interview"
           description="Solve algorithmic challenges in a real-time environment with live intelligent execution feedback."
-        />
+        /> */}
       </div>
 
       {/* Executive Summary */}
