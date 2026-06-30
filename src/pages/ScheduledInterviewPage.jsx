@@ -1,10 +1,10 @@
-import {ArrowLeft, Search, ChevronLeft, ChevronRight, Video, Play, Clock3 } from "lucide-react";
+import { ArrowLeft, Search, ChevronLeft, ChevronRight, Video, Play, Clock3 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { useRef } from "react";
-
+import { useNavigate } from "react-router-dom";
 function ScheduledInterviewPage() {
     const [view, setView] = useState("list");
     const [search, setSearch] = useState("")
@@ -142,7 +142,7 @@ function ScheduledInterviewPage() {
         {
             title: "MC Self Introduction",
             candidateName: "Vikram Singh",
-             role: "Senior System Architect",
+            role: "Senior System Architect",
             start: "2026-06-26T11:30:00",
             end: "2026-06-26T12:00:00",
             time: "11:30 AM",
@@ -152,7 +152,7 @@ function ScheduledInterviewPage() {
         {
             title: "MC Self Introduction",
             candidateName: "Ananya Rao",
-             role: "Senior System Architect",
+            role: "Senior System Architect",
             start: "2026-06-26T02:30:00",
             end: "2026-06-26T03:00:00",
             time: "2:30 AM",
@@ -171,6 +171,29 @@ function ScheduledInterviewPage() {
             status: "scheduled",
         }
     ]);
+    const navigate = useNavigate();
+    const handleStartInterview = (item) => {
+        navigate("/scheduled-interview-mode", {
+            state: {
+                interview: item,
+            },
+        });
+    };
+
+    const handleCalendarInterview = (event) => {
+        navigate("/scheduled-Interview-mode", {
+            state: {
+                interview: {
+                    interview_name: event.title,
+                    category:
+                        event.extendedProps.type === "company"
+                            ? "Company"
+                            : "Mock",
+                    ...event.extendedProps,
+                },
+            },
+        });
+    };
     const renderEventContent = (eventInfo) => {
         // Interview type (Company / Mock)
         const type = eventInfo.event.extendedProps.type;
@@ -193,12 +216,12 @@ function ScheduledInterviewPage() {
         if (calendarType === "week") {
             return (
                 <div
-                    className={`h-full w-full rounded-md border-l-4 px-2 py-2 flex flex-col justify-center
-                  ${isToday
-                            ? "bg-[#bcf1ad] border-[#2d5a27]"
-                            : type === "company"
-                                ? "bg-[#dbeafe] border-[#2563eb]"
-                                : "bg-[#e2e8f0] border-[#64748b]"
+                    onClick={() => handleCalendarInterview(eventInfo.event)}
+                    className={`h-full w-full rounded-md border-l-4 px-2 py-2 flex flex-col justify-center cursor-pointer                  ${isToday
+                        ? "bg-[#bcf1ad] border-[#2d5a27]"
+                        : type === "company"
+                            ? "bg-[#dbeafe] border-[#2563eb]"
+                            : "bg-[#e2e8f0] border-[#64748b]"
                         }`}
                 >
                     <div
@@ -225,15 +248,16 @@ function ScheduledInterviewPage() {
                 </div>
             );
         }
+
         // MONTH VIEW
         return (
             <div
-                className={`min-h-17.5 w-full rounded-md border-l-4 px-2 py-2 overflow-hidden shadow-sm
-                    ${isLive
-                        ? "bg-white border-[#2d5a27]"
-                        : type === "company"
-                            ? "bg-[#dbeafe] border-[#2563eb]"
-                            : "bg-[#e2e8f0] border-[#64748b]"
+                onClick={() => handleCalendarInterview(eventInfo.event)}
+                className={`min-h-17.5 w-full rounded-md border-l-4 px-2 py-2 overflow-hidden shadow-sm cursor-pointer                    ${isLive
+                    ? "bg-white border-[#2d5a27]"
+                    : type === "company"
+                        ? "bg-[#dbeafe] border-[#2563eb]"
+                        : "bg-[#e2e8f0] border-[#64748b]"
                     }`}
             >
                 {isLive && (
@@ -449,7 +473,10 @@ function ScheduledInterviewPage() {
                                                         )}
                                                     </td>
                                                     <td className="text-center px-6">
-                                                        <button className="bg-[#2d5a27] text-white px-3 py-2 text-sm font-semibold rounded">
+                                                        <button
+                                                            onClick={() => handleStartInterview(item)}
+                                                            className="bg-[#2d5a27] text-white px-3 py-2 text-sm font-semibold rounded cursor-pointer hover:bg-[#23481f] transition-colors duration-200"
+                                                        >
                                                             START INTERVIEW
                                                         </button>
                                                     </td>
@@ -710,7 +737,7 @@ function ScheduledInterviewPage() {
 
                             </div>
 
-                           <h3 className="text-xl md:text-[22px] font-bold mb-5">
+                            <h3 className="text-xl md:text-[22px] font-bold mb-5">
                                 Today's Timeline
                             </h3>
 
@@ -754,14 +781,14 @@ function ScheduledInterviewPage() {
                                                 {item.role}
                                             </p>
 
-                                            
+
 
                                         </div>
 
                                     );
                                 })}
 
-                            </div>                        
+                            </div>
                         </div>
 
                     </div>
