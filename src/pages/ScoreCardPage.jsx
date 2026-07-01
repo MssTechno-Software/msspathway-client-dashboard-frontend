@@ -60,6 +60,34 @@ function ScoreCardPage() {
         getScorecards(page, fromDate, toDate);
     }, [page]);
 
+    const handleViewInsights = async (scorecardId) => {
+        try {
+            setLoading(true);
+
+            const response = await axios.get(
+                `${BASE_URL}/api/clients/${client_id}/scorecards/${scorecardId}`
+            );
+
+            navigate("/Interview-Performance-Report", {
+                state: {
+                    scorecard: response.data.scorecard,
+                },
+            });
+        } catch (error) {
+            console.error(error);
+
+            setPopup({
+                show: true,
+                type: "error",
+                message:
+                    error.response?.data?.message ||
+                    "Failed to load interview report.",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="bg-[#f8f8f8] min-h-screen p-8">
             {/*Loader*/}
@@ -166,7 +194,7 @@ function ScoreCardPage() {
                         ) : (
                             scorecards.map((item) => (
                                 <tr
-                                    key={item.id}
+                                    key={item.scorecard_id}
                                     className="border-b border-gray-200 hover:bg-gray-50"
                                 >
                                     <td className="px-6 py-7">
@@ -198,14 +226,8 @@ function ScoreCardPage() {
 
                                     <td>
                                         <button
-                                            onClick={() =>
-                                                navigate("/Interview-Performance-Report", {
-                                                    state: {
-                                                        interview: item,
-                                                    },
-                                                })
-                                            }
-                                            className="text-[#2f6c2f] font-semibold text-sm flex items-center gap-2"
+                                            onClick={() => handleViewInsights(item.scorecard_id)}
+                                            className="text-[#2f6c2f] font-semibold text-sm flex items-center gap-2 cursor-pointer"
                                         >
                                             <FiMapPin />
                                             VIEW INSIGHTS & FEEDBACK

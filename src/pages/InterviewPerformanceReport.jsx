@@ -22,238 +22,47 @@ import {
     FileText
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-const defaultMockScorecard = {
-    overall_score: 70,
-    score_summary: "Helena Rosales is ranked top 5% of candidates for this tier.",
-    technical_metrics: [
-        { name: 'Technical Accuracy', score: 90 },
-        { name: 'Problem Solving', score: 85 },
-        { name: 'Communication', score: 88 },
-        { name: 'Role Relevance', score: 92 },
-        { name: 'Confidence', score: 95 }
-    ],
-    executive_summary: "Helena demonstrates exceptional strategic thinking and a unique ability to bridge the gap between high-level operational logistics and human-centric leadership. Her responses reflect a candidate with mature judgment, particularly in high-pressure crisis scenarios, making her a strong contender for senior leadership roles.",
-    key_strengths: [
-        "High emotional intelligence in stakeholder management.",
-        "Proven track record of leveraging AI for operational efficiency.",
-        "Strong focus on long-term sustainability and workforce trust."
-    ],
-    development_areas: [
-        "Opportunity to refine granular financial modeling specifics.",
-        "Could further articulate international expansion strategies."
-    ],
-    interview_highlights: [
-        {
-            quote: "When we faced the 2021 port congestion, my first priority wasn't the cargo, it was the stakeholders' trust. Transparency is the only currency in a crisis.",
-            tag: "High Emotional Intelligence",
-            tag_type: "emotional"
-        },
-        {
-            quote: "I believe AI should augment the workforce, not replace it. We used predictive modeling to reduce staff burnout by 22%.",
-            tag: "Tech Forward",
-            tag_type: "tech"
-        },
-        {
-            quote: "Success in logistics is about the last mile, not the first thousand. If the customer doesn't have it, we haven't done our job.",
-            tag: "Customer-Centric",
-            tag_type: "customer"
-        }
-    ],
-    stepper_questions: [
-        { id: 1, status: 'completed' },
-        { id: 2, status: 'completed' },
-        { id: 3, status: 'completed' },
-        { id: 4, status: 'skipped' },
-        { id: 5, status: 'completed' },
-        { id: 6, status: 'not_answered' },
-        { id: 7, status: 'completed' },
-        { id: 8, status: 'completed' }
-    ],
-    questions_detail: [
-        {
-            id: 1,
-            title: "Stakeholder Trust Management",
-            question_text: "How do you manage stakeholder trust during a major supply chain disruption?",
-            candidate_answer: "I prioritize open and transparent communication with all key partners immediately, sharing what we know and what we are doing to solve the issue, rather than trying to hide failures.",
-            ideal_answer: "Provide proactive updates, establish a single source of truth, explain remediation steps, and offer realistic timelines for resolution.",
-            question_score: 95,
-            duration: "02:15",
-            language: "ENGLISH",
-            key_components: ["Transparency", "Stakeholder Mgmt", "Crisis Resolution"],
-            correct_points: [
-                "Immediate and proactive outreach.",
-                "Establishing a single channel of truth.",
-                "Honest timeline estimation."
-            ],
-            missing_points: [
-                "Articulating precise risk-mitigation SLA boundaries."
-            ],
-            question_feedback: "Excellent stakeholder communication style. Clear emphasis on building long-term trust over short-term reputation management.",
-            question_status: "correct"
-        },
-        {
-            id: 2,
-            title: "AI & Predictive Analytics",
-            question_text: "Describe a time you leveraged AI or predictive analytics in operational planning.",
-            candidate_answer: "We implemented a demand-forecasting model using historical shipping logs. This allowed us to optimize warehouse staffing levels before seasonal spikes.",
-            ideal_answer: "Explain data selection, model deployment, measurable efficiency gains, and impact on team bandwidth.",
-            question_score: 88,
-            duration: "03:10",
-            language: "ENGLISH",
-            key_components: ["Predictive Models", "Staff Optimization", "Log Analysis"],
-            correct_points: [
-                "Identified key operational bottleneck (staffing spikes).",
-                "Utilized historical log databases.",
-                "Achieved staffing optimization."
-            ],
-            missing_points: [
-                "Quantification of model performance error rate (e.g. MAPE)."
-            ],
-            question_feedback: "Very strong use-case of automated data analytics. Adding concrete accuracy indicators would strengthen this response.",
-            question_status: "correct"
-        },
-        {
-            id: 3,
-            title: "Logistics Efficiency Metrics",
-            question_text: "What key metrics do you look at to assess global logistics efficiency?",
-            candidate_answer: "I focus on cost per ton-mile, dock-to-dock turnaround times, warehouse utilization rates, and first-time-right delivery metrics.",
-            ideal_answer: "Evaluate freight cost analysis, throughput efficiency, cargo dwell times, inventory turns, and carrier scorecard metrics.",
-            question_score: 84,
-            duration: "01:45",
-            language: "ENGLISH",
-            key_components: ["KPI Mapping", "Logistics Efficiency", "Freight Cost Analysis"],
-            correct_points: [
-                "Turnaround times.",
-                "Warehouse utilization rates.",
-                "First-time-right delivery."
-            ],
-            missing_points: [
-                "Carrier service level scorecards.",
-                "Cargo dwell times."
-            ],
-            question_feedback: "A good operational overview. Candidate missed mentioning cargo dwell times, which are critical for ocean freight nodes.",
-            question_status: "warning"
-        },
-        {
-            id: 4,
-            title: "Green Freight Reconciliation",
-            question_text: "How do you reconcile carbon reduction targets with expedited freight requirements?",
-            candidate_answer: "We consolidate loads to maximize vehicle fill rates and shift expedited items to hybrid fleets where available.",
-            ideal_answer: "Propose intermodal shipping shifts, optimized logistics networks, routing software upgrades, and fleet carbon offsetting.",
-            question_score: 78,
-            duration: "02:30",
-            language: "ENGLISH",
-            key_components: ["Carbon Footprint", "Consolidation", "Fleet Optimization"],
-            correct_points: [
-                "Load consolidation.",
-                "Alternative fuel/hybrid vehicles."
-            ],
-            missing_points: [
-                "Intermodal optimization strategies.",
-                "Routing software algorithm enhancements."
-            ],
-            question_feedback: "Solid baseline understanding, but lacks depth in software-driven route optimization and multi-modal logistics shifts.",
-            question_status: "warning"
-        },
-        {
-            id: 5,
-            title: "Regional Management Conflict",
-            question_text: "How do you handle conflict between regional distribution center managers?",
-            candidate_answer: "I bring them together in a virtual war-room, hear their constraints, and align them back to the overall company throughput targets.",
-            ideal_answer: "De-escalate local tension, focus on shared corporate KPIs, standardize capacity sharing protocols, and resolve resource constraints objectively.",
-            question_score: 92,
-            duration: "02:05",
-            language: "ENGLISH",
-            key_components: ["Leadership Scale", "Conflict Resolution", "KPI Alignment"],
-            correct_points: [
-                "Objective conflict resolution.",
-                "Focus on company throughput targets.",
-                "Collaborative problem-solving."
-            ],
-            missing_points: [
-                "Standardizing long-term capacity sharing policies."
-            ],
-            question_feedback: "Strong leadership skills. The candidate shows empathy and aligns teams towards overall business objectives effectively.",
-            question_status: "correct"
-        },
-        {
-            id: 6,
-            title: "Granular Financial Route Modeling",
-            question_text: "Describe a granular financial model you built for a major transport route.",
-            candidate_answer: "I helped model fuel costs and toll fees on our major European routes using Excel spreadsheets, updating them monthly.",
-            ideal_answer: "Detail cost of capital, depreciation schedule of assets, driver wage curves, seasonal tariff variances, and sensitivity analysis.",
-            question_score: 65,
-            duration: "03:40",
-            language: "ENGLISH",
-            key_components: ["Financial Modeling", "Excel Spreadsheets", "Route Costing"],
-            correct_points: [
-                "Fuel cost modeling.",
-                "Toll fee accounting."
-            ],
-            missing_points: [
-                "Sensitivity analysis under volatile markets.",
-                "Driver wage curves and asset depreciation schedules."
-            ],
-            question_feedback: "Weakest response. The model described is basic and lacks key elements of high-level financial risk modeling.",
-            question_status: "incorrect"
-        },
-        {
-            id: 7,
-            title: "Supplier Inflation Negotiations",
-            question_text: "What is your approach to supplier negotiations during high-inflation periods?",
-            candidate_answer: "We offer longer contract durations or volume commitments in exchange for pricing caps and index-linked adjustments.",
-            ideal_answer: "Leverage total volume spend, utilize dual-sourcing threats, propose index-linked contract clauses, and collaborate on shared cost-reduction initiatives.",
-            question_score: 94,
-            duration: "02:50",
-            language: "ENGLISH",
-            key_components: ["Commercial Acumen", "Supplier Relations", "Index Adjustment"],
-            correct_points: [
-                "Pricing caps implementation.",
-                "Index-linked adjustment formulas.",
-                "Volume commitment leverage."
-            ],
-            missing_points: [],
-            question_feedback: "Highly strategic response demonstrating mature supply market understanding and strong commercial acumen.",
-            question_status: "correct"
-        },
-        {
-            id: 8,
-            title: "Professional Background Analysis",
-            question_text: "Tell us about your professional background and the key milestones that have shaped your career.",
-            candidate_answer: "I started my career at Global Logistics Corp, where I managed the regional expansion into EMEA. This was a pivotal moment because it taught me the importance of balancing local regulatory needs with global operational standards. Over the...",
-            ideal_answer: "An ideal response should demonstrate a clear progression from technical execution to strategic leadership. It should highlight specific milestones like leading large-scale digital transformations, managing cross-functional global teams, and aligning technical architecture with broader business outcomes (e.g., ROI, market expansion). The tone should be authoritative yet collaborative, showcasing executive presence and a deep understanding of both technology and stakeholder management.",
-            question_score: 92,
-            duration: "02:45",
-            language: "ENGLISH",
-            key_components: ["Strategic Vision", "Business Alignment", "Leadership Scale", "Technical Depth", "Executive Tone"],
-            correct_points: [
-                "EMEA Regional Expansion management.",
-                "Operational standards calibration.",
-                "Regulatory compliance alignment."
-            ],
-            missing_points: [
-                "Quantification of business metrics scale (e.g. ROI growth).",
-                "Direct connection to high-level digital transformation pillars."
-            ],
-            question_feedback: "Excellent demonstration of regional expansion management. Solid executive presence, though linking the operational scale directly to top-line business outcomes would make it bulletproof.",
-            question_status: "correct"
-        }
-    ]
-};
+import { useLocation } from "react-router-dom";
 
 export default function InterviewPerformanceReport({ data = null }) {
     const navigate = useNavigate();
-    const scorecard = data || defaultMockScorecard;
-
+    const location = useLocation();
+    const scorecard = location.state?.scorecard;
+    console.log("Scorecard:", scorecard);
     // View state: 'overall' or 'question'
     const [viewMode, setViewMode] = useState('overall');
-    const [selectedQuestionId, setSelectedQuestionId] = useState(8);
-
+    const [selectedQuestionId, setSelectedQuestionId] = useState(1);
+    const technicalMetrics = scorecard?.soft_skills
+        ? [
+            {
+                name: "Confidence",
+                score: scorecard.soft_skills.scores.confidence,
+            },
+            {
+                name: "Clarity",
+                score: scorecard.soft_skills.scores.clarity,
+            },
+            {
+                name: "Leadership",
+                score: scorecard.soft_skills.scores.leadership_potential,
+            },
+            {
+                name: "Problem Solving",
+                score: scorecard.soft_skills.scores.problem_solving,
+            },
+            {
+                name: "Empathy",
+                score: scorecard.soft_skills.scores.empathy,
+            },
+        ]
+        : [];
     // Dynamic calculations for overall score SVG circular progress
     const circleRadius = 58;
     const circleCircumference = 2 * Math.PI * circleRadius;
-    const scorePercent = Math.min(Math.max(scorecard.overall_score, 0), 100);
+    const scorePercent = Math.min(
+        Math.max(scorecard?.performance_score || 0, 0),
+        100
+    );
     const strokeDashoffset = circleCircumference - (scorePercent / 100) * circleCircumference;
 
     // Dynamic coordinates plotting for custom SVG radar chart (regular pentagon)
@@ -268,15 +77,23 @@ export default function InterviewPerformanceReport({ data = null }) {
         11 * Math.PI / 10,   // Top-Left Axis (Confidence)
     ];
 
-    const radarPolygonPoints = scorecard.technical_metrics.map((metric, index) => {
-        const angleIndex = index % 5;
-        const scoreRatio = Math.min(Math.max(metric.score, 0), 100) / 100;
-        const currentRadius = maxRadarRadius * scoreRatio;
-        const x = centerX + currentRadius * Math.cos(pentagonAngles[angleIndex]);
-        const y = centerY + currentRadius * Math.sin(pentagonAngles[angleIndex]);
-        return `${x.toFixed(1)},${y.toFixed(1)}`;
-    }).join(' ');
+    const radarPolygonPoints = technicalMetrics
+        .map((metric, index) => {
+            const angleIndex = index % 5;
+            const scoreRatio = metric.score / 100;
+            const currentRadius = maxRadarRadius * scoreRatio;
 
+            const x =
+                centerX +
+                currentRadius * Math.cos(pentagonAngles[angleIndex]);
+
+            const y =
+                centerY +
+                currentRadius * Math.sin(pentagonAngles[angleIndex]);
+
+            return `${x.toFixed(1)},${y.toFixed(1)}`;
+        })
+        .join(" ");
     // Stepper Click handler
     const handleStepClick = (stepId) => {
         setSelectedQuestionId(stepId);
@@ -293,7 +110,7 @@ export default function InterviewPerformanceReport({ data = null }) {
     };
 
     const handleNextStep = () => {
-        if (selectedQuestionId < scorecard.stepper_questions.length) {
+        if (selectedQuestionId < (scorecard?.question_stepper?.length || 0)) {
             const next = selectedQuestionId + 1;
             setSelectedQuestionId(next);
             setViewMode('question');
@@ -301,7 +118,9 @@ export default function InterviewPerformanceReport({ data = null }) {
     };
 
     // Find active question detail
-    const activeQuestion = scorecard.questions_detail.find(q => q.id === selectedQuestionId);
+    const question = scorecard?.questions_detail?.find(
+        q => q.question_number === selectedQuestionId
+    );
 
     return (
         <div className="w-full min-h-screen bg-[#f8f9fa] text-[#212529] ">
@@ -341,27 +160,29 @@ export default function InterviewPerformanceReport({ data = null }) {
                     </button>
 
                     <div className="flex-1 flex items-center justify-center gap-3 md:gap-4 overflow-x-auto py-1">
-                        {scorecard.stepper_questions.map((step, idx) => {
-                            const isSelected = step.id === selectedQuestionId && viewMode === 'question';
+                        {scorecard?.question_stepper?.map((step, idx) => {
+                            const isSelected =
+                                step.question_number === selectedQuestionId &&
+                                viewMode === "question";
                             const isCompleted = step.status === 'completed';
                             const isSkipped = step.status === 'skipped';
 
                             return (
-                                <React.Fragment key={step.id}>
+                                <React.Fragment key={step.question_number}>
                                     <button
-                                        onClick={() => handleStepClick(step.id)}
+                                        onClick={() => handleStepClick(step.question_number)}
                                         className="relative cursor-pointer shrink-0 focus:outline-none"
                                     >
                                         {/* Selected State: White circle with green border */}
                                         {isSelected ? (
                                             <div className="w-8 h-8 rounded-full border-2 border-[#2d5a27] bg-white flex items-center justify-center text-[#2d5a27] text-sm font-bold">
-                                                {step.id}
+                                                {step.question_number}
                                             </div>
                                         ) : isCompleted ? (
                                             /* Completed State: Green circle with completed icon */
                                             <>
                                                 <div className="w-8 h-8 rounded-full bg-[#2d5a27] flex items-center justify-center text-white text-sm font-bold">
-                                                    {step.id}
+                                                    {step.question_number}
                                                 </div>
                                                 <div className="absolute -top-1 -right-1 bg-white rounded-full">
                                                     <CheckCircle2 className="w-4 h-4 text-[#2d5a27] fill-white" />
@@ -371,7 +192,7 @@ export default function InterviewPerformanceReport({ data = null }) {
                                             /* Skipped State: Gray circle with skipped state badge */
                                             <>
                                                 <div className="w-8 h-8 rounded-full bg-gray-200 border border-gray-400 flex items-center justify-center text-gray-600 text-sm font-bold">
-                                                    {step.id}
+                                                    {step.question_number}
                                                 </div>
                                                 <div className="absolute -top-1 -right-1 bg-white rounded-full border border-gray-300 w-4 h-4 flex items-center justify-center text-[10px] text-gray-500 font-bold leading-none">
                                                     -
@@ -380,11 +201,11 @@ export default function InterviewPerformanceReport({ data = null }) {
                                         ) : (
                                             /* Not Answered / Upcoming State: Default gray circle */
                                             <div className="w-8 h-8 rounded-full border border-gray-200 bg-gray-100 flex items-center justify-center text-gray-400 text-sm font-bold">
-                                                {step.id}
+                                                {step.question_number}
                                             </div>
                                         )}
                                     </button>
-                                    {idx < scorecard.stepper_questions.length - 1 && (
+                                    {idx < (scorecard?.question_stepper?.length || 0) - 1 && (
                                         <div className="h-px w-6 md:w-8 bg-gray-200 shrink-0" />
                                     )}
                                 </React.Fragment>
@@ -394,8 +215,12 @@ export default function InterviewPerformanceReport({ data = null }) {
 
                     <button
                         onClick={handleNextStep}
-                        disabled={selectedQuestionId === scorecard.stepper_questions.length && viewMode === 'question'}
-                        className={`transition-colors ${selectedQuestionId === scorecard.stepper_questions.length && viewMode === 'question' ? 'text-[#dee2e6] cursor-not-allowed' : 'text-[#adb5bd] hover:text-[#2d5a27]'}`}
+                        disabled={selectedQuestionId === (scorecard?.question_stepper?.length || 0)}
+                        className={`transition-colors ${selectedQuestionId === (scorecard?.question_stepper?.length || 0) &&
+                            viewMode === "question"
+                            ? "text-[#dee2e6] cursor-not-allowed"
+                            : "text-[#adb5bd] hover:text-[#2d5a27]"
+                            }`}
                     >
                         <ChevronRight className="w-5 h-5" />
                     </button>
@@ -441,10 +266,10 @@ export default function InterviewPerformanceReport({ data = null }) {
                                             strokeWidth="8"
                                         />
                                     </svg>
-                                    <span className="absolute text-[48px] leading-14 font-bold text-white">{scorecard.overall_score}</span>
+                                    <span className="absolute text-[48px] leading-14 font-bold text-white">{scorecard?.performance_score}</span>
                                 </div>
                                 <p className="mt-4 text-white/70 text-sm max-w-60">
-                                    {scorecard.score_summary}
+                                    {scorecard?.executive_summary}
                                 </p>
                             </section>
 
@@ -527,7 +352,7 @@ export default function InterviewPerformanceReport({ data = null }) {
 
                                     {/* Metrics list on the right */}
                                     <div className="space-y-5">
-                                        {scorecard.technical_metrics.map((metric) => (
+                                        {technicalMetrics?.map((metric) => (
                                             <div key={metric.name} className="space-y-1.5">
                                                 <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-[10px]">
                                                     <span className="text-[#6c757d]">{metric.name}</span>
@@ -564,7 +389,6 @@ export default function InterviewPerformanceReport({ data = null }) {
                                             {scorecard.executive_summary}
                                         </p>
                                     </div>
-
                                     {/* Key Strengths & Development Areas Grid */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
                                         {/* Key Strengths */}
@@ -574,7 +398,7 @@ export default function InterviewPerformanceReport({ data = null }) {
                                                 Key Strengths
                                             </h5>
                                             <ul className="space-y-3.5 text-sm text-[#212529]">
-                                                {scorecard.key_strengths.map((strength, index) => (
+                                                {scorecard?.key_strengths?.map((strength, index) => (
                                                     <li key={index} className="flex items-start gap-2.5">
                                                         <span className="text-[#2d5a27] font-bold mt-0.5">•</span>
                                                         <span>{strength}</span>
@@ -590,7 +414,7 @@ export default function InterviewPerformanceReport({ data = null }) {
                                                 Development Areas
                                             </h5>
                                             <ul className="space-y-3.5 text-sm text-[#212529]">
-                                                {scorecard.development_areas.map((dev, index) => (
+                                                {scorecard?.development_areas?.map((dev, index) => (
                                                     <li key={index} className="flex items-start gap-2.5">
                                                         <span className="text-[#6c757d] font-bold mt-0.5">•</span>
                                                         <span>{dev}</span>
@@ -613,21 +437,21 @@ export default function InterviewPerformanceReport({ data = null }) {
 
                                 {/* Scrollable list */}
                                 <div className="space-y-6 overflow-y-auto max-h-95 pr-2 flex-1 scrollbar-thin">
-                                    {scorecard.interview_highlights.map((highlight, index) => {
-                                        const isEmotional = highlight.tag_type === "emotional";
-                                        const isTech = highlight.tag_type === "tech";
+                                    {scorecard?.interview_highlights?.map((highlight, index) => {
+                                        const isTech = highlight.tag === "TECH_FORWARD";
+                                        const isCommunication = highlight.tag === "COMMUNICATION";
 
                                         return (
-                                            <div key={index} className={`relative pl-5 border-l-[3px] ${isEmotional ? "border-[#2d5a27]" : "border-[#dee2e6]"
+                                            <div key={index} className={`relative pl-5 border-l-[3px] ${isTech ? "border-[#2d5a27]" : "border-[#dee2e6]"
                                                 }`}>
                                                 <p className="italic text-[#212529] text-[15px] leading-relaxed mb-3">
                                                     "{highlight.quote}"
                                                 </p>
-                                                <div className={`inline-flex items-center bg-opacity-10 px-3 py-1.5 rounded-full border ${isEmotional
+                                                <div className={`inline-flex items-center bg-opacity-10 px-3 py-1.5 rounded-full border ${isCommunication
                                                     ? "bg-[#2d5a27]/10 border-[#2d5a27]/20 text-[#2d5a27]"
                                                     : "bg-[#f1f3f5] border-[#dee2e6] text-[#6c757d]"
                                                     }`}>
-                                                    {isEmotional ? (
+                                                    {isTech ? (
                                                         <BadgeCheck className="w-3.5 h-3.5 mr-1 text-[#2d5a27]" />
                                                     ) : isTech ? (
                                                         <Sparkles className="w-3.5 h-3.5 mr-1 text-[#6c757d]" />
@@ -650,11 +474,11 @@ export default function InterviewPerformanceReport({ data = null }) {
                 ) : (
 
                     // Question-Level Feedback Screen
-                    activeQuestion && (
+                    question && (
                         <div>
                             {/* Selected Question Header Title */}
                             <h2 className="text-[28px] md:text-[32px] leading-10 font-bold text-[#230804] mb-8 font-sans tracking-tight">
-                                Question {activeQuestion.id}: {activeQuestion.title}
+                                Question {question.question_number}
                             </h2>
 
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
@@ -669,7 +493,7 @@ export default function InterviewPerformanceReport({ data = null }) {
                                             </h4>
                                         </div>
                                         <p className="text-[#212529] font-medium italic text-[15px] leading-relaxed">
-                                            "{activeQuestion.question_text}"
+                                            "{question.question_text}"
                                         </p>
                                     </div>
 
@@ -679,7 +503,7 @@ export default function InterviewPerformanceReport({ data = null }) {
                                         </span>
                                         <div className="flex items-baseline gap-1">
                                             <span className="text-[36px] font-bold text-[#2d5a27] leading-none">
-                                                {activeQuestion.question_score}
+                                                {question.score_obtained}
                                             </span>
                                             <span className="text-[#6c757d] text-xs font-bold font-sans uppercase">
                                                 /100
@@ -703,25 +527,18 @@ export default function InterviewPerformanceReport({ data = null }) {
                                         </span>
 
                                         <div className="bg-[#f8f9fa] border border-[#dee2e6]/60 p-4 rounded-lg text-sm text-[#212529] leading-relaxed max-h-45 overflow-y-auto scrollbar-thin">
-                                            "{activeQuestion.candidate_answer}"
+                                            "{question.candidate_response}"
                                         </div>
                                     </div>
 
                                     <div className="flex items-center gap-2 mt-6 pt-4 border-t border-[#dee2e6]/70">
-                                        {/* Duration badge */}
                                         <div className="bg-[#f8f9fa] border border-[#dee2e6]/80 rounded px-2.5 py-1 flex items-center gap-1.5 text-[#6c757d]">
-                                            <Clock className="w-3.5 h-3.5 text-[#6c757d]" />
+                                            <FileText className="w-3.5 h-3.5" />
                                             <span className="text-[9px] font-bold uppercase tracking-wider">
-                                                {activeQuestion.duration} Duration
+                                                {question.category}
                                             </span>
                                         </div>
-                                        {/* Language badge */}
-                                        <div className="bg-[#f8f9fa] border border-[#dee2e6]/80 rounded px-2.5 py-1 flex items-center gap-1.5 text-[#6c757d]">
-                                            <Globe className="w-3.5 h-3.5 text-[#6c757d]" />
-                                            <span className="text-[9px] font-bold uppercase tracking-wider">
-                                                {activeQuestion.language}
-                                            </span>
-                                        </div>
+
                                     </div>
                                 </section>
 
@@ -740,7 +557,7 @@ export default function InterviewPerformanceReport({ data = null }) {
                                         </span>
 
                                         <div className="bg-[#f8f9fa] border border-[#dee2e6]/60 p-4 rounded-lg text-sm text-[#212529] leading-relaxed max-h-40 overflow-y-auto scrollbar-thin mb-4">
-                                            {activeQuestion.ideal_answer}
+                                            {question.ideal_answer_summary}
                                         </div>
                                     </div>
 
@@ -749,7 +566,7 @@ export default function InterviewPerformanceReport({ data = null }) {
                                             Key Components
                                         </span>
                                         <div className="flex flex-wrap gap-1.5">
-                                            {activeQuestion.key_components.map((comp, i) => (
+                                            {question.ideal_key_components?.map((comp, i) => (
                                                 <span
                                                     key={i}
                                                     className="bg-[#2d5a27]/10 text-[#2d5a27] border border-[#2d5a27]/20 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase font-sans"
@@ -780,7 +597,7 @@ export default function InterviewPerformanceReport({ data = null }) {
                                             AI Review Feedback
                                         </h5>
                                         <p className="text-[#212529] text-[14px] leading-relaxed">
-                                            {activeQuestion.question_feedback}
+                                            {question.evaluator_note}
                                         </p>
                                     </div>
 
@@ -793,7 +610,7 @@ export default function InterviewPerformanceReport({ data = null }) {
                                                 Key Points Covered
                                             </h5>
                                             <ul className="space-y-2.5 text-sm text-[#212529]">
-                                                {activeQuestion.correct_points.map((pt, index) => (
+                                                {question.comprehensive_strengths?.map((pt, index) => (
                                                     <li key={index} className="flex items-start gap-2">
                                                         <span className="text-[#2d5a27] font-bold mt-0.5">
                                                             <Check className="w-4 h-4 text-[#2d5a27] stroke-3" />
@@ -811,7 +628,7 @@ export default function InterviewPerformanceReport({ data = null }) {
                                                 Missed Opportunities
                                             </h5>
                                             <ul className="space-y-2.5 text-sm text-[#212529]">
-                                                {activeQuestion.missing_points.map((pt, index) => (
+                                                {question.strategic_improvements?.map((pt, index) => (
                                                     <li key={index} className="flex items-start gap-2">
                                                         <span className="text-[#6c757d] font-bold mt-0.5">
                                                             <AlertTriangle className="w-4 h-4 text-[#6c757d]" />
@@ -819,7 +636,7 @@ export default function InterviewPerformanceReport({ data = null }) {
                                                         <span>{pt}</span>
                                                     </li>
                                                 ))}
-                                                {activeQuestion.missing_points.length === 0 && (
+                                                {(question?.strategic_improvements?.length || 0) === 0 && (
                                                     <span className="text-[#2d5a27] text-xs italic font-semibold">Perfect alignment. No points missed!</span>
                                                 )}
                                             </ul>
