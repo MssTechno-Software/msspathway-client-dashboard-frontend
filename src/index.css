@@ -1,3 +1,25 @@
+/* @import url("https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&display=swap");
+
+@import "tailwindcss";
+
+body {
+  font-family: "Hanken Grotesk", sans-serif;
+  background: #f8f9fa;
+  color: #212529;
+}
+
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  display: inline-block;
+  white-space: nowrap;
+  direction: ltr;
+  font-feature-settings: "liga";
+} */
 @import url("https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&display=swap");
 
@@ -19,4 +41,185 @@ body {
   white-space: nowrap;
   direction: ltr;
   font-feature-settings: "liga";
+}
+
+
+/* HEADER*/
+
+.fc-col-header {
+  background: #edf3fc !important;
+  border-bottom: 1px solid #d5dde8 !important;
+}
+
+.fc-col-header-cell {
+  background: #edf3fc !important;
+  border: 1px solid #d5dde8 !important;
+  height: 56px !important;
+  vertical-align: middle !important;
+}
+
+.fc-col-header-cell-cushion {
+  color: #514441 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  text-decoration: none !important;
+
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100%;
+  padding: 0 !important;
+}
+.fc .fc-col-header-cell.fc-day-today {
+  background: #eef8ef !important;
+  border: 1px solid #356d32 !important;
+}
+
+.fc .fc-col-header-cell.fc-day-today .fc-col-header-cell-cushion {
+  color: #356d32 !important;
+}
+
+.fc-timegrid thead th {
+  background: #edf3fc !important;
+}
+
+/* GRID */
+
+.fc-theme-standard th,
+.fc-theme-standard td {
+  border: 1px solid #e6e9ef !important;
+}
+
+.fc-scrollgrid {
+  border: 1px solid #e6e9ef !important;
+}
+
+.fc-scrollgrid-section-header td {
+  border-bottom: 1px solid #e6e9ef !important;
+}
+
+.fc-daygrid-day {
+  background: #fff !important;
+}
+
+.fc-daygrid-day-frame {
+  min-height: 105px;
+}
+
+.fc-daygrid-day-top {
+  justify-content: flex-end;
+  padding: 8px;
+}
+
+.fc-daygrid-day-number {
+  color: #514441 !important;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none !important;
+}
+
+/* TODAY */
+
+.fc-day-today {
+  background: #f3fbf2 !important;
+}
+
+.fc-day-today .fc-daygrid-day-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: #356d32;
+  color: #fff !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/*MONTH EVENTS*/
+
+.fc-daygrid-event {
+  display: block !important;
+  width: 100% !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 3px 0 !important;
+  box-shadow: none !important;
+}
+
+.fc-daygrid-event-harness {
+  padding: 0 2px !important;
+}
+
+.fc-event-main {
+  padding: 0 !important;
+}
+
+.fc-daygrid-day-events {
+  max-height: 98px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.fc-daygrid-day-events::-webkit-scrollbar {
+  display: none;
+}
+
+/*WEEK GRID */
+
+.fc-timegrid-slot {
+  height: 72px !important;
+  border-color: #e6e9ef !important;
+}
+
+.fc-timegrid-axis {
+  background: #ffffff !important;
+  border-right: 1px solid #d5dde8 !important;
+  color: #8b8b8b;
+  font-size: 12px;
+}
+
+.fc-timegrid-col {
+  border-color: #e6e9ef !important;
+}
+
+.fc-timegrid-col-frame {
+  min-height: 100%;
+}
+
+.fc-timegrid-divider {
+  display: none !important;
+}
+
+/*WEEK EVENTS */
+
+.fc-timegrid-event {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.fc-timegrid-event .fc-event-main {
+  padding: 0 !important;
+  height: 100%;
+}
+
+.fc-timegrid-event .fc-event-main-frame {
+  height: 100%;
+}
+
+.fc-timegrid-event-harness {
+  padding: 2px !important;
+}
+
+/*REMOVE RESIZE*/
+
+.fc-event-resizer,
+.fc-daygrid-event-resizer {
+  display: none !important;
 }

@@ -1,176 +1,175 @@
-import {ArrowLeft, Search, ChevronLeft, ChevronRight, Video, Play, Clock3 } from "lucide-react";
+import { ArrowLeft, Search, ChevronLeft, ChevronRight, Video, Play, Clock3 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { useRef } from "react";
-
+import { FiLoader } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import BASE_URL from "../config/api";
 function ScheduledInterviewPage() {
     const [view, setView] = useState("list");
+    const [calendarType, setCalendarType] = useState("month");
     const [search, setSearch] = useState("")
-    const [interviews, setInterviews] = useState([
-        {
-            id: 1,
-            interview_name: "MC THEORY-TOPIC",
-            interview_type: "Technical",
-            category: "Mock",
-            department: "Engineering Dept",
-            duration: "45 mins",
-            deadline_date: "Oct 12, 2024",
-            status: "COMPLETED"
-        },
-        {
-            id: 2,
-            interview_name: "MC SELF-INTRODUCTION",
-            interview_type: "Communication",
-            category: "Mock",
-            department: "Round Screening",
-            duration: "15 mins",
-            deadline_date: "Oct 15, 2024",
-            status: "IN PROGRESS"
-        },
-        {
-            id: 3,
-            interview_name: "CAPGEMINI L1 INTERVIEW",
-            interview_type: "HR",
-            category: "Company",
-            department: "HR Evaluation",
-            duration: "30 mins",
-            deadline_date: "Oct 18, 2024",
-            status: "SCHEDULED"
-        },
-        {
-            id: 4,
-            interview_name: "TCS L2 INTERVIEW",
-            interview_type: "HR",
-            category: "Company",
-            department: "HR Evaluation",
-            duration: "60 mins",
-            deadline_date: "Oct 20, 2024",
-            status: "SCHEDULED"
-        },
-        {
-            id: 5,
-            interview_name: "MC CODING INTERVIEW",
-            interview_type: "Technical",
-            category: "Mock",
-            department: "Engineering Dept",
-            duration: "90 mins",
-            deadline_date: "Oct 25, 2024",
-            status: "SCHEDULED"
-        },
-        {
-            id: 6,
-            interview_name: "INFOSYS L1 INTERVIEW",
-            interview_type: "Screening",
-            category: "Company",
-            department: "General Screening",
-            duration: "45 mins",
-            deadline_date: "Oct 28, 2024",
-            status: "SCHEDULED"
-        },
-        {
-            id: 7,
-            interview_name: "INFOSYS L1 INTERVIEW",
-            interview_type: "Screening",
-            category: "Company",
-            department: "General Screening",
-            duration: "45 mins",
-            deadline_date: "Oct 28, 2024",
-            status: "SCHEDULED"
+    const [interviews, setInterviews] = useState([]);
+    const [calendarEvents, setCalendarEvents] = useState([]);
+    const [summary, setSummary] = useState({});
+    const [nextSession, setNextSession] = useState(null);
+    const [todayTimeline, setTodayTimeline] = useState([]);
+    const [pagination, setPagination] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 6;
+    const [popup, setPopup] = useState({
+        open: false,
+        type: "",
+        title: "",
+        message: "",
+    });
+    const navigate = useNavigate();
+    const clientId = localStorage.getItem("client_id");
+
+    const getScheduledInterviews = async (selectedView) => {
+        try {
+            setLoading(true);
+
+            const res = await axios.get(
+                `${BASE_URL}/clients/${clientId}/scheduled-interviews`,
+                {
+                    params: {
+                        view: selectedView,
+                        page: currentPage,
+                        page_size: 10,
+                    },
+                }
+            );
+
+            const data = res.data;
+
+            setSummary(data.summary);
+            setNextSession(data.next_session);
+            setTodayTimeline(data.today_timeline);
+            setPagination(data.pagination);
+            if (selectedView === "list") {
+                setInterviews(data.scheduled_interviews);
+            } else {
+                const events = [];
+
+                Object.entries(data.scheduled_interviews).forEach(([date, list]) => {
+                    list.forEach((item) => {
+                        events.push({
+                            id: item.interview_id,
+                            title: item.title,
+                            start: item.scheduled_at,
+                            end: item.scheduled_at,
+                            type:
+                                item.interview_source === "mock_interview"
+                                    ? "mock"
+                                    : "company",
+
+                            status: item.status.toLowerCase(),
+
+                            candidateName: data.client_name,
+
+                            meetingLink: item.meeting_link,
+
+                            role: item.role,
+
+                            time: new Date(item.scheduled_at).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            }),
+
+                            extendedProps: {
+                                ...item,
+                            },
+                        });
+                    });
+                });
+
+                setCalendarEvents(events);
+            }
+        } catch (err) {
+            setPopup({
+                open: true,
+                type: "error",
+                title: "Error",
+                message:
+                    err?.response?.data?.detail ||
+                    err?.response?.data?.message ||
+                    "Unable to fetch scheduled interviews.",
+            });
+        } finally {
+            setLoading(false);
         }
-    ]);
+    };
+
+    useEffect(() => {
+        getScheduledInterviews(view);
+    }, [view, currentPage]);
 
     const filteredInterviews = interviews.filter((item) => {
-        const searchValue = search.toLowerCase().trim();
+        const value = search.toLowerCase().trim();
+
+        if (!value) return true;
+
         return (
-            !searchValue ||
-            item.interview_name?.toLowerCase().includes(searchValue) ||
-            item.interview_type?.toLowerCase().includes(searchValue) ||
-            item.category?.toLowerCase().includes(searchValue)
+            item.title?.toLowerCase().includes(value) ||
+            item.interview_source?.toLowerCase().includes(value) ||
+            item.status?.toLowerCase().includes(value)
         );
     });
-    const [currentPage, setCurrentPage] = useState(1);
 
-    const ITEMS_PER_PAGE = 6;
-    const totalPages = Math.ceil(
-        filteredInterviews.length / ITEMS_PER_PAGE
-    );
+    const totalPages = pagination?.total_pages || 1;
     const paginatedInterviews = filteredInterviews.slice(
         (currentPage - 1) * ITEMS_PER_PAGE,
         currentPage * ITEMS_PER_PAGE
     );
 
-    const [calendarType, setCalendarType] = useState("month");
-    const [calendarEvents, setCalendarEvents] = useState([
-        {
-            title: "Infosys Code Interview",
-            candidateName: "Rahul Sharma",
-            start: "2026-06-24T10:00:00",
-            end: "2026-06-24T11:00:00",
-            time: "10:00 AM",
-            type: "company",
-            status: "scheduled",
-        },
-        {
-            title: "MC Self Introduction",
-            candidateName: "Priya Reddy",
-            start: "2026-06-24T03:00:00",
-            end: "2026-06-24T04:00:00",
-            time: "3:00 AM",
-            type: "mock",
-            status: "scheduled",
-        },
-        {
-            title: "Capgemini L1 Interview",
-            candidateName: "Arjun Kumar",
-            start: "2026-06-24T10:00:00",
-            end: "2026-06-24T11:00:00",
-            time: "10:00 AM",
-            type: "company",
-            status: "scheduled",
-        },
-        {
-            title: "Capgemini L1 Interview",
-            candidateName: "Sneha Patel",
-            start: "2026-06-02T10:30:00",
-            end: "2026-06-02T11:00:00",
-            time: "10:30 AM",
-            type: "company",
-            status: "completed",
-        },
-        {
-            title: "MC Self Introduction",
-            candidateName: "Vikram Singh",
-             role: "Senior System Architect",
-            start: "2026-06-26T11:30:00",
-            end: "2026-06-26T12:00:00",
-            time: "11:30 AM",
-            type: "mock",
-            status: "in_progress",
-        },
-        {
-            title: "MC Self Introduction",
-            candidateName: "Ananya Rao",
-             role: "Senior System Architect",
-            start: "2026-06-26T02:30:00",
-            end: "2026-06-26T03:00:00",
-            time: "2:30 AM",
-            type: "mock",
-            status: "scheduled",
-        },
-        {
-            title: "Google Technical Interview",
-            candidateName: "Rahul Sharma",
-            role: "Senior System Architect",
-            meetingLink: "https://meet.google.com/wdi-ddgt-ufo",
-            start: "2026-06-27T10:00:00",
-            end: "2026-06-27T11:00:00",
-            time: "10:00 AM",
-            type: "company",
-            status: "scheduled",
+    const handleStartInterview = async (item) => {
+        try {
+            setLoading(true);
+
+            const response = await axios.get(
+                `${BASE_URL}/api/clients/${clientId}/interviews/${item.interview_id}/pre-start`
+            );
+
+            navigate("/scheduled-interview-mode", {
+                state: {
+                    interview: item,
+                    preStartData: response.data,
+                },
+            });
+
+        } catch (err) {
+            setPopup({
+                open: true,
+                type: "error",
+                title: "Error",
+                message:
+                    err?.response?.data?.detail ||
+                    "Unable to load interview details.",
+            });
+        } finally {
+            setLoading(false);
         }
-    ]);
+    };
+
+    const handleCalendarInterview = (event) => {
+        navigate("/scheduled-Interview-mode", {
+            state: {
+                interview: {
+                    interview_name: event.title,
+                    category:
+                        event.extendedProps.type === "company"
+                            ? "Company"
+                            : "Mock",
+                    ...event.extendedProps,
+                },
+            },
+        });
+    };
     const renderEventContent = (eventInfo) => {
         // Interview type (Company / Mock)
         const type = eventInfo.event.extendedProps.type;
@@ -193,12 +192,12 @@ function ScheduledInterviewPage() {
         if (calendarType === "week") {
             return (
                 <div
-                    className={`h-full w-full rounded-md border-l-4 px-2 py-2 flex flex-col justify-center
-                  ${isToday
-                            ? "bg-[#bcf1ad] border-[#2d5a27]"
-                            : type === "company"
-                                ? "bg-[#dbeafe] border-[#2563eb]"
-                                : "bg-[#e2e8f0] border-[#64748b]"
+                    onClick={() => handleCalendarInterview(eventInfo.event)}
+                    className={`h-full w-full rounded-md border-l-4 px-2 py-2 flex flex-col justify-center cursor-pointer                  ${isToday
+                        ? "bg-[#bcf1ad] border-[#2d5a27]"
+                        : type === "company"
+                            ? "bg-[#dbeafe] border-[#2563eb]"
+                            : "bg-[#e2e8f0] border-[#64748b]"
                         }`}
                 >
                     <div
@@ -225,15 +224,16 @@ function ScheduledInterviewPage() {
                 </div>
             );
         }
+
         // MONTH VIEW
         return (
             <div
-                className={`min-h-17.5 w-full rounded-md border-l-4 px-2 py-2 overflow-hidden shadow-sm
-                    ${isLive
-                        ? "bg-white border-[#2d5a27]"
-                        : type === "company"
-                            ? "bg-[#dbeafe] border-[#2563eb]"
-                            : "bg-[#e2e8f0] border-[#64748b]"
+                onClick={() => handleCalendarInterview(eventInfo.event)}
+                className={`min-h-17.5 w-full rounded-md border-l-4 px-2 py-2 overflow-hidden shadow-sm cursor-pointer                    ${isLive
+                    ? "bg-white border-[#2d5a27]"
+                    : type === "company"
+                        ? "bg-[#dbeafe] border-[#2563eb]"
+                        : "bg-[#e2e8f0] border-[#64748b]"
                     }`}
             >
                 {isLive && (
@@ -285,11 +285,6 @@ function ScheduledInterviewPage() {
     // FullCalendar reference
     const calendarRef = useRef(null);
 
-    // Next upcoming interview
-    const nextSession = calendarEvents
-        .filter((event) => new Date(event.start) > new Date())
-        .sort((a, b) => new Date(a.start) - new Date(b.start))[0];
-
     // Format date & time
     const formattedDate = nextSession
         ? new Date(nextSession.start).toLocaleString("en-US", {
@@ -311,40 +306,29 @@ function ScheduledInterviewPage() {
 
     return (
         <div className="bg-[#f8f9fa]">
+            {/*Loader*/}
+            {loading && (
+                <div className="fixed inset-0 bg-black/40 z-9999 flex items-center justify-center">
+                    <div className="p-6 flex flex-col items-center gap-3">
+                        <FiLoader className="animate-spin text-4xl text-green-800" />
+
+                        <p className="text-gray-800 font-medium">
+                            Please wait...
+                        </p>
+                    </div>
+                </div>
+            )}
             {view === "list" && (
                 <>
-                    <div className="bg-white border-b border-[#ececec] px-4 py-3 mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
-                        {/* Left */}
-                        <div className="flex items-center pl-5">
-                            <ArrowLeft size={20} />
-                            <h2 className="text-[20px] font-semibold text-[#2b0b05] ml-8">
-                                Interview Schedule
-                            </h2>
-                        </div>
-                        {/* Right Search */}
-                        <div className="relative w-full md:w-62.5 mt-3 md:mt-0 md:mr-8">
-                            <Search
-                                size={18}
-                                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                            />
-                            <input
-                                type="text"
-                                placeholder="Search interviews..."
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                className="w-full md:w-62.5 h-10 border border-[#d9d9d9] rounded-full py-2 pl-10 pr-4 outline-none"
-                            />
-                        </div>
-                    </div>
                     {/* Header */}
-                    <div className="flex flex-wrap items-center justify-between gap-3 mb-8 px-4 md:px-15">
+                    <div className="flex flex-wrap items-center justify-between gap-3 mb-4 px-4 py-4 md:px-15">
                         <h1 className="text-[28px] md:text-[45px] font-bold text-[#230804]">
                             Scheduled Interviews
                         </h1>
 
                         <div className="flex items-center bg-white border border-[#d9d9d9] rounded-md overflow-hidden">                            <button
                             onClick={() => setView("calendar")}
-                            className={`px-6 py-2 text-sm ${view === "calendar"
+                            className={`px-6 py-2 text-sm cursor-pointer ${view === "calendar"
                                 ? "bg-[#f5f5f5] font-medium"
                                 : "bg-white text-[#666]"
                                 }`}
@@ -353,7 +337,7 @@ function ScheduledInterviewPage() {
                         </button>
                             <button
                                 onClick={() => setView("list")}
-                                className={`px-6 py-2 text-sm border-l border-[#d9d9d9] ${view === "list"
+                                className={`px-6 py-2 text-sm border-l border-[#d9d9d9] cursor-pointer ${view === "list"
                                     ? "bg-[#f5f5f5] font-medium"
                                     : "bg-white text-[#666]"
                                     }`}
@@ -425,15 +409,15 @@ function ScheduledInterviewPage() {
                                                     </td>
 
                                                     <td className="px-6">
-                                                        {item.duration}
+                                                        {item.duration_minutes} mins
                                                     </td>
 
                                                     <td className="px-6">
-                                                        {item.deadline_date}
+                                                        {new Date(item.deadline_date).toLocaleDateString()}
                                                     </td>
 
                                                     <td className="px-6">
-                                                        {item.status === "COMPLETED" ? (
+                                                        {item.status.toUpperCase() === "COMPLETED" ? (
                                                             <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-[#bcf1ad] text-[#2d5a27] border border-[#2d5a27]/20">
                                                                 COMPLETED
                                                             </span>
@@ -449,7 +433,10 @@ function ScheduledInterviewPage() {
                                                         )}
                                                     </td>
                                                     <td className="text-center px-6">
-                                                        <button className="bg-[#2d5a27] text-white px-3 py-2 text-sm font-semibold rounded">
+                                                        <button
+                                                            onClick={() => handleStartInterview(item)}
+                                                            className="bg-[#2d5a27] text-white px-3 py-2 text-sm font-semibold rounded cursor-pointer hover:bg-[#23481f] transition-colors duration-200"
+                                                        >
                                                             START INTERVIEW
                                                         </button>
                                                     </td>
@@ -587,20 +574,19 @@ function ScheduledInterviewPage() {
 
                                             setCurrentDate(calendarApi.getDate());
                                         }}
-                                        className="px-4 py-2 border border-[#d5c2bf] rounded-lg bg-white"
+                                        className="px-4 py-2 border border-[#d5c2bf] rounded-lg bg-white cursor-pointer"
                                     >
                                         Today
                                     </button>
-
-
                                 </div>
                                 <div className="flex items-center self-start lg:self-auto bg-[#eff4ff] p-1 rounded-lg border border-[#d5c2bf]">
                                     <button
                                         onClick={() => {
                                             setCalendarType("week");
                                             calendarRef.current?.getApi().changeView("timeGridWeek");
+                                            getScheduledInterviews("week");
                                         }}
-                                        className={`px-4 py-1.5 rounded-md ${calendarType === "week"
+                                        className={`px-4 py-1.5 rounded-md cursor-pointer ${calendarType === "week"
                                             ? "bg-white shadow-sm text-[#3b6934] font-bold"
                                             : "text-[#514441]"
                                             }`}
@@ -611,18 +597,17 @@ function ScheduledInterviewPage() {
                                     <button
                                         onClick={() => {
                                             setCalendarType("month");
+                                            setView("month");
                                             calendarRef.current?.getApi().changeView("dayGridMonth");
                                         }}
-                                        className={`px-4 py-1.5 rounded-md ${calendarType === "month"
+                                        className={`px-4 py-1.5 rounded-md cursor-pointer ${calendarType === "month"
                                             ? "bg-white shadow-sm text-[#3b6934] font-bold"
                                             : "text-[#514441]"
                                             }`}
                                     >
                                         Month
                                     </button>
-
                                 </div>
-
                             </div>
                             {/* Calendar Container */}
                             <div className="bg-white border border-[#d5c2bf] rounded-xl shadow-sm overflow-x-auto mb-8 md:mb-16">
@@ -698,7 +683,7 @@ function ScheduledInterviewPage() {
                                                     window.open(nextSession.meetingLink, "_blank");
                                                 }
                                             }}
-                                            className="w-full py-3 bg-[#3b6934] text-white rounded-lg flex items-center justify-center gap-2 font-semibold uppercase tracking-wider"
+                                            className="w-full py-3 bg-[#3b6934] text-white rounded-lg flex items-center justify-center gap-2 font-semibold uppercase tracking-wider cursor-pointer"
                                         >
                                             START
                                             <Play size={16} />
@@ -710,7 +695,7 @@ function ScheduledInterviewPage() {
 
                             </div>
 
-                           <h3 className="text-xl md:text-[22px] font-bold mb-5">
+                            <h3 className="text-xl md:text-[22px] font-bold mb-5">
                                 Today's Timeline
                             </h3>
 
@@ -753,15 +738,12 @@ function ScheduledInterviewPage() {
                                             <p className="text-[11px] text-[#514441]">
                                                 {item.role}
                                             </p>
-
-                                            
-
                                         </div>
 
                                     );
                                 })}
 
-                            </div>                        
+                            </div>
                         </div>
 
                     </div>
