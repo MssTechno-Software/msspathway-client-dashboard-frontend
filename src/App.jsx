@@ -8,6 +8,7 @@ import {
 import ProtectedRoute from "./components/ProtectedRoute";
 import AppLayout from "./pages/AppLayout";
 import LoginPage from "./pages/LoginPage";
+import MyProfile from "./pages/MyProfile";
 import Dashboard from "./pages/Dashboard";
 import InterviewMode from "./pages/InterviewMode";
 import SelfIntroductionQuestion from "./pages/SelfIntroductionQuestion";
@@ -49,6 +50,15 @@ function App() {
             )
           }
         >
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute allowedRoles={["client"]}>
+                <MyProfile />
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path="/client-dashboard"
             element={
@@ -138,7 +148,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          
+
           <Route
             path="/scheduled-Interview-mode"
             element={

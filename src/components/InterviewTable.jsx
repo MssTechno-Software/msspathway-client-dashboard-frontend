@@ -1,12 +1,9 @@
-function InterviewTable({ interviews }) {
+function InterviewTable({ interviews = [] }) {
   return (
     <div className="bg-white border border-[#dee2e6] shadow-sm overflow-hidden h-full flex flex-col">
       <div className="px-6 py-5 border-b border-[#dee2e6] flex items-center gap-3">
         <div className="w-10 h-10 shrink-0 bg-green-50 rounded-lg flex items-center justify-center">
-          <span
-            className="material-symbols-outlined text-[#2d5a27] text-[24px] leading-none"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-          >
+          <span className="material-symbols-outlined text-[#2d5a27]">
             assignment
           </span>
         </div>
@@ -36,7 +33,7 @@ function InterviewTable({ interviews }) {
           </thead>
 
           <tbody>
-            {interviews.map((item) => (
+            {interviews.map((item, index) => (
               <tr
                 key={item.date}
                 className="border-t border-[#dee2e6] hover:bg-[#f8f9fa] transition-colors"
@@ -46,38 +43,30 @@ function InterviewTable({ interviews }) {
                 </td>
 
                 <td className="px-6 py-5 text-[#6c757d] text-[16px]">
-                  {item.mode}
+                  {item.mode_label}
                 </td>
 
                 <td className="px-6 py-5">
                   <span
                     className={`
                       px-3 py-1 text-xs font-bold border rounded-sm
-                      ${
-                        item.score >= 70
-                          ? "bg-green-50 text-[#2d5a27] border-green-200"
-                          : "bg-red-50 text-red-700 border-red-200"
+                      ${item.score >= 70
+                        ? "bg-green-50 text-[#2d5a27] border-green-200"
+                        : "bg-red-50 text-red-700 border-red-200"
                       }
                     `}
                   >
-                    {item.score}/100
+                    {item.score_display}
                   </span>
                 </td>
 
                 <td className="px-6 py-5 text-left">
                   <a
                     href={item.insights_url}
-                    target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-[#2d5a27] font-bold text-sm hover:underline"
                   >
                     View Insights
-                    <span
-                      className="material-symbols-outlined text-[16px] leading-none"
-                      style={{ fontVariationSettings: "'FILL' 0" }}
-                    >
-                      open_in_new
-                    </span>
                   </a>
                 </td>
               </tr>

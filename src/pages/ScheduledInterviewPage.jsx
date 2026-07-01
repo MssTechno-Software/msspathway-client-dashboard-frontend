@@ -106,7 +106,11 @@ function ScheduledInterviewPage() {
     };
 
     useEffect(() => {
-        getScheduledInterviews(view);
+        if (view === "calendar") {
+            getScheduledInterviews("calendar");
+        } else {
+            getScheduledInterviews("list");
+        }
     }, [view, currentPage]);
 
     const filteredInterviews = interviews.filter((item) => {
@@ -400,7 +404,9 @@ function ScheduledInterviewPage() {
                                                                 : "text-[#445066]"
                                                                 }`}
                                                         >
-                                                            {item.interview_name}
+                                                            {item.interview_source === "mock_interview"
+                                                                ? "Mock Interview"
+                                                                : "Company Interview"}
                                                         </h3>
 
                                                         <p className="text-[12px] text-[#666]">
@@ -413,7 +419,7 @@ function ScheduledInterviewPage() {
                                                     </td>
 
                                                     <td className="px-6">
-                                                        {new Date(item.deadline_date).toLocaleDateString()}
+                                                        {item.deadline_date}
                                                     </td>
 
                                                     <td className="px-6">

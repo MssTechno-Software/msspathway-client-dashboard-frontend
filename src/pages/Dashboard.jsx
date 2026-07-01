@@ -3,32 +3,49 @@ import { FiLoader } from "react-icons/fi";
 import StatCard from "../components/StatCard";
 import InterviewTable from "../components/InterviewTable";
 import AnalyticsPanel from "../components/AnalyticsPanel";
-
-import { getDashboardData } from "../api/dashboardApi";
-
-export default function Dashboard() {
+import axios from "axios";
+import BASE_URL from "../config/api";
+function Dashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const clientId = localStorage.getItem("client_id");
+  const token = localStorage.getItem("token");
+
   useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        setLoading(true);
-
-        const response = await getDashboardData();
-        setData(response);
-      } catch (error) {
-        console.error(
-          "Dashboard Error:",
-          error.response?.data || error.message
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchDashboard();
   }, []);
 
+  const fetchDashboard = async () => {
+    try {
+      setLoading(true);
+
+      console.log("Client ID:", clientId);
+      console.log("Token:", token);
+
+      const response = await axios.get(
+        `${BASE_URL}/api/clients/${clientId}/dashboard`,
+        {
+          params: {
+            recent_limit: 5,
+          },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("Dashboard Response:", response.data);
+
+      setData(response.data);
+    } catch (error) {
+      console.error(
+        "Dashboard Error:",
+        error.response?.data || error.message
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
   if (loading || !data) {
     return (
       <div className="fixed inset-0 bg-black/40 z-9999 flex items-center justify-center">
@@ -48,7 +65,7 @@ export default function Dashboard() {
       {/* Header */}
       <header className="mb-8 md:mb-10">
         <h1 className="text-[28px] md:text-[32px] leading-tight font-bold tracking-[-0.01em] text-[#230804]">
-          Welcome back, Revanth
+          {data.greeting}
         </h1>
 
         <p className="mt-2 text-[16px] md:text-[18px] text-[#6c757d]">
@@ -60,14 +77,14 @@ export default function Dashboard() {
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
         <StatCard
           title="Total Interviews Completed"
-          value={data.total_interviews_completed}
-          message="Keep up the good work! ❤ ፁ"
+          value={data?.summary?.total_interviews_completed ?? 0}
+          message="Keep up the good work! ❤️"
           type="interviews"
         />
 
         <StatCard
           title="Average Performance Score"
-          value={`${data.average_performance_score}%`}
+          value={`${data?.summary?.average_performance_score ?? 0}%`}
           message="You're performing great! ✨"
           type="performance"
         />
@@ -90,3 +107,4 @@ export default function Dashboard() {
     </div>
   );
 }
+export default Dashboard;
