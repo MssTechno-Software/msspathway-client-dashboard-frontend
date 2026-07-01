@@ -198,7 +198,7 @@ function ScoreCardPage() {
                                     className="border-b border-gray-200 hover:bg-gray-50"
                                 >
                                     <td className="px-6 py-7">
-                                        {new Date(item.submitted_at).toLocaleDateString()}
+                                        {item.submitted_date}
                                     </td>
 
                                     <td>

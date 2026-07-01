@@ -268,9 +268,6 @@ export default function InterviewPerformanceReport({ data = null }) {
                                     </svg>
                                     <span className="absolute text-[48px] leading-14 font-bold text-white">{scorecard?.performance_score}</span>
                                 </div>
-                                <p className="mt-4 text-white/70 text-sm max-w-60">
-                                    {scorecard?.executive_summary}
-                                </p>
                             </section>
 
                             {/* Technical Analysis Bento Card */}
