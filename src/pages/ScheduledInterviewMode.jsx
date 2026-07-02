@@ -9,6 +9,7 @@ import {
     Info,
     FileText,
 } from "lucide-react";
+import { FiLoader } from "react-icons/fi";
 import { useNavigate, Link } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
@@ -22,7 +23,6 @@ export default function ScheduledInterviewMode() {
     const clientId =
         state?.client_id ??
         localStorage.getItem("client_id");
-
     // Determine if it is a company-based interview
     const isCompanyInterview = interview?.category?.toLowerCase() === "company";
 
@@ -110,6 +110,18 @@ export default function ScheduledInterviewMode() {
 
     return (
         <div className="w-full min-h-screen bg-[#f8f9ff] px-12 py-8 font-sans antialiased text-[#0b1c30]">
+            {/*Loader*/}
+            {loading && (
+                <div className="fixed inset-0 bg-black/40 z-9999 flex items-center justify-center">
+                    <div className="p-6 flex flex-col items-center gap-3">
+                        <FiLoader className="animate-spin text-4xl text-green-800" />
+
+                        <p className="text-gray-800 font-medium">
+                            Please wait...
+                        </p>
+                    </div>
+                </div>
+            )}
             <div className="w-full max-w-full flex flex-col pt-2">
 
                 {isCompanyInterview ? (

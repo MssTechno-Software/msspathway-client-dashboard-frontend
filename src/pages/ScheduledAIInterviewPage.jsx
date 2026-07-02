@@ -184,8 +184,15 @@ function ScheduledAIInterview() {
     };
 
     const handleSkipQuestion = () => {
-        const updatedQuestions = [...questions];
+        setAnswers(prev => [
+            ...prev,
+            {
+                question_number: currentQuestionIndex + 1,
+                answer_text: ""
+            }
+        ]);
 
+        const updatedQuestions = [...questions];
         updatedQuestions[currentQuestionIndex].attempted_status = "skipped";
 
         if (currentQuestionIndex < updatedQuestions.length - 1) {
@@ -203,9 +210,9 @@ function ScheduledAIInterview() {
         try {
             setLoading(true);
 
-            // Add the final answer if present
             let finalAnswers = [...answers];
 
+            // Add current answer if the user has spoken
             if (transcript.trim()) {
                 finalAnswers.push({
                     question_number: currentQuestionIndex + 1,
@@ -213,9 +220,29 @@ function ScheduledAIInterview() {
                 });
             }
 
-            console.log("state", state);
-            console.log("clientId", clientId);
-            console.log("interview_id", interview_id);
+            // 👇 ADD THIS BLOCK HERE
+            const unanswered = questions.findIndex((_, index) => {
+                return !finalAnswers.some(
+                    answer => answer.question_number === index + 1
+                );
+            });
+
+            if (unanswered !== -1) {
+                setLoading(false);
+
+                setPopup({
+                    show: true,
+                    type: "error",
+                    message: `Please answer Question ${unanswered + 1} before finishing the interview.`,
+                });
+
+                // Move to the unanswered question
+                setCurrentQuestionIndex(unanswered);
+
+                return;
+            }
+
+            // 👇 API CALL SHOULD COME AFTER THE VALIDATION
             const response = await fetch(
                 `${BASE_URL}/api/clients/${clientId}/interviews/${interview_id}/submit-all-answers`,
                 {
@@ -232,21 +259,20 @@ function ScheduledAIInterview() {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.detail || "Submission failed");
+                throw new Error(data.detail?.error || "Submission failed");
             }
 
-            navigate("/theory-feedback", {
+            navigate("/scheduled-interview-feedback", {
                 state: {
-                    feedbackData: data,
-                    questions,
+                    scorecard: data,
                 },
             });
 
         } catch (err) {
             setPopup({
                 show: true,
-                message: err.message,
                 type: "error",
+                message: err.message,
             });
         } finally {
             setLoading(false);
@@ -270,25 +296,17 @@ function ScheduledAIInterview() {
             <div className="h-auto min-h-16 border-b border-[#d5c2bf] flex items-center px-4 sm:px-6 lg:px-12 py-4">
                 <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm font-bold uppercase text-[#514441]">
                     <span
-                        onClick={() => navigate("/interview-modes")}
+                        onClick={() => navigate("/scheduled-interview")}
                         className="cursor-pointer hover:text-[#3b6934]"
                     >
-                        Interview Modes
+                        Scheduled Interviews
                     </span>
                     <span>›</span>
                     <span
-                        onClick={() => navigate("/theory-topic")}
+                        onClick={() => navigate("/scheduled-interview-mode", { state: { interview_id, client_id: clientId } })}
                         className="cursor-pointer hover:text-[#3b6934]"
                     >
-                        Technologies
-                    </span>
-                    <span>›</span>
-                    <span>
-                        {topic}
-                    </span>
-                    <span>›</span>
-                    <span>
-                        {subTopic}
+                        Interview Mode
                     </span>
                     <span>›</span>
                     <span className="text-[#3b6934]">
@@ -296,7 +314,7 @@ function ScheduledAIInterview() {
                     </span>
                 </div>
             </div>
-            <div className="border border-gray-300 rounded-xl p-4 mb-6">
+            <div className="border border-gray-300 p-4 mb-6">
                 {/* Question Stepper */}
                 <div className="px-4 sm:px-6 lg:px-12 mt-6">
                     <div className="bg-white border border-[#e7dbd6] rounded-xl px-5 py-4 shadow-sm">
@@ -305,7 +323,7 @@ function ScheduledAIInterview() {
 
                             {/* Previous */}
                             <button
-                                className="w-8 h-8 rounded-full flex items-center justify-center text-[#6b5f5b] hover:bg-gray-100 transition"
+                                className="w-8 h-8 rounded-full flex items-center justify-center text-[#6b5f5b] hover:bg-gray-100 transition cursor-pointer"
                             >
                                 &#8249;
                             </button>
@@ -327,6 +345,7 @@ function ScheduledAIInterview() {
                                             flex items-center justify-center
                                             text-xs font-semibold
                                             transition-all duration-300
+                                            cursor-pointer
                                             ${questions[index]?.attempted_status === "completed"
                                                     ? "bg-[#3b6934] text-white"
                                                     : questions[index]?.attempted_status === "current"
@@ -445,7 +464,7 @@ function ScheduledAIInterview() {
                                             ? stopRecording()
                                             : startRecording()
                                     }
-                                    className={`flex-1 py-4 rounded-lg flex items-center justify-center gap-2 font-bold uppercase transition
+                                    className={`flex-1 py-4 rounded-lg flex items-center justify-center gap-2 font-bold uppercase transition cursor-pointer
                                     ${isRecording
                                             ? "bg-red-600 hover:bg-red-700 text-white"
                                             : "bg-[#3b6934] hover:bg-[#2f5a29] text-white"
@@ -467,7 +486,7 @@ function ScheduledAIInterview() {
                                 <button
                                     onClick={handleSkipQuestion}
                                     disabled={currentQuestion?.attempted_status !== "current"}
-                                    className={`w-full flex-1 py-4 rounded-lg flex items-center justify-center gap-2 font-bold uppercase transition
+                                    className={`w-full flex-1 py-4 rounded-lg flex items-center justify-center gap-2 font-bold uppercase transition cursor-pointer
                                     ${currentQuestion?.attempted_status
                                             ? "border-2 border-[#3b6934] text-[#3b6934] hover:bg-[#3b6934]/5"
                                             : "bg-gray-200 text-gray-500 cursor-not-allowed border-2 border-gray-300"
@@ -481,7 +500,7 @@ function ScheduledAIInterview() {
                                 {currentQuestionIndex === questions.length - 1 ? (
                                     <button
                                         onClick={handleFinishInterview}
-                                        className="w-full flex-1 bg-[#3b6934] hover:bg-[#2f5a29] text-white py-4 rounded-lg flex items-center justify-center gap-2 font-bold uppercase"
+                                        className="w-full flex-1 bg-[#3b6934] hover:bg-[#2f5a29] text-white py-4 rounded-lg flex items-center justify-center gap-2 font-bold uppercase cursor-pointer"
                                     >
                                         <CheckCircle size={18} />
                                         Finish Interview
@@ -489,7 +508,7 @@ function ScheduledAIInterview() {
                                 ) : (
                                     <button
                                         onClick={handleSubmitAnswer}
-                                        className="w-full flex-1 bg-[#3b6934] hover:bg-[#2f5a29] text-white py-4 rounded-lg flex items-center justify-center gap-2 font-bold uppercase"
+                                        className="w-full flex-1 bg-[#3b6934] hover:bg-[#2f5a29] text-white py-4 rounded-lg flex items-center justify-center gap-2 font-bold uppercase cursor-pointer"
                                     >
                                         <CheckCircle size={18} />
                                         Submit Answer

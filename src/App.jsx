@@ -21,6 +21,7 @@ import TheoryFeedbackPage from "./pages/TheoryFeedackPage";
 import ScheduledInterviewPage from "./pages/ScheduledInterviewPage";
 import ScheduledInterviewMode from "./pages/ScheduledInterviewMode";
 import ScheduledAIInterviewPage from "./pages/ScheduledAIInterviewPage";
+import ScheduledInterviewFeedback from "./pages/ScheduledInterviewFeedback";
 import ScoreCardPage from "./pages/ScoreCardPage";
 import InterviewPerformanceReport from "./pages/InterviewPerformanceReport";
 function App() {
@@ -163,6 +164,15 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["client"]}>
                 <ScheduledAIInterviewPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/scheduled-Interview-feedback"
+            element={
+              <ProtectedRoute allowedRoles={["client"]}>
+                <ScheduledInterviewFeedback />
               </ProtectedRoute>
             }
           />
