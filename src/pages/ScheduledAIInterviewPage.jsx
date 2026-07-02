@@ -10,16 +10,11 @@ function ScheduledAIInterview() {
     const { state } = useLocation();
     const navigate = useNavigate();
     const location = useLocation();
-    const topic = state?.topic || "";
-    const subTopic = state?.subTopic || "";
-    const client_id = state?.client_id;
-    const interviewId = state?.interview?.interview_id;
+    const apiQuestions = state?.questions || [];
+    const clientId = state?.client_id || localStorage.getItem("client_id");
+    const interview_id = state?.interview_id;
     const technology_id = state?.technology_id;
-    const subtopic_id = state?.subtopic_id;
-    const difficulty_level = state?.difficulty_level;
-    const nextQuestionIndex = state?.nextQuestionIndex;
-    const existingQuestions = state?.questions;
-
+    const [answers, setAnswers] = useState([]);
     const [isRecording, setIsRecording] = useState(false);
     const [waveScale, setWaveScale] = useState(1);
     const [timeLeft, setTimeLeft] = useState(119);
@@ -36,6 +31,10 @@ function ScheduledAIInterview() {
         message: "",
         type: "", // success | error
     });
+
+    console.log("state", state);
+    console.log("clientId", clientId);
+    console.log("questions", state?.questions);
     const {
         transcript,
         resetTranscript,
@@ -69,20 +68,19 @@ function ScheduledAIInterview() {
     }, [isRecording]);
 
     useEffect(() => {
-        if (state?.questions?.length) {
+        if (!apiQuestions?.length) return;
 
-            const formattedQuestions = state.questions.map((q, index) => ({
-                ...q,
-                question_id: q.id,
-                question_text: q.question,
-                attempted_status:
-                    index === 0 ? "current" : "pending",
-            }));
+        const formatted = apiQuestions.map((q, index) => ({
+            ...q,
+            question_id: q.id,
+            question_text: q.question,
+            attempted_status:
+                index === 0 ? "current" : "pending",
+        }));
 
-            setQuestions(formattedQuestions);
-            setCurrentQuestionIndex(0);
-        }
-    }, []);
+        setQuestions(formatted);
+        setCurrentQuestionIndex(0);
+    }, [apiQuestions]);
 
     useEffect(() => {
         let interval;
@@ -217,9 +215,9 @@ function ScheduledAIInterview() {
 
             console.log("state", state);
             console.log("clientId", clientId);
-            console.log("interviewId", interviewId);
+            console.log("interview_id", interview_id);
             const response = await fetch(
-                `${BASE_URL}/api/clients/${client_id}/interviews/${state.interview_id}/submit-all-answers`,
+                `${BASE_URL}/api/clients/${clientId}/interviews/${interview_id}/submit-all-answers`,
                 {
                     method: "POST",
                     headers: {

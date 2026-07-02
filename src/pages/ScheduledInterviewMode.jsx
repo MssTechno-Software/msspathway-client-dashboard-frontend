@@ -19,7 +19,9 @@ export default function ScheduledInterviewMode() {
     const interview = state?.interview;
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
-    const clientId = state?.client_id || interview?.client_id;
+    const clientId =
+        state?.client_id ??
+        localStorage.getItem("client_id");
 
     // Determine if it is a company-based interview
     const isCompanyInterview = interview?.category?.toLowerCase() === "company";
@@ -84,30 +86,19 @@ export default function ScheduledInterviewMode() {
     const focusAreas = interview?.focusAreas || defaultCompanyFocusAreas;
 
     /*start interview*/
+    console.log({ clientId, interviewId: interview.interview_id });
     const handleStartInterview = async () => {
         try {
             setLoading(true);
-
+            console.log(clientId);
+            console.log(interview.interview_id);
             const response = await axios.post(
                 `${BASE_URL}/api/clients/${clientId}/interviews/${interview.interview_id}/generate-questions`
             );
 
+            console.log("Generate Questions Response:", response.data);
             navigate("/scheduled-ai-interview", {
-                state: {
-                    interview_id: response.data.interview_id,
-                    client_id: response.data.client_id,
-                    interview_type: response.data.interview_type,
-                    company_name: response.data.company_name,
-                    role: response.data.role,
-                    experience: response.data.experience,
-                    mode: response.data.mode,
-                    difficulty: response.data.difficulty,
-                    duration_mins: response.data.duration_mins,
-                    total_questions: response.data.total_questions,
-                    total_time_mins: response.data.total_time_mins,
-                    max_score: response.data.max_score,
-                    questions: response.data.questions,
-                },
+                state: response.data,
             });
 
         } catch (err) {

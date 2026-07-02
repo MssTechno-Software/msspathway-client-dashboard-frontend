@@ -29,10 +29,6 @@ function MyProfile() {
     });
     const getAuthHeaders = () => {
         const token = localStorage.getItem("token");
-
-        console.log("TOKEN =", token);
-        console.log("CLIENT ID =", localStorage.getItem("client_id"));
-
         return {
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -148,6 +144,87 @@ function MyProfile() {
     if (!client) {
         return <div className="p-6">Loading client details...</div>;
     }
+
+    /*view document*/
+    const handleView = async (doc) => {
+        console.log("Viewing document:", doc);
+        try {
+            setLoading(true);
+            console.log("VIEW FILE ID:", doc.file_id);
+            const res = await axios.get(
+                `${BASE_URL}/documents/files/view`,
+                {
+                    params: { file_id: doc.file_id },
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                }
+            );
+            console.log("Document View response received:", res.data);
+            const viewUrl = res.data.view_url;
+            window.open(viewUrl, "_blank");
+            setPopup({
+                show: true,
+                message: "Document opened in new tab",
+                type: "success"
+            });
+            fetchDocuments();
+
+        } catch (err) {
+            console.error("View error:", err.response?.data || err.message);
+            setPopup({
+                show: true,
+                message: "Failed to open document",
+                type: "error"
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    /*download document*/
+    const handleDownload = async (doc) => {
+        console.log("Downloading document:", doc);
+        try {
+            setLoading(true);
+            console.log("DOWNLOAD FILE ID:", doc.file_id);
+            const res = await axios.get(
+                `${BASE_URL}/documents/files/download`,
+                {
+                    params: { file_id: doc.file_id },
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                }
+            );
+            console.log("Download response received:", res.data);
+            const downloadUrl = res.data.download_url;
+
+            const link = document.createElement("a");
+            link.href = downloadUrl;
+            link.setAttribute("download", doc.original_name);
+
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setPopup({
+                show: true,
+                message: "Download started",
+                type: "success"
+            });
+            fetchDocuments();
+
+        } catch (err) {
+            console.error("Download error:", err.response?.data || err.message);
+            setPopup({
+                show: true,
+                message: "Failed to download document",
+                type: "error"
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleProfileChange = (e) => {
         const file = e.target.files[0];
@@ -453,6 +530,18 @@ function MyProfile() {
                                                 : "Recently added"}
                                         </p>
                                     </div>
+                                </div>
+                                <div className="flex items-center gap-4 text-gray-500 self-end sm:self-auto">
+
+                                    <FiEye
+                                        className="cursor-pointer hover:text-green-700"
+                                        onClick={() => handleView(doc)}
+                                    />
+
+                                    <FiDownload
+                                        className="cursor-pointer hover:text-green-700"
+                                        onClick={() => handleDownload(doc)}
+                                    />
                                 </div>
                             </div>
                         );

@@ -29,7 +29,7 @@ function ScheduledInterviewPage() {
     });
     const navigate = useNavigate();
     const clientId = localStorage.getItem("client_id");
-
+    console.log("clientId:", clientId);
     const getScheduledInterviews = async (selectedView) => {
         try {
             setLoading(true);
@@ -132,6 +132,8 @@ function ScheduledInterviewPage() {
     );
 
     const handleStartInterview = async (item) => {
+        console.log(item);
+        console.log(clientId);
         try {
             setLoading(true);
 
@@ -142,6 +144,7 @@ function ScheduledInterviewPage() {
             navigate("/scheduled-interview-mode", {
                 state: {
                     interview: item,
+                    client_id: clientId,
                     preStartData: response.data,
                 },
             });
