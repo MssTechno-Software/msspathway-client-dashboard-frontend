@@ -4,7 +4,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import NextSessionCard from "./NextSessionCard";
 import TimelineCard from "./TimelineCard";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 const CalendarView = ({
     scheduledInterviews,
@@ -16,7 +16,16 @@ const CalendarView = ({
     const calendarRef = useRef();
 
     const [currentTitle, setCurrentTitle] = useState("");
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            const api = calendarRef.current?.getApi();
+            if (api) {
+                setCurrentTitle(api.view.title);
+            }
+        }, 100);
 
+        return () => clearTimeout(timer);
+    }, []);
     const updateTitle = () => {
         const calendarApi = calendarRef.current?.getApi();
         if (calendarApi) {
@@ -166,15 +175,21 @@ const CalendarView = ({
                         interactionPlugin,
                     ]}
                     initialView="dayGridMonth"
+                    initialDate={new Date()}
                     headerToolbar={false}
-                    datesSet={updateTitle}
-                    viewDidMount={updateTitle}
+                    datesSet={() => {
+                        const api = calendarRef.current?.getApi();
+                        if (api) {
+                            setCurrentTitle(api.view.title);
+                        }
+                    }}
                     events={events}
                     eventContent={renderEvent}
                     height="auto"
-                    eventClick={(info) => onStartInterview(info.event.extendedProps)}
+                    eventClick={(info) =>
+                        onStartInterview(info.event.extendedProps)
+                    }
                 />
-
             </div>
 
             {/* Sidebar */}
