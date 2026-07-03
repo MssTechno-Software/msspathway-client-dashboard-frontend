@@ -1,10 +1,10 @@
-import React, { useMemo, useRef } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import NextSessionCard from "./NextSessionCard";
 import TimelineCard from "./TimelineCard";
+import React, { useMemo, useRef, useState } from "react";
 
 const CalendarView = ({
     scheduledInterviews,
@@ -14,6 +14,39 @@ const CalendarView = ({
 }) => {
 
     const calendarRef = useRef();
+
+    const [currentTitle, setCurrentTitle] = useState("");
+
+    const updateTitle = () => {
+        const calendarApi = calendarRef.current?.getApi();
+        if (calendarApi) {
+            setCurrentTitle(calendarApi.view.title);
+        }
+    };
+
+    const handlePrev = () => {
+        const api = calendarRef.current.getApi();
+        api.prev();
+        updateTitle();
+    };
+
+    const handleNext = () => {
+        const api = calendarRef.current.getApi();
+        api.next();
+        updateTitle();
+    };
+
+    const handleToday = () => {
+        const api = calendarRef.current.getApi();
+        api.today();
+        updateTitle();
+    };
+
+    const changeView = (view) => {
+        const api = calendarRef.current.getApi();
+        api.changeView(view);
+        updateTitle();
+    };
 
     const events = useMemo(() => {
 
@@ -64,8 +97,67 @@ const CalendarView = ({
 
             {/* Calendar */}
 
-            <div className="col-span-9 bg-white rounded-xl shadow border p-4">
+            <div className="col-span-9 bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+                <div className="flex items-center justify-between mb-4">
 
+                    {/* Left */}
+                    <div className="flex items-center gap-2">
+
+                        {/* Month Dropdown */}
+                        <div className="flex items-center border border-[#D5DDE8] rounded overflow-hidden bg-white">
+
+                            <button
+                                onClick={handlePrev}
+                                className="w-8 h-8 flex items-center justify-center border-r border-[#D5DDE8] hover:bg-gray-100 cursor-pointer"
+                            >
+                                ❮
+                            </button>
+
+                            <button
+                                className="px-4 h-8 text-[11px] font-semibold text-[#514441] flex items-center gap-2"
+                            >
+                                {currentTitle}
+                            </button>
+
+                            <button
+                                onClick={handleNext}
+                                className="w-8 h-8 flex items-center justify-center border-l border-[#D5DDE8] hover:bg-gray-100 cursor-pointer"
+                            >
+                                ❯
+                            </button>
+
+                        </div>
+
+                        {/* Today */}
+                        <button
+                            onClick={handleToday}
+                            className="px-4 h-8 border border-[#D5DDE8] rounded bg-white hover:bg-gray-100 text-[11px] font-semibold text-[#514441] cursor-pointer"
+                        >
+                            Today
+                        </button>
+
+                    </div>
+
+                    {/* Right */}
+                    <div className="flex border border-[#D5DDE8] rounded overflow-hidden">
+
+                        <button
+                            onClick={() => changeView("timeGridWeek")}
+                            className="px-4 h-8 text-[11px] font-semibold bg-white border-r border-[#D5DDE8] cursor-pointer hover:bg-gray-100"
+                        >
+                            Week
+                        </button>
+
+                        <button
+                            onClick={() => changeView("dayGridMonth")}
+                            className="px-4 h-8 text-[11px] font-semibold bg-[#F7F8FB] cursor-pointer hover:bg-gray-100"
+                        >
+                            Month
+                        </button>
+
+                    </div>
+
+                </div>
                 <FullCalendar
                     ref={calendarRef}
                     plugins={[
@@ -74,26 +166,13 @@ const CalendarView = ({
                         interactionPlugin,
                     ]}
                     initialView="dayGridMonth"
-                    headerToolbar={{
-                        left: "prev,next today",
-                        center: "title",
-                        right: "dayGridMonth,timeGridWeek",
-                    }}
-                    buttonText={{
-                        today: "Today",
-                        month: "Month",
-                        week: "Week",
-                    }}
+                    headerToolbar={false}
+                    datesSet={updateTitle}
+                    viewDidMount={updateTitle}
                     events={events}
                     eventContent={renderEvent}
                     height="auto"
-                    eventClick={(info) => {
-
-                        onStartInterview(
-                            info.event.extendedProps
-                        );
-
-                    }}
+                    eventClick={(info) => onStartInterview(info.event.extendedProps)}
                 />
 
             </div>
