@@ -5,7 +5,7 @@ const NextSessionCard = ({ session, onStart }) => {
     if (!session)
         return (
 
-            <div className="bg-white rounded-xl border p-5">
+            <div className="bg-white rounded-xl border border-[#D5DDE8] shadow p-5">
 
                 <h3 className="font-semibold mb-4">
                     Next Session
@@ -21,7 +21,7 @@ const NextSessionCard = ({ session, onStart }) => {
 
     return (
 
-        <div className="bg-white rounded-xl border border-gray-200 shadow p-5">
+        <div className="bg-white rounded-xl border border-[#D5DDE8] shadow p-5">
 
             <h3 className="font-semibold text-lg">
                 Next Session

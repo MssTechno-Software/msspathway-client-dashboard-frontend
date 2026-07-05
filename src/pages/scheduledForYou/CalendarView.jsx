@@ -123,7 +123,7 @@ const CalendarView = ({
                             </button>
 
                             <button
-                                className="px-4 h-8 text-[11px] font-semibold text-[#514441] flex items-center gap-2"
+                                className="px-4 h-8 text-[12px] font-semibold text-[#514441] flex items-center gap-2"
                             >
                                 {currentTitle}
                             </button>
@@ -140,7 +140,7 @@ const CalendarView = ({
                         {/* Today */}
                         <button
                             onClick={handleToday}
-                            className="px-4 h-8 border border-[#D5DDE8] rounded bg-white hover:bg-gray-100 text-[11px] font-semibold text-[#514441] cursor-pointer"
+                            className="px-4 h-8 border border-[#D5DDE8] rounded bg-white hover:bg-gray-100 text-[12px] font-semibold text-[#514441] cursor-pointer"
                         >
                             Today
                         </button>
@@ -152,14 +152,14 @@ const CalendarView = ({
 
                         <button
                             onClick={() => changeView("timeGridWeek")}
-                            className="px-4 h-8 text-[11px] font-semibold bg-white border-r border-[#D5DDE8] cursor-pointer hover:bg-gray-100"
+                            className="px-4 h-8 text-[12px] font-semibold bg-white border-r border-[#D5DDE8] cursor-pointer hover:bg-gray-100"
                         >
                             Week
                         </button>
 
                         <button
                             onClick={() => changeView("dayGridMonth")}
-                            className="px-4 h-8 text-[11px] font-semibold bg-[#F7F8FB] cursor-pointer hover:bg-gray-100"
+                            className="px-4 h-8 text-[12px] font-semibold bg-[#F7F8FB] cursor-pointer hover:bg-gray-100"
                         >
                             Month
                         </button>
