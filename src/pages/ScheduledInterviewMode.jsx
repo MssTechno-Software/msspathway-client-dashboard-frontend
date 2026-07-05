@@ -221,7 +221,7 @@ function ScheduledInterviewMode() {
                                     </p>
                                     <button
                                         onClick={handleStartInterview}
-                                        className="bg-[#2d5a27] text-white px-16 py-3 rounded-lg text-[24px] leading-8 font-semibold shadow-lg hover:brightness-110 active:scale-95 transition-all w-full md:w-auto min-w-[320px]"
+                                        className="bg-[#2d5a27] text-white px-16 py-3 rounded-lg text-[24px] leading-8 font-semibold shadow-lg hover:brightness-110 active:scale-95 transition-all w-full md:w-auto min-w-[320px] cursor-pointer"
                                     >
                                         START INTERVIEW
                                     </button>
@@ -334,7 +334,7 @@ function ScheduledInterviewMode() {
                                     </p>
                                     <button
                                         onClick={handleStartInterview}
-                                        className="bg-[#2d5a27] text-white px-16 py-3 rounded-lg text-[24px] leading-8 font-semibold shadow-lg hover:brightness-110 active:scale-95 transition-all w-full md:w-auto min-w-[320px]"
+                                        className="bg-[#2d5a27] text-white px-16 py-3 rounded-lg text-[24px] leading-8 font-semibold shadow-lg hover:brightness-110 active:scale-95 transition-all w-full md:w-auto min-w-[320px] cursor-pointer"
                                     >
                                         START INTERVIEW
                                     </button>

@@ -101,7 +101,7 @@ const ListView = ({
                       disabled={
                         item.status.toLowerCase() === "completed"
                       }
-                      className={`px-5 py-2 rounded text-white text-[11px] font-semibold transition
+                      className={`px-5 py-2 rounded text-white text-[11px] font-semibold transition cursor-pointer
                         ${item.status.toLowerCase() ===
                           "completed"
                           ? "bg-gray-400 cursor-not-allowed"

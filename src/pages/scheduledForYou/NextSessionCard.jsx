@@ -52,7 +52,7 @@ const NextSessionCard = ({ session, onStart }) => {
                 </p>
 
                 <button
-                    className="mt-6 w-full bg-green-700 text-white py-2 rounded-lg hover:bg-green-800"
+                    className="mt-6 w-full bg-green-700 text-white py-2 rounded-lg hover:bg-green-800 cursor-pointer"
                     onClick={() => onStart(session)}
                 >
                     START
