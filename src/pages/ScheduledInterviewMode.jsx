@@ -1,14 +1,6 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
-import {
-    ChevronRight,
-    Clock3,
-    ShieldCheck,
-    CircleCheck,
-    ArrowRight,
-    Info,
-    FileText,
-} from "lucide-react";
+import { ChevronRight, Clock3, ShieldCheck, CircleCheck, ArrowRight, Info, FileText } from "lucide-react";
 import { FiLoader } from "react-icons/fi";
 import { useNavigate, Link } from "react-router-dom";
 import { useState } from "react";
@@ -19,8 +11,10 @@ function ScheduledInterviewMode() {
     const { state } = useLocation();
     const interview = state?.interview;
     const preStartData = state?.preStartData;
-    const pageTitle = preStartData?.page_title?.trim() || "Interview";
-    const isCompanyInterview = pageTitle.toLowerCase().includes("company");
+    const interviewType = preStartData?.interview_type || "";
+    const pageTitle = interviewType.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+    // const pageTitle = preStartData?.page_title?.trim() || "Interview";
+    const isCompanyInterview = interviewType === "company_based";
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [popup, setPopup] = useState({
@@ -84,7 +78,7 @@ function ScheduledInterviewMode() {
     };
 
     return (
-        <div className="w-full min-h-screen bg-[#f8f9ff] px-12 py-8 font-sans antialiased text-[#0b1c30]">
+        <div className="w-full min-h-screen font-sans antialiased text-[#0b1c30]">
             {/*Loader*/}
             {loading && (
                 <div className="fixed inset-0 bg-black/40 z-9999 flex items-center justify-center">
@@ -97,85 +91,137 @@ function ScheduledInterviewMode() {
                     </div>
                 </div>
             )}
+
             <div className="w-full max-w-full flex flex-col pt-2">
+                {/* Breadcrumb */}
+                <div className="h-auto min-h-16 border-b border-[#d5c2bf] flex items-center px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 py-4 mb-10">
+                    <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm font-bold uppercase text-[#514441]">
+
+                        <span
+                            onClick={() => navigate("/scheduled-interview")}
+                            className="cursor-pointer hover:text-[#3b6934]"
+                        >
+                            Scheduled Interviews
+                        </span>
+
+                        <span>›</span>
+
+                        <span className="text-[#3b6934]">
+                            {pageTitle}
+                        </span>
+
+                    </div>
+                </div>
 
                 {isCompanyInterview ? (
                     <>
-                        {/* Breadcrumb */}
-                        <div className="flex items-center gap-2 font-bold text-[12px] tracking-[0.05em] text-[#514441] mb-10 uppercase">
-                            <Link
-                                to="/scheduled-Interview"
-                                className="text-[#514441] hover:text-[#154212] transition-colors"
-                            >
-                                Scheduled for You
-                            </Link>
-
-                            <ChevronRight className="w-3.5 h-3.5 text-[#514441]" />
-                            <span className="text-[#154212]">{pageTitle}</span>
-                        </div>
-                        <div className="max-w-[800px] mx-auto flex flex-col">
+                        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 flex flex-col">
                             {/* Page Title */}
-                            <h2 className="text-[32px] leading-[40px] tracking-[-0.01em] font-semibold text-[#0b1c30] text-left mb-10 font-sans">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center text-[#0B1C30] mb-5">
                                 {pageTitle}
                             </h2>
 
                             {/* Main Card */}
-                            <div className="bg-[#ffffff] border border-[#e5e7eb] rounded-xl p-6 shadow-sm w-full">
-                                <div className="grid md:grid-cols-2 gap-6 items-start">
-                                    {/* Left Column */}
-                                    <div className="flex flex-col gap-6">
-                                        {/* Assessment Mode Box */}
-                                        <div className="p-3 bg-[#f8f9ff] border border-[#e5e7eb] rounded-lg flex flex-col gap-1">
-                                            <p className="text-[12px] leading-[16px] tracking-[0.05em] font-semibold text-[#514441] uppercase">
+                            <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 sm:p-6 lg:p-8 shadow-sm">
+                                <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-[340px_minmax(0,1fr)] xl:grid-cols-[360px_minmax(0,1fr)] gap-6">
+                                    {/* Left */}
+                                    <div className="flex flex-col gap-5">
+                                        {/* Assessment Mode */}
+                                        <div
+                                            className="
+                                                bg-[#F8F9FD]
+                                                border
+                                                border-[#E5E7EB]
+                                                rounded-lg
+                                                p-4
+                                                sm:p-5
+                                                min-h-30
+                                                flex
+                                                flex-col
+                                                justify-center
+                                            "
+                                        >
+                                            <p className="text-xs uppercase tracking-wider font-semibold text-[#514441] mb-2">
                                                 Assessment Mode
                                             </p>
-                                            <div className="flex items-center gap-1.5">
+                                            <div className="flex items-center gap-2">
                                                 <ShieldCheck className="w-5 h-5 text-[#154212]" />
-                                                <span className="text-[20px] leading-[28px] font-semibold text-[#0b1c30] font-sans">{activeAssessmentMode}</span>
+                                                <span className="text-base sm:text-lg md:text-xl lg:text-2xl break-word font-semibold break-word text-[#0b1c30]">
+                                                    {activeAssessmentMode}
+                                                </span>
                                             </div>
                                         </div>
-
-                                        {/* Duration Box */}
-                                        <div className="p-3 bg-[#f8f9ff] border border-[#e5e7eb] rounded-lg flex flex-col gap-1">
-                                            <p className="text-[12px] leading-[16px] tracking-[0.05em] font-semibold text-[#514441] uppercase">
+                                        {/* Duration */}
+                                        <div className="
+                                            bg-[#F8F9FD]
+                                            border
+                                            border-[#E5E7EB]
+                                            rounded-lg
+                                            p-4
+                                            sm:p-5
+                                            min-h-30
+                                            flex
+                                            flex-col
+                                            justify-center
+                                        "
+                                        >
+                                            <p className="text-xs uppercase tracking-wider font-semibold text-[#514441] mb-2">
                                                 Duration
                                             </p>
-                                            <div className="flex items-center gap-1.5">
+                                            <div className="flex items-center gap-2">
                                                 <Clock3 className="w-5 h-5 text-[#154212]" />
-                                                <span className="text-[20px] leading-[28px] font-semibold text-[#0b1c30] font-sans">{activeDuration}</span>
+                                                <span className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold break-word text-[#0b1c30]">
+                                                    {activeDuration}
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
-
-                                    {/* Right Column */}
-                                    <div className="p-6 bg-[#f0f2f5] border border-[#e5e7eb] rounded-lg h-full flex flex-col gap-4">
-                                        <h4 className="text-[12px] leading-[16px] tracking-[0.05em] font-semibold text-[#514441] uppercase">
+                                    {/* Right */}
+                                    <div className="bg-[#F3F5F8] border border-[#E5E7EB] rounded-lg p-6 h-full">
+                                        <p className="text-xs uppercase tracking-wider font-semibold text-[#514441] mb-6">
                                             Question Focus Areas
-                                        </h4>
-                                        <ul className="space-y-3">
-                                            {focusAreas.map((area, idx) => (
-                                                <li key={idx} className="flex items-start gap-3">
-                                                    <CircleCheck className="w-5 h-5 text-[#154212] flex-shrink-0 mt-0.5" />
+                                        </p>
+                                        <div className="space-y-5">
+                                            {focusAreas.map((area, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="flex items-start gap-3"
+                                                >
+                                                    <CircleCheck className="w-5 h-5 text-[#154212] mt-1 shrink-0" />
                                                     <div>
-                                                        <p className="text-[16px] leading-[24px] font-bold text-[#0b1c30] font-sans">{area.title}</p>
-                                                        <p className="text-[14px] leading-[20px] font-normal text-[#514441] font-sans">{area.description}</p>
+                                                        <h4 className="text-base sm:text-lg font-bold text-[#0b1c30]">
+                                                            {area.title}
+                                                        </h4>
+                                                        <p className="text-sm sm:text-base leading-6 text-[#514441]">
+                                                            {area.description}
+                                                        </p>
                                                     </div>
-                                                </li>
+                                                </div>
                                             ))}
-                                        </ul>
+                                        </div>
                                     </div>
+                                </div>
+                                {/* Info */}
+                                <div className="mt-6 pt-6 border-t border-[#E5E7EB] flex gap-3 items-start">
+                                    <span className="p-1 rounded-full bg-[#ffdad6] text-[#ba1a1a]">
+                                        <Info className="w-4 h-4" />
+                                    </span>
+
+                                    <p className="text-sm sm:text-base leading-6 text-[#514441]">
+                                        {preStartData?.info_note}
+                                    </p>
                                 </div>
                             </div>
 
                             {/* Warning Text */}
                             <div className="mt-10 flex flex-col items-center w-full">
                                 <div className="text-center w-full max-w-2xl mb-16 flex flex-col items-center">
-                                    <p className="text-[14px] leading-[20px] font-normal text-[#514441] italic mb-6">
+                                    <p className="text-[14px] leading-5 font-normal text-[#514441] italic mb-6">
                                         {preStartData?.consent_text}
                                     </p>
                                     <button
                                         onClick={handleStartInterview}
-                                        className="bg-[#2d5a27] text-white px-16 py-3 rounded-lg text-[24px] leading-[32px] font-semibold shadow-lg hover:brightness-110 active:scale-95 transition-all w-full md:w-auto min-w-[320px]"
+                                        className="bg-[#2d5a27] text-white px-16 py-3 rounded-lg text-[24px] leading-8 font-semibold shadow-lg hover:brightness-110 active:scale-95 transition-all w-full md:w-auto min-w-[320px]"
                                     >
                                         START INTERVIEW
                                     </button>
@@ -186,109 +232,117 @@ function ScheduledInterviewMode() {
                 ) : (
                     // Resume-Based 
                     <>
-                        {/* Breadcrumb - Full Width */}
-                        <div className="flex items-center gap-2 font-bold text-[12px] tracking-[0.05em] text-[#514441] mb-10 uppercase">
-                            <Link
-                                to="/scheduled-Interview"
-                                className="text-[#514441] hover:text-[#154212] transition-colors"
-                            >
-                                Scheduled for You
-                            </Link>
-
-                            <ChevronRight className="w-3.5 h-3.5 text-[#514441]" />
-                            <span className="text-[#154212]">{pageTitle}</span>
-                        </div>
-
                         {/* Main Content */}
-                        <div className="max-w-[1200px] mx-auto flex flex-col">
-
+                        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 flex flex-col">
                             {/* Page Title */}
-                            <h2 className="text-[32px] leading-[40px] tracking-[-0.01em] font-semibold text-[#0b1c30] text-center mb-10">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#0b1c30] text-center mb-5">
                                 {pageTitle}
                             </h2>
-
                             {/* Main Card */}
-                            <div className="bg-white border border-[#e5e7eb] rounded-xl p-6 shadow-sm w-full flex flex-col gap-6">
+                            <div className="bg-white border border-[#e5e7eb] rounded-xl p-5 sm:p-6 lg:p-8 shadow-sm">
+                                <div className="grid grid-cols-1 lg:grid-cols-[340px_minmax(0,1fr)] xl:grid-cols-[360px_minmax(0,1fr)] gap-6 lg:gap-8">
+                                    {/* Left */}
+                                    <div className="flex flex-col gap-5 h-full">
+                                        {/* Assessment Mode */}
+                                        <div className="bg-[#F8F9FD] border border-[#E5E7EB] rounded-lg p-4 sm:p-5 min-h-30 flex flex-col justify-center">
+                                            <p className="text-xs uppercase tracking-wider font-semibold text-[#514441] mb-2">
+                                                Assessment Mode
+                                            </p>
+                                            <div className="flex items-center gap-2">
+                                                <ShieldCheck className="w-5 h-5 text-[#154212]" />
+                                                <span className="text-base sm:text-lg md:text-xl lg:text-2xl break-word font-semibold break-word text-[#0b1c30]">
+                                                    {activeAssessmentMode}
+                                                </span>
+                                            </div>
+                                        </div>
 
-                                {/* Metadata */}
-                                <div className="grid md:grid-cols-2 gap-6">
-                                    <div className="flex flex-col gap-1">
-                                        <p className="text-[12px] uppercase tracking-[0.05em] font-semibold text-[#514441]">
-                                            Assessment Mode
-                                        </p>
-
-                                        <div className="flex items-center gap-2">
-                                            <FileText className="w-5 h-5 text-[#154212]" />
-                                            <span className="text-[20px] font-semibold">
-                                                {activeAssessmentMode}
-                                            </span>
+                                        {/* Duration */}
+                                        <div className="
+                                                bg-[#F8F9FD]
+                                                border
+                                                border-[#E5E7EB]
+                                                rounded-lg
+                                                p-4
+                                                sm:p-5
+                                                min-h-30
+                                                flex
+                                                flex-col
+                                                justify-center
+                                            ">
+                                            <p className="text-xs uppercase tracking-wider font-semibold text-[#514441] mb-2">
+                                                Duration
+                                            </p>
+                                            <div className="flex items-center gap-2">
+                                                <Clock3 className="w-5 h-5 text-[#154212]" />
+                                                <span className="text-base sm:text-lg md:text-xl lg:text-2xl break-word font-semibold break-word text-[#0b1c30]">
+                                                    {activeDuration}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col gap-1">
-                                        <p className="text-[12px] uppercase tracking-[0.05em] font-semibold text-[#514441]">
-                                            Duration
+                                    {/* Right */}
+                                    <div className="
+                                        bg-[#F3F5F8]
+                                        border
+                                        border-[#E5E7EB]
+                                        rounded-lg
+                                        p-5
+                                        sm:p-6
+                                        h-full
+                                    ">
+                                        <p className="text-xs uppercase tracking-wider font-semibold text-[#514441] mb-6">
+                                            Question Focus Areas
                                         </p>
-
-                                        <div className="flex items-center gap-2">
-                                            <Clock3 className="w-5 h-5 text-[#154212]" />
-                                            <span className="text-[20px] font-semibold">
-                                                {activeDuration}
-                                            </span>
+                                        <div className="space-y-5">
+                                            {focusAreas.map((area, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="flex items-start gap-3"
+                                                >
+                                                    <CircleCheck className="w-5 h-5 text-[#154212] mt-1 shrink-0" />
+                                                    <div>
+                                                        <h4 className="text-base sm:text-lg font-bold text-[#0b1c30]">
+                                                            {area.title}
+                                                        </h4>
+                                                        <p className="text-sm sm:text-base leading-6 text-[#514441]">
+                                                            {area.description}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
                                 </div>
-
-                                {/* Question Focus */}
-                                <div className="p-6 bg-[#f0f2f5] border border-[#e5e7eb] rounded-lg">
-                                    <h4 className="text-[12px] uppercase tracking-[0.05em] font-semibold text-[#514441] mb-4">
-                                        Question Focus
-                                    </h4>
-
-                                    <div className="flex flex-wrap gap-2">
-                                        {focusTags.map((tag, idx) => (
-                                            <span
-                                                key={idx}
-                                                className="bg-white border border-[#e5e7eb] px-4 py-2 rounded-full text-[14px] font-semibold"
-                                            >
-                                                {tag}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="border-t border-[#e5e7eb]"></div>
-
                                 {/* Info */}
-                                <div className="flex gap-3 items-start">
+                                <div className="mt-6 pt-6 border-t border-[#E5E7EB] flex gap-3 items-start">
                                     <span className="p-1 rounded-full bg-[#ffdad6] text-[#ba1a1a]">
                                         <Info className="w-4 h-4" />
                                     </span>
 
-                                    <p className="text-sm text-[#514441]">
+                                    <p className="text-sm sm:text-base leading-6 text-[#514441]">
                                         {preStartData?.info_note}
                                     </p>
                                 </div>
                             </div>
 
-                            {/* Button */}
-                            <button
-                                onClick={handleStartInterview}
-                                className="w-full mt-6 bg-[#2d5a27] text-white py-4 rounded-lg text-[24px] font-semibold flex items-center justify-center gap-2 cursor-pointer"
-                            >
-                                START INTERVIEW
-                                <ArrowRight className="w-5 h-5" />
-                            </button>
-
-                            {/* Footer */}
-                            <p className="text-center text-[10px] uppercase tracking-widest text-[#64748B] mt-4">
-                                {preStartData?.consent_text}
-                            </p>
-
+                            {/* Warning Text */}
+                            <div className="mt-10 flex flex-col items-center w-full">
+                                <div className="text-center w-full max-w-2xl mb-16 flex flex-col items-center">
+                                    <p className="text-[14px] leading-5 font-normal text-[#514441] italic mb-6">
+                                        {preStartData?.consent_text}
+                                    </p>
+                                    <button
+                                        onClick={handleStartInterview}
+                                        className="bg-[#2d5a27] text-white px-16 py-3 rounded-lg text-[24px] leading-8 font-semibold shadow-lg hover:brightness-110 active:scale-95 transition-all w-full md:w-auto min-w-[320px]"
+                                    >
+                                        START INTERVIEW
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </>
                 )}
-
             </div>
             {/* Popup */}
             {popup.show && (

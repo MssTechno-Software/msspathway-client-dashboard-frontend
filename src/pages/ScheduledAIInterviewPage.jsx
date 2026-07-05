@@ -8,7 +8,10 @@ import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognitio
 
 function ScheduledAIInterview() {
     const { state } = useLocation();
-    const pageTitle = state?.preStartData?.page_title?.trim();
+    const preStartData = state?.preStartData;
+    const interviewType = preStartData?.interview_type || "";
+    const pageTitle = interviewType.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+    //const pageTitle = state?.preStartData?.page_title?.trim();
     const navigate = useNavigate();
     const location = useLocation();
     const apiQuestions = state?.questions || [];
