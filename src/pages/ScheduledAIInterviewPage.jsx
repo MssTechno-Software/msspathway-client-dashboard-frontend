@@ -8,11 +8,13 @@ import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognitio
 
 function ScheduledAIInterview() {
     const { state } = useLocation();
+    const pageTitle = state?.preStartData?.page_title?.trim();
     const navigate = useNavigate();
     const location = useLocation();
     const apiQuestions = state?.questions || [];
     const clientId = state?.client_id || localStorage.getItem("client_id");
-    const interview_id = state?.interview_id;
+    const interview_id =
+        state?.interview_id || state?.interview?.interview_id;
     const technology_id = state?.technology_id;
     const [answers, setAnswers] = useState([]);
     const [isRecording, setIsRecording] = useState(false);
@@ -303,12 +305,21 @@ function ScheduledAIInterview() {
                     </span>
                     <span>›</span>
                     <span
-                        onClick={() => navigate("/scheduled-interview-mode", { state: { interview_id, client_id: clientId } })}
+                        onClick={() =>
+                            navigate("/scheduled-interview-mode", {
+                                state: {
+                                    interview: state?.interview,
+                                    preStartData: state?.preStartData,
+                                },
+                            })
+                        }
                         className="cursor-pointer hover:text-[#3b6934]"
                     >
-                        Interview Mode
+                        {pageTitle}
                     </span>
+
                     <span>›</span>
+
                     <span className="text-[#3b6934]">
                         Question {(currentQuestionIndex ?? 0) + 1}
                     </span>

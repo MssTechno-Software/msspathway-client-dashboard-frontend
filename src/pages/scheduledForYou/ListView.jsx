@@ -46,7 +46,7 @@ const ListView = ({
 
           <tbody>
 
-            {interviews.length === 0 ? (
+            {!Array.isArray(interviews) || interviews.length === 0 ? (
 
               <tr>
                 <td
@@ -58,7 +58,7 @@ const ListView = ({
               </tr>
 
             ) : (
-              interviews.map((item, index) => (
+              Array.isArray(interviews) && interviews.map((item, index) => (
                 <tr
                   key={`${item.interview_id}-${index}`}
                   className="border-t border-gray-200 hover:bg-gray-50 transition"

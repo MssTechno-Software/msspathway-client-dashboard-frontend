@@ -58,15 +58,23 @@ const CalendarView = ({
     };
 
     const events = useMemo(() => {
+        if (!scheduledInterviews) return [];
 
-        return scheduledInterviews.map((item) => ({
+        let interviews = [];
+
+        if (Array.isArray(scheduledInterviews)) {
+            interviews = scheduledInterviews;
+        } else {
+            interviews = Object.values(scheduledInterviews).flat();
+        }
+
+        return interviews.map((item) => ({
             id: item.interview_id,
             title: item.title,
             start: item.scheduled_at,
             end: item.scheduled_at,
             extendedProps: item,
         }));
-
     }, [scheduledInterviews]);
 
     const renderEvent = (eventInfo) => {

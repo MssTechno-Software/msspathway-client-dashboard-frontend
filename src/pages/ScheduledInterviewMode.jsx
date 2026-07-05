@@ -15,75 +15,34 @@ import { useState } from "react";
 import axios from "axios";
 import BASE_URL from "../config/api";
 
-export default function ScheduledInterviewMode() {
+function ScheduledInterviewMode() {
     const { state } = useLocation();
     const interview = state?.interview;
+    const preStartData = state?.preStartData;
+    const pageTitle = preStartData?.page_title?.trim() || "Interview";
+    const isCompanyInterview = pageTitle.toLowerCase().includes("company");
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
+    const [popup, setPopup] = useState({
+        show: false,
+        message: "",
+        type: "", // success | error
+    });
     const clientId =
         state?.client_id ??
         localStorage.getItem("client_id");
-    // Determine if it is a company-based interview
-    const isCompanyInterview = interview?.category?.toLowerCase() === "company";
 
-    // Helper to format text into Title Case while preserving acronyms (like MC, TCS, AI, L1, L2)
-    const formatTitleText = (str) => {
-        if (!str) return "";
-        return str
-            .split(" ")
-            .map((word) => {
-                const lower = word.toLowerCase();
-                // Keep acronyms uppercase
-                if (
-                    word.length <= 3 &&
-                    (word === word.toUpperCase() || ["mc", "tcs", "ai", "l1", "l2", "l3"].includes(lower))
-                ) {
-                    return word.toUpperCase();
-                }
-                return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-            })
-            .join(" ");
-    };
+    const activeAssessmentMode =
+        preStartData?.assessment_mode?.label || "--";
 
-    // Get raw interview name and format it
-    const rawName = interview?.interview_name || interview?.title || "";
-    const formattedName = formatTitleText(rawName);
+    const activeDuration =
+        preStartData?.duration?.label || "--";
 
-    // Dynamic Title Determination combining the formatted name and mode suffix
-    const activeTitle = isCompanyInterview
-        ? `${formattedName} Company-Based Interview`
-        : `${formattedName} Resume-Based Interview`;
+    const focusAreas =
+        preStartData?.question_focus_areas || [];
 
-    // Dynamic Assessment Mode & Duration from the interview object
-    const activeAssessmentMode = interview?.assessmentMode || (isCompanyInterview ? "Company-Based" : "Resume-Based");
-    const activeDuration = interview?.duration || (isCompanyInterview ? "45 Minutes (Deep Dive)" : "30 Minutes (Deep Dive)");
-
-    // Default values for Resume-Based Interview focus tags
-    const defaultResumeTags = [
-        "Professional Experience",
-        "Technical Skills",
-        "Leadership Competencies"
-    ];
-
-    // Default values for Company-Based Interview focus areas
-    const defaultCompanyFocusAreas = [
-        {
-            title: "Cultural Alignment",
-            description: "Evaluating shared values and leadership ethos."
-        },
-        {
-            title: "Role-Specific Technical Skills",
-            description: "Precision testing for high-level domain expertise."
-        },
-        {
-            title: "Problem Solving",
-            description: "Real-world scenario analysis and decision making."
-        }
-    ];
-
-    // Extract focus details or fall back to defaults
-    const focusTags = interview?.focusTags || defaultResumeTags;
-    const focusAreas = interview?.focusAreas || defaultCompanyFocusAreas;
+    const focusTags =
+        preStartData?.question_focus_areas?.map(area => area.title) || [];
 
     /*start interview*/
     console.log({ clientId, interviewId: interview.interview_id });
@@ -98,11 +57,27 @@ export default function ScheduledInterviewMode() {
 
             console.log("Generate Questions Response:", response.data);
             navigate("/scheduled-ai-interview", {
-                state: response.data,
+                state: {
+                    ...response.data,
+                    interview_id: interview.interview_id,
+                    client_id: clientId,
+                    preStartData,
+                    interview,
+                },
             });
 
         } catch (err) {
-            console.log(err);
+            console.error(err);
+
+            setPopup({
+                show: true,
+                type: "error",
+                message:
+                    err?.response?.data?.message ||
+                    err?.response?.data?.error ||
+                    err?.response?.data?.detail ||
+                    "Failed to start the interview. Please try again.",
+            });
         } finally {
             setLoading(false);
         }
@@ -136,12 +111,12 @@ export default function ScheduledInterviewMode() {
                             </Link>
 
                             <ChevronRight className="w-3.5 h-3.5 text-[#514441]" />
-                            <span className="text-[#154212]">Company Based Interview</span>
+                            <span className="text-[#154212]">{pageTitle}</span>
                         </div>
                         <div className="max-w-[800px] mx-auto flex flex-col">
                             {/* Page Title */}
                             <h2 className="text-[32px] leading-[40px] tracking-[-0.01em] font-semibold text-[#0b1c30] text-left mb-10 font-sans">
-                                {activeTitle}
+                                {pageTitle}
                             </h2>
 
                             {/* Main Card */}
@@ -196,7 +171,7 @@ export default function ScheduledInterviewMode() {
                             <div className="mt-10 flex flex-col items-center w-full">
                                 <div className="text-center w-full max-w-2xl mb-16 flex flex-col items-center">
                                     <p className="text-[14px] leading-[20px] font-normal text-[#514441] italic mb-6">
-                                        By clicking 'Start Interview', you confirm your microphone and camera are calibrated. AI analysis will begin immediately upon session entry.
+                                        {preStartData?.consent_text}
                                     </p>
                                     <button
                                         onClick={handleStartInterview}
@@ -221,7 +196,7 @@ export default function ScheduledInterviewMode() {
                             </Link>
 
                             <ChevronRight className="w-3.5 h-3.5 text-[#514441]" />
-                            <span className="text-[#154212]">Resume Based Interview</span>
+                            <span className="text-[#154212]">{pageTitle}</span>
                         </div>
 
                         {/* Main Content */}
@@ -229,7 +204,7 @@ export default function ScheduledInterviewMode() {
 
                             {/* Page Title */}
                             <h2 className="text-[32px] leading-[40px] tracking-[-0.01em] font-semibold text-[#0b1c30] text-center mb-10">
-                                {activeTitle}
+                                {pageTitle}
                             </h2>
 
                             {/* Main Card */}
@@ -291,7 +266,7 @@ export default function ScheduledInterviewMode() {
                                     </span>
 
                                     <p className="text-sm text-[#514441]">
-                                        The AI will analyze the uploaded resume to generate 15-20 customized questions. Please ensure your microphone is active and you are in a quiet environment.
+                                        {preStartData?.info_note}
                                     </p>
                                 </div>
                             </div>
@@ -307,7 +282,7 @@ export default function ScheduledInterviewMode() {
 
                             {/* Footer */}
                             <p className="text-center text-[10px] uppercase tracking-widest text-[#64748B] mt-4">
-                                By clicking start, you agree to the AI processing terms
+                                {preStartData?.consent_text}
                             </p>
 
                         </div>
@@ -315,6 +290,37 @@ export default function ScheduledInterviewMode() {
                 )}
 
             </div>
+            {/* Popup */}
+            {popup.show && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+                    <div className="bg-white rounded-xl shadow-lg p-6 w-80 text-center">
+
+                        <p
+                            className={`text-lg font-semibold mb-4 ${popup.type === "success"
+                                ? "text-green-700"
+                                : "text-red-600"
+                                }`}
+                        >
+                            {popup.message}
+                        </p>
+
+                        <button
+                            onClick={() =>
+                                setPopup({
+                                    show: false,
+                                    message: "",
+                                    type: "",
+                                })
+                            }
+                            className="px-5 py-2 bg-green-800 text-white rounded-full hover:bg-green-700"
+                        >
+                            OK
+                        </button>
+
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
+export default ScheduledInterviewMode;

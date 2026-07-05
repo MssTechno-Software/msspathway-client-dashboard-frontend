@@ -23,6 +23,11 @@ const ScheduledInterviews = () => {
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const navigate = useNavigate();
+    const [popup, setPopup] = useState({
+        show: false,
+        message: "",
+        type: "", // success | error
+    });
     const getScheduledInterviews = async () => {
         try {
             setLoading(true);
@@ -40,8 +45,18 @@ const ScheduledInterviews = () => {
 
             setData(res.data);
 
-        } catch (error) {
-            console.error(error);
+        } catch (err) {
+            console.error(err);
+
+            setPopup({
+                show: true,
+                type: "error",
+                message:
+                    err?.response?.data?.message ||
+                    err?.response?.data?.error ||
+                    err?.response?.data?.detail ||
+                    "Failed to start the interview. Please try again.",
+            });
         } finally {
             setLoading(false);
         }
@@ -75,9 +90,28 @@ const ScheduledInterviews = () => {
             });
 
         } catch (err) {
+            console.error(err);
 
-            console.log(err);
+            let errorMessage = "Failed to load scheduled interviews.";
 
+            if (err.response?.data?.message) {
+                errorMessage = err.response.data.message;
+            } else if (err.response?.data?.error) {
+                errorMessage = err.response.data.error;
+            } else if (
+                Array.isArray(err.response?.data?.detail) &&
+                err.response.data.detail.length > 0
+            ) {
+                errorMessage = err.response.data.detail[0].msg;
+            } else if (typeof err.response?.data?.detail === "string") {
+                errorMessage = err.response.data.detail;
+            }
+
+            setPopup({
+                show: true,
+                type: "error",
+                message: errorMessage,
+            });
         } finally {
             setLoading(false);
         }
@@ -106,8 +140,8 @@ const ScheduledInterviews = () => {
                 <div className="flex rounded-lg overflow-hidden border border-gray-300 shadow">
 
                     <button
-                        onClick={() => setView("calendar")}
-                        className={`px-5 py-2 cursor-pointer ${view === "calendar"
+                        onClick={() => setView("month")}
+                        className={`px-5 py-2 cursor-pointer ${view === "month"
                             ? "bg-gray-300 text-black"
                             : "bg-white"
                             }`}
@@ -152,6 +186,35 @@ const ScheduledInterviews = () => {
 
             )}
 
+            {popup.show && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+                    <div className="bg-white rounded-xl shadow-lg p-6 w-80 text-center">
+
+                        <p
+                            className={`text-lg font-semibold mb-4 ${popup.type === "success"
+                                ? "text-green-700"
+                                : "text-red-600"
+                                }`}
+                        >
+                            {popup.message}
+                        </p>
+
+                        <button
+                            onClick={() =>
+                                setPopup({
+                                    show: false,
+                                    message: "",
+                                    type: "",
+                                })
+                            }
+                            className="px-5 py-2 bg-green-800 text-white rounded-full hover:bg-green-700"
+                        >
+                            OK
+                        </button>
+
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
