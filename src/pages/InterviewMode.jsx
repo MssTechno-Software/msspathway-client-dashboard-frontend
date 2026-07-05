@@ -1,17 +1,39 @@
-import {
-  Presentation,
-  BrainCircuit,
-  TerminalSquare,
-} from "lucide-react";
-import { useState } from "react";
+import { Presentation, BrainCircuit, TerminalSquare, } from "lucide-react";
+import { useState, useEffect } from "react";
 import { FiLoader } from "react-icons/fi";
 import ModeCard from "../components/ModeCard";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from "../config/api";
 
 function InterviewModes() {
   const [showBeginAssessmentModal, setShowBeginAssessmentModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [dashboardData, setDashboardData] = useState(null);
   const navigate = useNavigate();
+  const fetchDashboard = async () => {
+    try {
+      setLoading(true);
+
+      const clientId = localStorage.getItem("client_id");
+
+      const response = await fetch(
+        `${BASE_URL}/api/clients/${clientId}/dashboard`,
+      );
+      console.log("Status:", response.status);
+      const data = await response.json();
+
+      console.log(data); // Check the response
+
+      setDashboardData(data);
+    } catch (error) {
+      console.error("Dashboard Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchDashboard();
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#FDFDFF] px-12 py-12">
@@ -118,11 +140,13 @@ function InterviewModes() {
 
             <div className="flex flex-wrap items-end gap-2 mt-2">
               <h3 className="text-4xl lg:text-5xl font-bold text-[#230804]">
-                24
+                {dashboardData?.summary?.total_interviews_completed || 0}
               </h3>
 
               <span className="text-sm text-[#2d5a27] font-semibold">
-                +2 this week
+                {dashboardData?.summary?.total_interviews_completed > 0
+                  ? `(${dashboardData?.summary?.total_interviews_completed} completed)`
+                  : "(0 completed)"}
               </span>
             </div>
           </div>
@@ -134,7 +158,7 @@ function InterviewModes() {
             </p>
 
             <h3 className="text-4xl lg:text-5xl font-bold text-[#2d5a27] mt-2">
-              82%
+              {dashboardData?.summary?.average_performance_score?.toFixed(2) || 0}%
             </h3>
           </div>
 
@@ -145,11 +169,11 @@ function InterviewModes() {
             </p>
 
             <h3 className="text-xl lg:text-2xl font-bold mt-2 text-[#230804]">
-              Tomorrow, 10AM
+              {dashboardData?.next_sessions?.mockup?.date || "No Session"}
             </h3>
 
             <p className="text-sm lg:text-base text-black/80 mt-2">
-              Resume Based
+              {dashboardData?.next_sessions?.mockup?.mode || "--"}
             </p>
           </div>
 
@@ -160,11 +184,11 @@ function InterviewModes() {
             </p>
 
             <h3 className="text-xl lg:text-2xl font-bold mt-2">
-              Today, 2PM
+              {dashboardData?.next_sessions?.realtime?.date || "No Session"}
             </h3>
 
             <p className="text-sm lg:text-base text-white/80 mt-2">
-              Infosys
+              {dashboardData?.next_sessions?.realtime?.company || "--"}
             </p>
           </div>
         </div>
