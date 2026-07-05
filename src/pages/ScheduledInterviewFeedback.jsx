@@ -2,15 +2,24 @@ import React, { useState } from 'react';
 import { Brain, ClipboardCheck, TrendingUp, Quote, Target, Flag, BadgeCheck, Sparkles, ChevronLeft, ChevronRight, CheckCircle2, Check, AlertTriangle, ArrowLeft, Search, Bell, HelpCircle, Clock, Globe, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import { FiLoader } from "react-icons/fi";
 
 function ScheduledInterviewFeedback({ data = null }) {
     const navigate = useNavigate();
     const location = useLocation();
+    const { state } = useLocation();
+    const [loading, setLoading] = useState(false);
     const scorecard = location.state?.scorecard;
     console.log("Scorecard:", scorecard);
+    const interviewType = state?.preStartData?.interview_type || "";
+    const pageTitle = interviewType
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, c => c.toUpperCase());
+    const questions = scorecard?.question_stepper || [];
     // View state: 'overall' or 'question'
     const [viewMode, setViewMode] = useState('overall');
     const [selectedQuestionId, setSelectedQuestionId] = useState(1);
+    const currentQuestionIndex = selectedQuestionId - 1;
     const technicalMetrics = scorecard?.soft_skills
         ? [
             {
@@ -104,26 +113,132 @@ function ScheduledInterviewFeedback({ data = null }) {
     return (
         <div className="w-full min-h-screen bg-[#f8f9fa] text-[#212529] ">
 
-            {/* Global Topbar */}
-            <header className="w-full bg-white border-b border-[#dee2e6] px-6 py-3 flex items-center justify-between ">
-                <div className="flex items-center gap-3">
-                    <button
-                        onClick={() => {
-                            if (viewMode === "question") {
-                                setViewMode("overall");
-                            } else {
-                                navigate("/scorecards");
-                            }
-                        }}
-                        className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
-                    >
-                        <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
-                    </button>
-                    <h1 className="text-lg font-bold text-[#230804] font-sans tracking-tight">
-                        Feedback
-                    </h1>
+            {/*loader*/}
+            {loading && (
+                <div className="fixed inset-0 bg-black/40 z-9999 flex items-center justify-center">
+                    <div className="p-6 flex flex-col items-center gap-3">
+                        <FiLoader className="animate-spin text-4xl text-green-800" />
+                        <p className="text-gray-800 font-medium">
+                            Please wait...
+                        </p>
+                    </div>
                 </div>
-            </header>
+            )}
+
+            {/* Breadcrumb */}
+            <div className="h-auto min-h-16 border-b border-[#d5c2bf] flex items-center px-4 sm:px-6 lg:px-12 py-4">
+                <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm font-bold uppercase text-[#514441]">
+                    <span
+                        onClick={() => navigate("/scheduled-interview")}
+                        className="cursor-pointer hover:text-[#3b6934]"
+                    >
+                        Scheduled Interviews
+                    </span>
+                    <span>›</span>
+                    <span
+                        onClick={() =>
+                            navigate("/scheduled-interview-mode", {
+                                state: {
+                                    interview: state?.interview,
+                                    preStartData: state?.preStartData,
+                                },
+                            })
+                        }
+                        className="cursor-pointer hover:text-[#3b6934]"
+                    >
+                        {pageTitle}
+                    </span>
+
+                    <span>›</span>
+
+                    <span className="text-[#3b6934]">
+                        Question-Level Feedback
+                    </span>
+                </div>
+            </div>
+            <div className="border border-gray-300 p-4 mb-6">
+                {/* Question Stepper */}
+                <div className="px-4 sm:px-6 lg:px-12 mt-6">
+                    <div className="bg-white border border-[#e7dbd6] rounded-xl px-5 py-4 shadow-sm">
+
+                        <div className="flex items-center">
+
+                            {/* Previous */}
+                            <button
+                                className="w-8 h-8 rounded-full flex items-center justify-center text-[#6b5f5b] hover:bg-gray-100 transition cursor-pointer"
+                            >
+                                &#8249;
+                            </button>
+
+                            {/* Steps */}
+                            <div className="flex-1 flex items-center px-3">
+
+                                {questions?.map((_, index) => (
+                                    <div
+                                        key={index}
+                                        className="flex items-center flex-1 last:flex-none"
+                                    >
+                                        <button
+                                            type="button"
+                                            onClick={() => handleStepClick(index + 1)}
+                                            className={`
+                                                        relative z-10
+                                                        w-7.5 h-7.5 rounded-xl
+                                                        flex items-center justify-center
+                                                        text-xs font-semibold
+                                                        transition-all duration-300
+                                                        cursor-pointer
+                                                        ${questions[index]?.attempted_status === "completed"
+                                                    ? "bg-[#3b6934] text-white"
+                                                    : questions[index]?.attempted_status === "current"
+                                                        ? "bg-green-100 border-2 border-[#3b6934] text-[#3b6934]"
+                                                        : questions[index]?.attempted_status === "skipped"
+                                                            ? "bg-red-100 border-2 border-red-500 text-red-500"
+                                                            : "bg-white border border-[#dddddd] text-[#bcbcbc]"
+                                                }
+                                                        `}
+                                        >
+                                            {index + 1}
+                                            {questions[index]?.attempted_status === "completed" && (
+                                                <div className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-white border-2 border-[#3b6934] flex items-center justify-center shadow-sm">
+                                                    <Check
+                                                        size={10}
+                                                        strokeWidth={3}
+                                                        className="text-[#3b6934]"
+                                                    />
+                                                </div>
+                                            )}
+                                        </button>
+
+                                        {index !== questions.length - 1 && (
+                                            <div className="flex-1 px-3">
+                                                <div className="relative h-0.5 bg-[#ececec]">
+                                                    <div
+                                                        className={`absolute left-0 top-0 h-full transition-all duration-300 ${index < currentQuestionIndex
+                                                            ? "w-full bg-[#97b78c]"
+                                                            : "w-0"
+                                                            }`}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+
+                            </div>
+
+                            {/* Next */}
+                            <button
+                                className="w-8 h-8 rounded-full flex items-center justify-center text-[#756965] hover:bg-gray-100 disabled:opacity-40"
+                            >
+                                &#8250;
+                            </button>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
 
             {/* Main content  */}
             <main className="w-full max-w-none px-4 sm:px-6 lg:px-8 py-6">
@@ -443,7 +558,6 @@ function ScheduledInterviewFeedback({ data = null }) {
                                     })}
                                 </div>
                             </section>
-
                         </div>
                     </div>
 

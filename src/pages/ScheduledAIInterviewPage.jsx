@@ -8,6 +8,7 @@ import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognitio
 
 function ScheduledAIInterview() {
     const { state } = useLocation();
+    const interview = state?.interview;
     const preStartData = state?.preStartData;
     const interviewType = preStartData?.interview_type || "";
     const pageTitle = interviewType.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
@@ -270,9 +271,10 @@ function ScheduledAIInterview() {
             navigate("/scheduled-interview-feedback", {
                 state: {
                     scorecard: data,
+                    interview: state?.interview,
+                    preStartData: state?.preStartData,
                 },
             });
-
         } catch (err) {
             setPopup({
                 show: true,
