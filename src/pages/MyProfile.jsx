@@ -246,9 +246,7 @@ function MyProfile() {
         setProfilePreview(URL.createObjectURL(file));
     };
 
-    const profileImage = profileFile
-        ? profilePreview
-        : profileUrl;
+    const profileImage = profileUrl;
 
     const initials = `${client?.client_name
         ?.split(" ")[0]
@@ -652,7 +650,13 @@ function MyProfile() {
 
                             <div className="flex gap-2 ml-auto">
                                 <button
-                                    onClick={() => setShowPhotoModal(false)}
+                                    onClick={() => {
+                                        setShowPhotoModal(false);
+                                        setProfileFile(null);
+                                        setProfilePreview("");
+                                        const input = document.getElementById("profileUpload");
+                                        if (input) input.value = "";
+                                    }}
                                     className="px-4 py-2 bg-gray-200 rounded-lg cursor-pointer"
                                 >
                                     Cancel
