@@ -7,7 +7,7 @@ const StatusBadge = ({ status }) => {
         return "bg-green-100 text-green-700";
 
       case "scheduled":
-        return "bg-orange-100 text-orange-700";
+        return "bg-yellow-100 text-yellow-700";
 
       case "in_progress":
       case "in progress":

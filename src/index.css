@@ -51,6 +51,7 @@ body {
   height: 100%;
   padding: 0 !important;
 }
+
 .fc .fc-col-header-cell.fc-day-today {
   background: #eef8ef !important;
   border: 1px solid #356d32 !important;
@@ -99,10 +100,28 @@ body {
   text-decoration: none !important;
 }
 
+/* Today's cell background */
+.fc .fc-day-today {
+  background: #f8fff6 !important;
+}
+
+/* Today's date number */
+.fc .fc-day-today .fc-daygrid-day-number {
+  width: 30px;
+  height: 30px;
+  background: #356d32;
+  color: #fff !important;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  margin: 4px;
+}
+
 .fc .fc-today-button:hover {
   background: #e5e7eb !important;
 }
-
 
 /*MONTH EVENTS*/
 
@@ -181,6 +200,17 @@ body {
 
 .fc-timegrid-event-harness {
   padding: 2px !important;
+}
+
+/* Week view current day */
+.fc .fc-timegrid-col.fc-day-today {
+  background: #f8fff6 !important;
+}
+
+/* Week view header date */
+.fc .fc-timegrid-col.fc-day-today .fc-col-header-cell-cushion {
+  color: #356d32 !important;
+  font-weight: 700;
 }
 
 /*REMOVE RESIZE*/

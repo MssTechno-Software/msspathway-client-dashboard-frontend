@@ -9,6 +9,21 @@ const ListView = ({
   onPageSizeChange,
   onStartInterview,
 }) => {
+  const getInterviewStyle = (item) => {
+    if (item.interview_source === "realtime") {
+      return {
+        row: "bg-blue-50 hover:bg-blue-100",
+        border: "border-l-[6px] border-blue-600",
+        title: "text-blue-800",
+      };
+    }
+
+    return {
+      row: "bg-slate-100 hover:bg-slate-200",
+      border: "border-l-[6px] border-slate-600",
+      title: "text-slate-700",
+    };
+  };
   return (
     <div className="bg-white shadow border border-gray-200 rounded-lg">
 
@@ -47,7 +62,6 @@ const ListView = ({
           <tbody>
 
             {!Array.isArray(interviews) || interviews.length === 0 ? (
-
               <tr>
                 <td
                   colSpan={5}
@@ -58,62 +72,55 @@ const ListView = ({
               </tr>
 
             ) : (
-              Array.isArray(interviews) && interviews.map((item, index) => (
-                <tr
-                  key={`${item.interview_id}-${index}`}
-                  className="border-t border-gray-200 hover:bg-gray-50 transition"
-                >
-                  <td className="px-6 py-5">
+              Array.isArray(interviews) &&
+              interviews.map((item, index) => {
+                const style = getInterviewStyle(item);
 
-                    <h3 className="text-[12px] font-extrabold uppercase text-blue-800">
-                      {item.title}
-                    </h3>
+                return (
+                  <tr
+                    key={`${item.interview_id}-${index}`}
+                    className={`${style.row} border-t border-gray-200 transition-all hover:brightness-100`}
+                  >
+                    <td className={`px-6 py-6 ${style.border}`}>
+                      <h3
+                        className={`text-[12px] font-extrabold uppercase tracking-wide ${style.title}`}
+                      >
+                        {item.title}
+                      </h3>
 
-                    <p className="text-[14px] text-[#514441]">
-                      {item.company_name || item.mode || item.interview_source}
-                    </p>
-                  </td>
+                      <p className="text-[14px] text-[#514441]">
+                        {item.company_name || item.mode || item.interview_source}
+                      </p>
+                    </td>
 
-                  <td className="text-[14px] text-[#0b1c30] px-6 py-5">
+                    <td className="px-6 py-6 text-[14px] text-[#0b1c30]">
+                      {item.duration_minutes} mins
+                    </td>
 
-                    {item.duration_minutes} mins
+                    <td className="px-6 py-6">
+                      {item.deadline_date}
+                    </td>
 
-                  </td>
+                    <td className="px-6 py-6">
+                      <StatusBadge status={item.status} />
+                    </td>
 
-                  <td className="px-6 py-5 text-left">
-
-                    {item.deadline_date}
-
-                  </td>
-
-                  <td className="px-6 py-5 text-left">
-
-                    <StatusBadge status={item.status} />
-
-                  </td>
-
-                  <td className="px-6 py-5 text-left">
-
-                    <button
-                      onClick={() =>
-                        onStartInterview(item)
-                      }
-                      disabled={
-                        item.status.toLowerCase() === "completed"
-                      }
-                      className={`px-5 py-2 rounded text-white text-[11px] font-semibold transition cursor-pointer
-                        ${item.status.toLowerCase() ===
-                          "completed"
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-green-700 hover:bg-green-800"
-                        }`}
-                    >
-                      START INTERVIEW
-                    </button>
-
-                  </td>
-                </tr>
-              ))
+                    <td className="px-6 py-6">
+                      <button
+                        onClick={() => onStartInterview(item)}
+                        disabled={item.status.toLowerCase() === "completed"}
+                        className={`px-5 py-2 rounded text-white text-[11px] font-semibold transition
+                          ${item.status.toLowerCase() === "completed"
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-green-700 hover:bg-green-800"
+                          }`}
+                      >
+                        START INTERVIEW
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
             )}
 
           </tbody>

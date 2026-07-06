@@ -3,7 +3,7 @@ import ListView from "../pages/scheduledForYou/ListView";
 import CalendarView from "../pages/scheduledForYou/CalendarView";
 import axios from "axios";
 import BASE_URL from "../config/api";
-import { FiLoader } from "react-icons/fi";
+import { FiLoader, FiSearch, FiX } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 const ScheduledInterviews = () => {
     const [view, setView] = useState("list");
@@ -19,6 +19,7 @@ const ScheduledInterviews = () => {
         today_timeline: [],
     });
     const clientId = localStorage.getItem("client_id");
+    const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
@@ -27,6 +28,25 @@ const ScheduledInterviews = () => {
         show: false,
         message: "",
         type: "", // success | error
+    });
+
+    const interviews = Array.isArray(data.scheduled_interviews)
+        ? data.scheduled_interviews
+        : Object.values(data.scheduled_interviews || {}).flat();
+
+    const filteredInterviews = interviews.filter((item) => {
+        const search = searchTerm.trim().toLowerCase();
+
+        if (!search) return true;
+
+        return (
+            (item.title || "").toLowerCase().includes(search) ||
+            (item.company_name || "").toLowerCase().includes(search) ||
+            (item.interview_type || "").toLowerCase().includes(search) ||
+            (item.interview_source || "").toLowerCase().includes(search) ||
+            (item.mode || "").toLowerCase().includes(search) ||
+            (item.status || "").toLowerCase().includes(search)
+        );
     });
     const getScheduledInterviews = async () => {
         try {
@@ -136,31 +156,54 @@ const ScheduledInterviews = () => {
                 <h1 className="text-[48px] font-bold text-[#230804]">
                     Scheduled Interviews
                 </h1>
+                <div className="flex items-center gap-4">
+                    {/* Search */}
+                    <div className="relative w-65">
+                        <FiSearch
+                            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                            size={16}
+                        />
+                        <input
+                            type="text"
+                            placeholder="Search events..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full h-11 rounded-full border border-gray-300 bg-white pl-11 pr-11 text-sm text-gray-700 placeholder:text-gray-400 outline-none focus:border-gray-300 focus:ring-2 focus:ring-gray-100 transition-all"
+                        />
+                        {searchTerm && (
+                            <button
+                                onClick={() => setSearchTerm("")}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700"
+                            >
+                                <FiX size={16} />
+                            </button>
+                        )}
+                    </div>
 
-                <div className="flex rounded-lg overflow-hidden border border-gray-300 shadow">
+                    {/* View Toggle */}
+                    <div className="flex rounded-lg overflow-hidden border border-gray-300 shadow">
 
-                    <button
-                        onClick={() => setView("month")}
-                        className={`px-5 py-2 cursor-pointer ${view === "month"
-                            ? "bg-gray-300 text-black"
-                            : "bg-white"
-                            }`}
-                    >
-                        Calendar View
-                    </button>
+                        <button
+                            onClick={() => setView("month")}
+                            className={`px-5 py-2 cursor-pointer ${view === "month"
+                                ? "bg-gray-300 text-black"
+                                : "bg-white"
+                                }`}
+                        >
+                            Calendar View
+                        </button>
 
-                    <button
-                        onClick={() => setView("list")}
-                        className={`px-5 py-2 cursor-pointer ${view === "list"
-                            ? "bg-gray-300 text-black"
-                            : "bg-white"
-                            }`}
-                    >
-                        List View
-                    </button>
-
+                        <button
+                            onClick={() => setView("list")}
+                            className={`px-5 py-2 cursor-pointer ${view === "list"
+                                ? "bg-gray-300 text-black"
+                                : "bg-white"
+                                }`}
+                        >
+                            List View
+                        </button>
+                    </div>
                 </div>
-
             </div>
 
             {/* Views */}
@@ -168,7 +211,7 @@ const ScheduledInterviews = () => {
             {view === "list" ? (
 
                 <ListView
-                    interviews={data.scheduled_interviews}
+                    interviews={filteredInterviews}
                     pagination={data.pagination}
                     onPageChange={setPage}
                     onPageSizeChange={setPageSize}
@@ -178,7 +221,7 @@ const ScheduledInterviews = () => {
             ) : (
 
                 <CalendarView
-                    scheduledInterviews={data.scheduled_interviews}
+                    scheduledInterviews={filteredInterviews}
                     nextSession={data.next_session}
                     todayTimeline={data.today_timeline}
                     onStartInterview={handleStartInterview}

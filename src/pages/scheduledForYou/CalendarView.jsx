@@ -80,15 +80,13 @@ const CalendarView = ({
     const renderEvent = (eventInfo) => {
 
         const interview = eventInfo.event.extendedProps;
+        const isRealtime = interview.interview_source === "realtime";
 
         return (
-
-            <div className="rounded-md p-1 bg-blue-100 border-l-4 border-blue-500 text-xs">
-
-                <div className="font-semibold truncate">
+            <div className={`rounded-md p-1 border-l-4 ${isRealtime ? "bg-blue-100 border-blue-500" : "bg-slate-100 border-slate-500"}`}>
+                <div className={`font-semibold truncate ${isRealtime ? "text-blue-800" : "text-slate-700"}`}>
                     {interview.title}
                 </div>
-
                 <div className="text-gray-500 truncate">
                     {interview.company_name ||
                         interview.interview_source}
@@ -100,9 +98,7 @@ const CalendarView = ({
                         hour: "2-digit",
                         minute: "2-digit",
                     })}
-
                 </div>
-
             </div>
 
         );
