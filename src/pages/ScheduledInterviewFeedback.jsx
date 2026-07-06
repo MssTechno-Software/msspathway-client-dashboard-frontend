@@ -7,7 +7,7 @@ import { FiLoader } from "react-icons/fi";
 function ScheduledInterviewFeedback({ data = null }) {
     const navigate = useNavigate();
     const location = useLocation();
-    const { state } = useLocation();
+    const state = location.state;
     const [loading, setLoading] = useState(false);
     const scorecard = location.state?.scorecard;
     console.log("Scorecard:", scorecard);

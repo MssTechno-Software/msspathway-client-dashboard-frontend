@@ -169,11 +169,11 @@ function InterviewModes() {
             </p>
 
             <h3 className="text-xl lg:text-2xl font-bold mt-2 text-[#230804]">
-              {dashboardData?.next_sessions?.mockup?.date || "No Session"}
+              {dashboardData?.next_sessions?.mockup?.date_display || "No Session"}
             </h3>
 
             <p className="text-sm lg:text-base text-black/80 mt-2">
-              {dashboardData?.next_sessions?.mockup?.mode || "--"}
+              {dashboardData?.next_sessions?.mockup?.subtitle || "--"}
             </p>
           </div>
 
@@ -184,11 +184,11 @@ function InterviewModes() {
             </p>
 
             <h3 className="text-xl lg:text-2xl font-bold mt-2">
-              {dashboardData?.next_sessions?.realtime?.date || "No Session"}
+              {dashboardData?.next_sessions?.realtime?.date_display || "No Session"}
             </h3>
 
             <p className="text-sm lg:text-base text-white/80 mt-2">
-              {dashboardData?.next_sessions?.realtime?.company || "--"}
+              {dashboardData?.next_sessions?.realtime?.subtitle || "--"}
             </p>
           </div>
         </div>

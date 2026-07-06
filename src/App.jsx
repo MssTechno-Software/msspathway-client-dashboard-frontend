@@ -42,15 +42,7 @@ function App() {
           element={<LoginPage />}
         />
 
-        <Route
-          element={
-            token ? (
-              <AppLayout />
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        >
+        <Route element={<AppLayout />}>
           <Route
             path="/profile"
             element={
