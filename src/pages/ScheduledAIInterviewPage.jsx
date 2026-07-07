@@ -160,13 +160,27 @@ function ScheduledAIInterview() {
             return;
         }
 
-        const updatedAnswers = [
-            ...answers,
-            {
-                question_number: currentQuestionIndex + 1,
+        const questionNumber = currentQuestionIndex + 1;
+
+        let updatedAnswers = [...answers];
+
+        const existingIndex = updatedAnswers.findIndex(
+            ans => ans.question_number === questionNumber
+        );
+
+        if (existingIndex !== -1) {
+            // Update skipped/previous answer
+            updatedAnswers[existingIndex] = {
+                ...updatedAnswers[existingIndex],
                 answer_text: transcript,
-            },
-        ];
+            };
+        } else {
+            // First time answering
+            updatedAnswers.push({
+                question_number: questionNumber,
+                answer_text: transcript,
+            });
+        }
 
         setAnswers(updatedAnswers);
 
@@ -218,12 +232,21 @@ function ScheduledAIInterview() {
 
             let finalAnswers = [...answers];
 
-            // Add current answer if the user has spoken
             if (transcript.trim()) {
-                finalAnswers.push({
-                    question_number: currentQuestionIndex + 1,
-                    answer_text: transcript,
-                });
+                const questionNumber = currentQuestionIndex + 1;
+
+                const existingIndex = finalAnswers.findIndex(
+                    ans => ans.question_number === questionNumber
+                );
+
+                if (existingIndex !== -1) {
+                    finalAnswers[existingIndex].answer_text = transcript;
+                } else {
+                    finalAnswers.push({
+                        question_number: questionNumber,
+                        answer_text: transcript,
+                    });
+                }
             }
 
             // 👇 ADD THIS BLOCK HERE
@@ -265,7 +288,19 @@ function ScheduledAIInterview() {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.detail?.error || "Submission failed");
+                let errorMessage = "Submission failed";
+
+                if (data?.detail?.validation_errors?.length) {
+                    errorMessage = data.detail.validation_errors.join("\n");
+                } else if (data?.detail?.error) {
+                    errorMessage = data.detail.error;
+                } else if (typeof data?.detail === "string") {
+                    errorMessage = data.detail;
+                } else if (data?.message) {
+                    errorMessage = data.message;
+                }
+
+                throw new Error(errorMessage);
             }
 
             navigate("/scheduled-interview-feedback", {

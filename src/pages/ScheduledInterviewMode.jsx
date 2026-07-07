@@ -33,10 +33,10 @@ function ScheduledInterviewMode() {
         preStartData?.duration?.label || "--";
 
     const focusAreas =
-        preStartData?.question_focus_areas || [];
+        preStartData?.question_focus || [];
 
-    const focusTags =
-        preStartData?.question_focus_areas?.map(area => area.title) || [];
+    // const focusTags =
+    //     preStartData?.question_focus?.map(area => area.title) || [];
 
     /*start interview*/
     console.log({ clientId, interviewId: interview.interview_id });
@@ -185,17 +185,15 @@ function ScheduledInterviewMode() {
                                             {focusAreas.map((area, index) => (
                                                 <div
                                                     key={index}
-                                                    className="flex items-start gap-3"
+                                                    className="flex items-center gap-3"
                                                 >
-                                                    <CircleCheck className="w-5 h-5 text-[#154212] mt-1 shrink-0" />
-                                                    <div>
-                                                        <h4 className="text-base sm:text-lg font-bold text-[#0b1c30]">
-                                                            {area.title}
-                                                        </h4>
-                                                        <p className="text-sm sm:text-base leading-6 text-[#514441]">
-                                                            {area.description}
-                                                        </p>
-                                                    </div>
+                                                    <CircleCheck
+                                                        className="w-5 h-5 text-[#154212] shrink-0"
+                                                    />
+
+                                                    <p className="text-lg font-semibold text-[#0b1c30]">
+                                                        {area}
+                                                    </p>
                                                 </div>
                                             ))}
                                         </div>
@@ -298,17 +296,15 @@ function ScheduledInterviewMode() {
                                             {focusAreas.map((area, index) => (
                                                 <div
                                                     key={index}
-                                                    className="flex items-start gap-3"
+                                                    className="flex items-center gap-3"
                                                 >
-                                                    <CircleCheck className="w-5 h-5 text-[#154212] mt-1 shrink-0" />
-                                                    <div>
-                                                        <h4 className="text-base sm:text-lg font-bold text-[#0b1c30]">
-                                                            {area.title}
-                                                        </h4>
-                                                        <p className="text-sm sm:text-base leading-6 text-[#514441]">
-                                                            {area.description}
-                                                        </p>
-                                                    </div>
+                                                    <CircleCheck
+                                                        className="w-5 h-5 text-[#154212] shrink-0"
+                                                    />
+
+                                                    <p className="text-lg font-semibold text-[#0b1c30]">
+                                                        {area}
+                                                    </p>
                                                 </div>
                                             ))}
                                         </div>
