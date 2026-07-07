@@ -20,37 +20,10 @@ function ScheduledInterviewFeedback({ data = null }) {
     const [viewMode, setViewMode] = useState('overall');
     const [selectedQuestionId, setSelectedQuestionId] = useState(1);
     const currentQuestionIndex = selectedQuestionId - 1;
-    const technicalMetrics = scorecard?.soft_skills
-        ? [
-            {
-                name: "Confidence",
-                score: scorecard.soft_skills.scores.confidence,
-            },
-            {
-                name: "Clarity",
-                score: scorecard.soft_skills.scores.clarity,
-            },
-            {
-                name: "Leadership",
-                score: scorecard.soft_skills.scores.leadership_potential,
-            },
-            {
-                name: "Problem Solving",
-                score: scorecard.soft_skills.scores.problem_solving,
-            },
-            {
-                name: "Empathy",
-                score: scorecard.soft_skills.scores.empathy,
-            },
-        ]
-        : [];
     // Dynamic calculations for overall score SVG circular progress
     const circleRadius = 58;
     const circleCircumference = 2 * Math.PI * circleRadius;
-    const scorePercent = Math.min(
-        Math.max(scorecard?.performance_score || 0, 0),
-        100
-    );
+    const scorePercent = scorecard?.percentage || 0;
     const strokeDashoffset = circleCircumference - (scorePercent / 100) * circleCircumference;
 
     // Dynamic coordinates plotting for custom SVG radar chart (regular pentagon)
@@ -105,8 +78,7 @@ function ScheduledInterviewFeedback({ data = null }) {
         }
     };
 
-    // Find active question detail
-    const question = scorecard?.questions_detail?.find(
+    const question = scorecard?.question_stepper?.find(
         q => q.question_number === selectedQuestionId
     );
 
@@ -165,6 +137,8 @@ function ScheduledInterviewFeedback({ data = null }) {
 
                             {/* Previous */}
                             <button
+                                onClick={handlePrevStep}
+                                disabled={selectedQuestionId === 1}
                                 className="w-8 h-8 rounded-full flex items-center justify-center text-[#6b5f5b] hover:bg-gray-100 transition cursor-pointer"
                             >
                                 &#8249;
@@ -229,6 +203,8 @@ function ScheduledInterviewFeedback({ data = null }) {
 
                             {/* Next */}
                             <button
+                                onClick={handleNextStep}
+                                disabled={selectedQuestionId === questions.length}
                                 className="w-8 h-8 rounded-full flex items-center justify-center text-[#756965] hover:bg-gray-100 disabled:opacity-40"
                             >
                                 &#8250;
@@ -283,7 +259,7 @@ function ScheduledInterviewFeedback({ data = null }) {
                                             strokeWidth="8"
                                         />
                                     </svg>
-                                    <span className="absolute text-[48px] leading-14 font-bold text-white">{scorecard?.performance_score}</span>
+                                    <span className="absolute text-[48px] leading-14 font-bold text-white">{scorecard?.final_score}</span>
                                 </div>
                             </section>
 
@@ -299,88 +275,6 @@ function ScheduledInterviewFeedback({ data = null }) {
                                     <span className="text-[#6c757d] text-xs font-bold uppercase tracking-wider">
                                         AI-Technical Evaluation v1.0
                                     </span>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                                    {/* Radar Chart SVG */}
-                                    <div className="relative w-full max-w-75 aspect-square mx-auto flex items-center justify-center">
-                                        <svg className="w-full h-full" viewBox="-30 -20  260 240">
-                                            {/* Radial Grid lines (Pentagons) */}
-                                            <polygon
-                                                points="100,30 166.6,78.4 141.2,156.6 58.8,156.6 33.4,78.4"
-                                                fill="none"
-                                                stroke="#dee2e6"
-                                                strokeWidth="1"
-                                                strokeDasharray="3 3"
-                                            />
-                                            <polygon
-                                                points="100,53.3 144.4,85.6 127.5,137.8 72.5,137.8 55.6,85.6"
-                                                fill="none"
-                                                stroke="#dee2e6"
-                                                strokeWidth="1"
-                                                strokeDasharray="3 3"
-                                            />
-                                            <polygon
-                                                points="100,76.7 122.2,92.8 113.7,118.9 86.3,118.9 77.8,92.8"
-                                                fill="none"
-                                                stroke="#dee2e6"
-                                                strokeWidth="1"
-                                                strokeDasharray="3 3"
-                                            />
-
-                                            {/* Spoke lines */}
-                                            <line x1="100" y1="100" x2="100" y2="30" stroke="#dee2e6" strokeWidth="1" />
-                                            <line x1="100" y1="100" x2="166.6" y2="78.4" stroke="#dee2e6" strokeWidth="1" />
-                                            <line x1="100" y1="100" x2="141.2" y2="156.6" stroke="#dee2e6" strokeWidth="1" />
-                                            <line x1="100" y1="100" x2="58.8" y2="156.6" stroke="#dee2e6" strokeWidth="1" />
-                                            <line x1="100" y1="100" x2="33.4" y2="78.4" stroke="#dee2e6" strokeWidth="1" />
-
-                                            {/* Candidate Score Pentagon Shape */}
-                                            <polygon
-                                                points={radarPolygonPoints}
-                                                fill="rgba(45, 90, 39, 0.1)"
-                                                stroke="#2d5a27"
-                                                strokeWidth="2"
-                                                strokeLinejoin="round"
-                                            />
-
-                                            {/* Grid Labels */}
-                                            <text x="100" y="18" textAnchor="middle" className="fill-[#6c757d] text-[8px] font-bold tracking-wider uppercase font-sans">
-                                                Technical Accuracy
-                                            </text>
-                                            <text x="150" y="78" textAnchor="start" className="fill-[#6c757d] text-[8px] font-bold tracking-wider uppercase font-sans">
-                                                <tspan x="170" dy="0">Problem</tspan>
-                                                <tspan x="170" dy="10">Solving</tspan>
-                                            </text>
-                                            <text x="146" y="168" textAnchor="start" className="fill-[#6c757d] text-[8px] font-bold tracking-wider uppercase font-sans">
-                                                Communication
-                                            </text>
-                                            <text x="54" y="168" textAnchor="end" className="fill-[#6c757d] text-[8px] font-bold tracking-wider uppercase font-sans">
-                                                Role Relevance
-                                            </text>
-                                            <text x="28" y="78" textAnchor="end" className="fill-[#6c757d] text-[8px] font-bold tracking-wider uppercase font-sans">
-                                                Confidence
-                                            </text>
-                                        </svg>
-                                    </div>
-
-                                    {/* Metrics list on the right */}
-                                    <div className="space-y-5">
-                                        {technicalMetrics?.map((metric) => (
-                                            <div key={metric.name} className="space-y-1.5">
-                                                <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-[10px]">
-                                                    <span className="text-[#6c757d]">{metric.name}</span>
-                                                    <span className="text-[#230804]">{metric.score}%</span>
-                                                </div>
-                                                <div className="h-2 w-full bg-[#f1f3f5] rounded-full overflow-hidden">
-                                                    <div
-                                                        className="h-full bg-[#2d5a27] rounded-full transition-all duration-500"
-                                                        style={{ width: `${metric.score}%` }}
-                                                    />
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
                                 </div>
                             </section>
 
@@ -400,7 +294,7 @@ function ScheduledInterviewFeedback({ data = null }) {
                                             Executive Summary
                                         </h5>
                                         <p className="text-[#212529] text-[15px] leading-relaxed">
-                                            {scorecard.executive_summary}
+                                            {scorecard?.overall_feedback}
                                         </p>
                                     </div>
                                     {/* Key Strengths & Development Areas Grid */}
@@ -412,10 +306,10 @@ function ScheduledInterviewFeedback({ data = null }) {
                                                 Key Strengths
                                             </h5>
                                             <ul className="space-y-3.5 text-sm text-[#212529]">
-                                                {scorecard?.key_strengths?.map((strength, index) => (
+                                                {scorecard?.per_question_summary?.flatMap(q => q.points_covered || []).map((item, index) => (
                                                     <li key={index} className="flex items-start gap-2.5">
                                                         <span className="text-[#2d5a27] font-bold mt-0.5">•</span>
-                                                        <span>{strength}</span>
+                                                        <span>{item}</span>
                                                     </li>
                                                 ))}
                                             </ul>
@@ -428,57 +322,15 @@ function ScheduledInterviewFeedback({ data = null }) {
                                                 Development Areas
                                             </h5>
                                             <ul className="space-y-3.5 text-sm text-[#212529]">
-                                                {scorecard?.development_areas?.map((dev, index) => (
+                                                {scorecard?.per_question_summary?.flatMap(q => q.points_missed || []).map((item, index) => (
                                                     <li key={index} className="flex items-start gap-2.5">
                                                         <span className="text-[#6c757d] font-bold mt-0.5">•</span>
-                                                        <span>{dev}</span>
+                                                        <span>{item}</span>
                                                     </li>
                                                 ))}
                                             </ul>
                                         </div>
                                     </div>
-                                </div>
-                            </section>
-
-                            {/* Interview Highlights */}
-                            <section className="col-span-12 lg:col-span-5 bg-white border border-[#dee2e6] p-6 rounded-xl shadow-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md flex flex-col">
-                                <div className="flex items-center gap-3 mb-6">
-                                    <div className="w-8 h-8 rounded bg-[#f8f9fa] flex items-center justify-center border border-[#dee2e6]/50">
-                                        <Quote className="w-5 h-5 text-[#2d5a27] fill-[#2d5a27]" />
-                                    </div>
-                                    <h4 className="text-xl font-bold text-[#230804]">Interview Highlights</h4>
-                                </div>
-
-                                {/* Scrollable list */}
-                                <div className="space-y-6 overflow-y-auto max-h-95 pr-2 flex-1 scrollbar-thin">
-                                    {scorecard?.interview_highlights?.map((highlight, index) => {
-                                        const isTech = highlight.tag === "TECH_FORWARD";
-                                        const isCommunication = highlight.tag === "COMMUNICATION";
-
-                                        return (
-                                            <div key={index} className={`relative pl-5 border-l-[3px] ${isTech ? "border-[#2d5a27]" : "border-[#dee2e6]"
-                                                }`}>
-                                                <p className="italic text-[#212529] text-[15px] leading-relaxed mb-3">
-                                                    "{highlight.quote}"
-                                                </p>
-                                                <div className={`inline-flex items-center bg-opacity-10 px-3 py-1.5 rounded-full border ${isCommunication
-                                                    ? "bg-[#2d5a27]/10 border-[#2d5a27]/20 text-[#2d5a27]"
-                                                    : "bg-[#f1f3f5] border-[#dee2e6] text-[#6c757d]"
-                                                    }`}>
-                                                    {isTech ? (
-                                                        <BadgeCheck className="w-3.5 h-3.5 mr-1 text-[#2d5a27]" />
-                                                    ) : isTech ? (
-                                                        <Sparkles className="w-3.5 h-3.5 mr-1 text-[#6c757d]" />
-                                                    ) : (
-                                                        <Target className="w-3.5 h-3.5 mr-1 text-[#6c757d]" />
-                                                    )}
-                                                    <span className="text-[10px] font-bold uppercase tracking-wider">
-                                                        {highlight.tag}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
                                 </div>
                             </section>
                         </div>
@@ -536,11 +388,11 @@ function ScheduledInterviewFeedback({ data = null }) {
                                         </div>
 
                                         <span className="text-[#6c757d] text-[10px] font-bold uppercase tracking-widest block mb-2">
-                                            Candidate Response
+                                            AI Feedback
                                         </span>
 
                                         <div className="bg-[#f8f9fa] border border-[#dee2e6]/60 p-4 rounded-lg text-sm text-[#212529] leading-relaxed max-h-45 overflow-y-auto scrollbar-thin">
-                                            "{question.candidate_response}"
+                                            "{question.evaluator_note}"
                                         </div>
                                     </div>
 
@@ -570,7 +422,11 @@ function ScheduledInterviewFeedback({ data = null }) {
                                         </span>
 
                                         <div className="bg-[#f8f9fa] border border-[#dee2e6]/60 p-4 rounded-lg text-sm text-[#212529] leading-relaxed max-h-40 overflow-y-auto scrollbar-thin mb-4">
-                                            {question.ideal_answer_summary}
+                                            <ul>
+                                                {question.points_missed?.map((item, index) => (
+                                                    <li key={index}>{item}</li>
+                                                ))}
+                                            </ul>
                                         </div>
                                     </div>
 
@@ -623,7 +479,7 @@ function ScheduledInterviewFeedback({ data = null }) {
                                                 Key Points Covered
                                             </h5>
                                             <ul className="space-y-2.5 text-sm text-[#212529]">
-                                                {question.comprehensive_strengths?.map((pt, index) => (
+                                                {question.points_covered?.map((pt, index) => (
                                                     <li key={index} className="flex items-start gap-2">
                                                         <span className="text-[#2d5a27] font-bold mt-0.5">
                                                             <Check className="w-4 h-4 text-[#2d5a27] stroke-3" />
