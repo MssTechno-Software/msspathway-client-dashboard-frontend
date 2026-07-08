@@ -20,10 +20,37 @@ function ScheduledInterviewFeedback({ data = null }) {
     const [viewMode, setViewMode] = useState('overall');
     const [selectedQuestionId, setSelectedQuestionId] = useState(1);
     const currentQuestionIndex = selectedQuestionId - 1;
+    const technicalMetrics = scorecard?.soft_skills
+        ? [
+            {
+                name: "Confidence",
+                score: scorecard.soft_skills.scores.confidence,
+            },
+            {
+                name: "Clarity",
+                score: scorecard.soft_skills.scores.clarity,
+            },
+            {
+                name: "Leadership",
+                score: scorecard.soft_skills.scores.leadership_potential,
+            },
+            {
+                name: "Problem Solving",
+                score: scorecard.soft_skills.scores.problem_solving,
+            },
+            {
+                name: "Empathy",
+                score: scorecard.soft_skills.scores.empathy,
+            },
+        ]
+        : [];
     // Dynamic calculations for overall score SVG circular progress
     const circleRadius = 58;
     const circleCircumference = 2 * Math.PI * circleRadius;
-    const scorePercent = scorecard?.percentage || 0;
+    const scorePercent = Math.min(
+        Math.max(scorecard?.percentage || 0, 0),
+        100
+    );
     const strokeDashoffset = circleCircumference - (scorePercent / 100) * circleCircumference;
 
     // Dynamic coordinates plotting for custom SVG radar chart (regular pentagon)
@@ -78,9 +105,11 @@ function ScheduledInterviewFeedback({ data = null }) {
         }
     };
 
-    const question = scorecard?.question_stepper?.find(
-        q => q.question_number === selectedQuestionId
-    );
+    // Find active question detail
+    const question =
+        scorecard.question_stepper.find(
+            q => q.question_number === selectedQuestionId
+        );
 
     return (
         <div className="w-full min-h-screen bg-[#f8f9fa] text-[#212529] ">
@@ -128,97 +157,85 @@ function ScheduledInterviewFeedback({ data = null }) {
                     </span>
                 </div>
             </div>
-            <div className="border border-gray-300 p-4 mb-6">
-                {/* Question Stepper */}
-                <div className="px-4 sm:px-6 lg:px-12 mt-6">
-                    <div className="bg-white border border-[#e7dbd6] rounded-xl px-5 py-4 shadow-sm">
-
-                        <div className="flex items-center">
-
-                            {/* Previous */}
-                            <button
-                                onClick={handlePrevStep}
-                                disabled={selectedQuestionId === 1}
-                                className="w-8 h-8 rounded-full flex items-center justify-center text-[#6b5f5b] hover:bg-gray-100 transition cursor-pointer"
-                            >
-                                &#8249;
-                            </button>
-
-                            {/* Steps */}
-                            <div className="flex-1 flex items-center px-3">
-
-                                {questions?.map((_, index) => (
-                                    <div
-                                        key={index}
-                                        className="flex items-center flex-1 last:flex-none"
-                                    >
-                                        <button
-                                            type="button"
-                                            onClick={() => handleStepClick(index + 1)}
-                                            className={`
-                                                        relative z-10
-                                                        w-7.5 h-7.5 rounded-xl
-                                                        flex items-center justify-center
-                                                        text-xs font-semibold
-                                                        transition-all duration-300
-                                                        cursor-pointer
-                                                        ${questions[index]?.attempted_status === "completed"
-                                                    ? "bg-[#3b6934] text-white"
-                                                    : questions[index]?.attempted_status === "current"
-                                                        ? "bg-green-100 border-2 border-[#3b6934] text-[#3b6934]"
-                                                        : questions[index]?.attempted_status === "skipped"
-                                                            ? "bg-red-100 border-2 border-red-500 text-red-500"
-                                                            : "bg-white border border-[#dddddd] text-[#bcbcbc]"
-                                                }
-                                                        `}
-                                        >
-                                            {index + 1}
-                                            {questions[index]?.attempted_status === "completed" && (
-                                                <div className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-white border-2 border-[#3b6934] flex items-center justify-center shadow-sm">
-                                                    <Check
-                                                        size={10}
-                                                        strokeWidth={3}
-                                                        className="text-[#3b6934]"
-                                                    />
-                                                </div>
-                                            )}
-                                        </button>
-
-                                        {index !== questions.length - 1 && (
-                                            <div className="flex-1 px-3">
-                                                <div className="relative h-0.5 bg-[#ececec]">
-                                                    <div
-                                                        className={`absolute left-0 top-0 h-full transition-all duration-300 ${index < currentQuestionIndex
-                                                            ? "w-full bg-[#97b78c]"
-                                                            : "w-0"
-                                                            }`}
-                                                    />
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-
-                            </div>
-
-                            {/* Next */}
-                            <button
-                                onClick={handleNextStep}
-                                disabled={selectedQuestionId === questions.length}
-                                className="w-8 h-8 rounded-full flex items-center justify-center text-[#756965] hover:bg-gray-100 disabled:opacity-40"
-                            >
-                                &#8250;
-                            </button>
-
-                        </div>
-
-                    </div>
-                </div>
-            </div>
 
             {/* Main content  */}
             <main className="w-full max-w-none px-4 sm:px-6 lg:px-8 py-6">
+                {/*  Dynamic Question Stepper */}
+                <div className="w-full bg-white border border-[#dee2e6] p-4 rounded-xl shadow-sm mb-6 flex items-center justify-between">
+                    <button
+                        onClick={handlePrevStep}
+                        disabled={selectedQuestionId === 1 && viewMode === 'question'}
+                        className={`transition-colors ${selectedQuestionId === 1 && viewMode === 'question' ? 'text-[#dee2e6] cursor-not-allowed' : 'text-[#adb5bd] hover:text-[#2d5a27]'}`}
+                    >
+                        <ChevronLeft className="w-5 h-5" />
+                    </button>
 
+                    <div className="flex-1 flex items-center justify-center gap-3 md:gap-4 overflow-x-auto py-1">
+                        {scorecard?.question_stepper?.map((step, idx) => {
+                            const isSelected =
+                                step.question_number === selectedQuestionId &&
+                                viewMode === "question";
+                            const isCompleted = step.question_status === "completed";
+                            const isSkipped = step.question_status === "skipped";
+
+                            return (
+                                <React.Fragment key={step.question_number}>
+                                    <button
+                                        onClick={() => handleStepClick(step.question_number)}
+                                        className="relative cursor-pointer shrink-0 focus:outline-none"
+                                    >
+                                        {/* Selected State: White circle with green border */}
+                                        {isSelected ? (
+                                            <div className="w-8 h-8 rounded-full border-2 border-[#2d5a27] bg-white flex items-center justify-center text-[#2d5a27] text-sm font-bold">
+                                                {step.question_number}
+                                            </div>
+                                        ) : isCompleted ? (
+                                            /* Completed State: Green circle with completed icon */
+                                            <>
+                                                <div className="w-8 h-8 rounded-full bg-[#2d5a27] flex items-center justify-center text-white text-sm font-bold">
+                                                    {step.question_number}
+                                                </div>
+                                                <div className="absolute -top-1 -right-1 bg-white rounded-full">
+                                                    <CheckCircle2 className="w-4 h-4 text-[#2d5a27] fill-white" />
+                                                </div>
+                                            </>
+                                        ) : isSkipped ? (
+                                            /* Skipped State: Gray circle with skipped state badge */
+                                            <>
+                                                <div className="w-8 h-8 rounded-full bg-gray-200 border border-gray-400 flex items-center justify-center text-gray-600 text-sm font-bold">
+                                                    {step.question_number}
+                                                </div>
+                                                <div className="absolute -top-1 -right-1 bg-white rounded-full border border-gray-300 w-4 h-4 flex items-center justify-center text-[10px] text-gray-500 font-bold leading-none">
+                                                    -
+                                                </div>
+                                            </>
+                                        ) : (
+                                            /* Not Answered / Upcoming State: Default gray circle */
+                                            <div className="w-8 h-8 rounded-full border border-gray-200 bg-gray-100 flex items-center justify-center text-gray-400 text-sm font-bold">
+                                                {step.question_number}
+                                            </div>
+                                        )}
+                                    </button>
+                                    {idx < (scorecard?.question_stepper?.length || 0) - 1 && (
+                                        <div className="h-px w-6 md:w-8 bg-gray-200 shrink-0" />
+                                    )}
+                                </React.Fragment>
+                            );
+                        })}
+                    </div>
+
+                    <button
+                        onClick={handleNextStep}
+                        disabled={selectedQuestionId === (scorecard?.question_stepper?.length || 0)}
+                        className={`transition-colors ${selectedQuestionId === (scorecard?.question_stepper?.length || 0) &&
+                            viewMode === "question"
+                            ? "text-[#dee2e6] cursor-not-allowed"
+                            : "text-[#adb5bd] hover:text-[#2d5a27]"
+                            }`}
+                    >
+                        <ChevronRight className="w-5 h-5" />
+                    </button>
+                </div>
                 {/* Switchable Views */}
                 {viewMode === 'overall' ? (
 
@@ -275,6 +292,88 @@ function ScheduledInterviewFeedback({ data = null }) {
                                     <span className="text-[#6c757d] text-xs font-bold uppercase tracking-wider">
                                         AI-Technical Evaluation v1.0
                                     </span>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                                    {/* Radar Chart SVG */}
+                                    <div className="relative w-full max-w-75 aspect-square mx-auto flex items-center justify-center">
+                                        <svg className="w-full h-full" viewBox="-30 -20  260 240">
+                                            {/* Radial Grid lines (Pentagons) */}
+                                            <polygon
+                                                points="100,30 166.6,78.4 141.2,156.6 58.8,156.6 33.4,78.4"
+                                                fill="none"
+                                                stroke="#dee2e6"
+                                                strokeWidth="1"
+                                                strokeDasharray="3 3"
+                                            />
+                                            <polygon
+                                                points="100,53.3 144.4,85.6 127.5,137.8 72.5,137.8 55.6,85.6"
+                                                fill="none"
+                                                stroke="#dee2e6"
+                                                strokeWidth="1"
+                                                strokeDasharray="3 3"
+                                            />
+                                            <polygon
+                                                points="100,76.7 122.2,92.8 113.7,118.9 86.3,118.9 77.8,92.8"
+                                                fill="none"
+                                                stroke="#dee2e6"
+                                                strokeWidth="1"
+                                                strokeDasharray="3 3"
+                                            />
+
+                                            {/* Spoke lines */}
+                                            <line x1="100" y1="100" x2="100" y2="30" stroke="#dee2e6" strokeWidth="1" />
+                                            <line x1="100" y1="100" x2="166.6" y2="78.4" stroke="#dee2e6" strokeWidth="1" />
+                                            <line x1="100" y1="100" x2="141.2" y2="156.6" stroke="#dee2e6" strokeWidth="1" />
+                                            <line x1="100" y1="100" x2="58.8" y2="156.6" stroke="#dee2e6" strokeWidth="1" />
+                                            <line x1="100" y1="100" x2="33.4" y2="78.4" stroke="#dee2e6" strokeWidth="1" />
+
+                                            {/* Candidate Score Pentagon Shape */}
+                                            <polygon
+                                                points={radarPolygonPoints}
+                                                fill="rgba(45, 90, 39, 0.1)"
+                                                stroke="#2d5a27"
+                                                strokeWidth="2"
+                                                strokeLinejoin="round"
+                                            />
+
+                                            {/* Grid Labels */}
+                                            <text x="100" y="18" textAnchor="middle" className="fill-[#6c757d] text-[8px] font-bold tracking-wider uppercase font-sans">
+                                                Technical Accuracy
+                                            </text>
+                                            <text x="150" y="78" textAnchor="start" className="fill-[#6c757d] text-[8px] font-bold tracking-wider uppercase font-sans">
+                                                <tspan x="170" dy="0">Problem</tspan>
+                                                <tspan x="170" dy="10">Solving</tspan>
+                                            </text>
+                                            <text x="146" y="168" textAnchor="start" className="fill-[#6c757d] text-[8px] font-bold tracking-wider uppercase font-sans">
+                                                Communication
+                                            </text>
+                                            <text x="54" y="168" textAnchor="end" className="fill-[#6c757d] text-[8px] font-bold tracking-wider uppercase font-sans">
+                                                Role Relevance
+                                            </text>
+                                            <text x="28" y="78" textAnchor="end" className="fill-[#6c757d] text-[8px] font-bold tracking-wider uppercase font-sans">
+                                                Confidence
+                                            </text>
+                                        </svg>
+                                    </div>
+
+                                    {/* Metrics list on the right */}
+                                    <div className="space-y-5">
+                                        {technicalMetrics?.map((metric) => (
+                                            <div key={metric.name} className="space-y-1.5">
+                                                <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-[10px]">
+                                                    <span className="text-[#6c757d]">{metric.name}</span>
+                                                    <span className="text-[#230804]">{metric.score}%</span>
+                                                </div>
+                                                <div className="h-2 w-full bg-[#f1f3f5] rounded-full overflow-hidden">
+                                                    <div
+                                                        className="h-full bg-[#2d5a27] rounded-full transition-all duration-500"
+                                                        style={{ width: `${metric.score}%` }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </section>
 
@@ -333,6 +432,48 @@ function ScheduledInterviewFeedback({ data = null }) {
                                     </div>
                                 </div>
                             </section>
+
+                            {/* Interview Highlights */}
+                            <section className="col-span-12 lg:col-span-5 bg-white border border-[#dee2e6] p-6 rounded-xl shadow-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md flex flex-col">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="w-8 h-8 rounded bg-[#f8f9fa] flex items-center justify-center border border-[#dee2e6]/50">
+                                        <Quote className="w-5 h-5 text-[#2d5a27] fill-[#2d5a27]" />
+                                    </div>
+                                    <h4 className="text-xl font-bold text-[#230804]">Interview Highlights</h4>
+                                </div>
+
+                                {/* Scrollable list */}
+                                <div className="space-y-6 overflow-y-auto max-h-95 pr-2 flex-1 scrollbar-thin">
+                                    {scorecard?.interview_highlights?.map((highlight, index) => {
+                                        const isTech = highlight.tag === "TECH_FORWARD";
+                                        const isCommunication = highlight.tag === "COMMUNICATION";
+
+                                        return (
+                                            <div key={index} className={`relative pl-5 border-l-[3px] ${isTech ? "border-[#2d5a27]" : "border-[#dee2e6]"
+                                                }`}>
+                                                <p className="italic text-[#212529] text-[15px] leading-relaxed mb-3">
+                                                    "{highlight.quote}"
+                                                </p>
+                                                <div className={`inline-flex items-center bg-opacity-10 px-3 py-1.5 rounded-full border ${isCommunication
+                                                    ? "bg-[#2d5a27]/10 border-[#2d5a27]/20 text-[#2d5a27]"
+                                                    : "bg-[#f1f3f5] border-[#dee2e6] text-[#6c757d]"
+                                                    }`}>
+                                                    {isTech ? (
+                                                        <BadgeCheck className="w-3.5 h-3.5 mr-1 text-[#2d5a27]" />
+                                                    ) : isTech ? (
+                                                        <Sparkles className="w-3.5 h-3.5 mr-1 text-[#6c757d]" />
+                                                    ) : (
+                                                        <Target className="w-3.5 h-3.5 mr-1 text-[#6c757d]" />
+                                                    )}
+                                                    <span className="text-[10px] font-bold uppercase tracking-wider">
+                                                        {highlight.tag}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </section>
                         </div>
                     </div>
 
@@ -371,7 +512,7 @@ function ScheduledInterviewFeedback({ data = null }) {
                                                 {question.score_obtained}
                                             </span>
                                             <span className="text-[#6c757d] text-xs font-bold font-sans uppercase">
-                                                /100
+                                                /{question.max_score}
                                             </span>
                                         </div>
                                     </div>
@@ -479,7 +620,7 @@ function ScheduledInterviewFeedback({ data = null }) {
                                                 Key Points Covered
                                             </h5>
                                             <ul className="space-y-2.5 text-sm text-[#212529]">
-                                                {question.points_covered?.map((pt, index) => (
+                                                {question.comprehensive_strengths?.map((pt, index) => (
                                                     <li key={index} className="flex items-start gap-2">
                                                         <span className="text-[#2d5a27] font-bold mt-0.5">
                                                             <Check className="w-4 h-4 text-[#2d5a27] stroke-3" />
@@ -510,17 +651,13 @@ function ScheduledInterviewFeedback({ data = null }) {
                                                 )}
                                             </ul>
                                         </div>
-
                                     </div>
                                 </div>
                             </section>
-
                         </div>
                     )
                 )}
-
             </main>
-
         </div>
     );
 }
