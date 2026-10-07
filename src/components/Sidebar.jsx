@@ -37,7 +37,7 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
       const token = localStorage.getItem("token");
 
       const response = await axios.post(
-        "https://uat-msspathway-software-backend-81057313575.asia-south1.run.app/auth/logout",
+        "https://timesheet-api-790373899641.asia-south1.run.app/auth/logout",
         null,
         {
           headers: {
