@@ -128,13 +128,14 @@ function MyProfile() {
             setProfileUrl(imageURL);
 
         } catch (err) {
-            console.error("Profile photo fetch failed:", err);
+            if (err.response?.status !== 404) {
+                console.error("Profile photo fetch failed:", err);
+            }
             setProfileUrl("");
         } finally {
             setLoading(false);
         }
     };
-
     useEffect(() => {
         if (client_id) {
             fetchProfilePhotoView();

@@ -94,13 +94,14 @@ function Dashboard() {
       <section className="grid grid-cols-1 xl:grid-cols-12 gap-8">
         <div className="xl:col-span-8">
           <InterviewTable
-            interviews={data.recently_completed_interviews}
+            interviews={data?.recently_completed_interviews ?? []}
           />
+
         </div>
 
         <div className="xl:col-span-4">
           <AnalyticsPanel
-            analytics={data.performance_analytics}
+            analytics={data?.performance_analytics ?? []}
           />
         </div>
       </section>

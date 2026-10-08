@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
+import BASE_URL from "../config/api";
 const menuItems = [
   {
     icon: "person",
@@ -37,7 +38,7 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
       const token = localStorage.getItem("token");
 
       const response = await axios.post(
-        "https://timesheet-api-790373899641.asia-south1.run.app/auth/logout",
+      `${BASE_URL}/auth/logout`,
         null,
         {
           headers: {

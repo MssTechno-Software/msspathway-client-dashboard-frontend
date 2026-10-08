@@ -19,10 +19,10 @@ function ScoreCardPage() {
     const [totalRecords, setTotalRecords] = useState(0);
     const [fromDate, setFromDate] = useState("");
     const [toDate, setToDate] = useState("");
-
+    const [invalidPopup, setInvalidPopup] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
     const client_id = localStorage.getItem("client_id");
-
-    const getScorecards = async () => {
+    const getScorecards = async (currentPage = page, currentFromDate = fromDate, currentToDate = toDate) => {
         try {
             setLoading(true);
 
@@ -30,10 +30,10 @@ function ScoreCardPage() {
                 `${BASE_URL}/api/clients/${client_id}/scorecards`,
                 {
                     params: {
-                        page,
+                        page: currentPage,
                         page_size: 10,
-                        from_date: fromDate || undefined,
-                        to_date: toDate || undefined,
+                        from_date: currentFromDate || undefined,
+                        to_date: currentToDate || undefined,
                     },
                 }
             );
@@ -91,6 +91,26 @@ function ScoreCardPage() {
 
     return (
         <div className="bg-[#f8f8f8] min-h-screen p-8">
+            {invalidPopup && (
+                <div className="fixed inset-0 bg-black/40 flex items-center justify-center px-4 z-50">
+                    <div className="bg-white w-full max-w-xs sm:max-w-[320px] p-5 sm:p-6 rounded-lg shadow-lg text-center">
+                        <h3 className="text-lg font-semibold mb-2 text-red-600">
+                            Invalid Date Range
+                        </h3>
+
+                        <p className="text-gray-600 text-sm wrap-break-word">
+                            {errorMessage}
+                        </p>
+
+                        <button
+                            onClick={() => setInvalidPopup(false)}
+                            className="mt-5 px-6 py-2 bg-green-800 text-white rounded-md hover:bg-green-700 text-sm cursor-pointer"
+                        >
+                            OK
+                        </button>
+                    </div>
+                </div>
+            )}
             {/*Loader*/}
             {loading && (
                 <div className="fixed inset-0 bg-black/40 z-9999 flex items-center justify-center">
@@ -136,13 +156,11 @@ function ScoreCardPage() {
                 <button
                     onClick={() => {
                         if (fromDate && toDate && fromDate > toDate) {
-                            setPopup({
-                                show: true,
-                                type: "error",
-                                message: "From Date cannot be greater than To Date.",
-                            });
+                            setErrorMessage("From Date cannot be greater than To Date.");
+                            setInvalidPopup(true);
                             return;
                         }
+
                         setPage(1);
                         getScorecards(1, fromDate, toDate);
                     }}

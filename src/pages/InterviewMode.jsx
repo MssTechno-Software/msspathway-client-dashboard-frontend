@@ -4,7 +4,7 @@ import { FiLoader } from "react-icons/fi";
 import ModeCard from "../components/ModeCard";
 import { useNavigate } from "react-router-dom";
 import BASE_URL from "../config/api";
-
+import PreMarketingSlider from "../components/PreMarketingSlider";
 function InterviewModes() {
   const [showBeginAssessmentModal, setShowBeginAssessmentModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -70,8 +70,8 @@ function InterviewModes() {
 
         <div className="flex-1 h-px bg-gray-300"></div>
       </div>
-
       {/* Cards */}
+      <PreMarketingSlider />
       <div className="grid lg:grid-cols-2 gap-8">
         <ModeCard
           icon={
