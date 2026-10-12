@@ -1,7 +1,6 @@
-import React from "react";
-
+// Display the next scheduled interview or an empty state when no session exists.
 const NextSessionCard = ({ session, onStart }) => {
-
+    // Show a message when there is no upcoming interview.
     if (!session)
         return (
 
@@ -37,6 +36,7 @@ const NextSessionCard = ({ session, onStart }) => {
                     {session.company_name}
                 </p>
 
+                {/* Display the scheduled interview date and time. */}
                 <p className="mt-3 text-sm">
                     📅{" "}
                     {new Date(
@@ -50,15 +50,18 @@ const NextSessionCard = ({ session, onStart }) => {
                         session.scheduled_at
                     ).toLocaleTimeString()}
                 </p>
-
+                
                 <button
                     className="mt-6 w-full bg-green-700 text-white py-2 rounded-lg hover:bg-green-800 cursor-pointer"
                     onClick={() => onStart(session)}
                 >
-                    {session.interview_source === "realtime"
+                    {session.interview_source === "realtime" ||
+                        session.interview_type === "in_person" ||
+                        session.title?.toLowerCase().includes("in person")
                         ? "JOIN MEETING"
                         : "START"}
                 </button>
+                
 
             </div>
 

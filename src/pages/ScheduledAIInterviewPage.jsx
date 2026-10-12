@@ -1,35 +1,74 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Check } from "lucide-react";
 import { Mic, SkipForward, CheckCircle, Timer, Square } from "lucide-react";
 import { FiLoader } from "react-icons/fi";
 import BASE_URL from "../config/api";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 
+// Animated bars shown only while recording
+function Waveform({ isRecording, waveScale }) {
+    if (!isRecording) return null;
+
+    const bars = [28, 40, 22, 34, 18, 30, 42];
+
+    return (
+        <div className="flex items-center justify-center gap-1 mt-8 h-15">
+            {bars.map((height, index) => (
+                <div
+                    key={index}
+                    className="bg-[#3b6934] rounded-full"
+                    style={{
+                        width: "4px",
+                        // base height * random scale = dancing effect
+                        height: `${height * waveScale}px`,
+                        transition: "height 0.15s ease-in-out",
+                    }}
+                />
+            ))}
+        </div>
+    );
+}
+
 function ScheduledAIInterview() {
+    // Data coming from previous page via router state
     const { state } = useLocation();
-    const interview = state?.interview;
+
     const preStartData = state?.preStartData;
     const interviewType = preStartData?.interview_type || "";
+    // "technical_round" -> "Technical Round" (used in breadcrumb)
     const pageTitle = interviewType.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
     //const pageTitle = state?.preStartData?.page_title?.trim();
     const navigate = useNavigate();
-    const location = useLocation();
-    const apiQuestions = state?.questions || [];
+
+    // router state first, localStorage as fallback
     const clientId = state?.client_id || localStorage.getItem("client_id");
     const interview_id =
         state?.interview_id || state?.interview?.interview_id;
-    const technology_id = state?.technology_id;
+
+    // submitted answers: [{ question_number, answer_text }]
     const [answers, setAnswers] = useState([]);
     const [isRecording, setIsRecording] = useState(false);
     const [waveScale, setWaveScale] = useState(1);
+    // seconds left for each question (119 = about 2 min)
     const [timeLeft, setTimeLeft] = useState(119);
     const minutes = String(Math.floor(timeLeft / 60)).padStart(2, "0");
     const seconds = String(timeLeft % 60).padStart(2, "0");
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [questions, setQuestions] = useState([]);
+
+    // API questions -> UI format. attempted_status: current | pending | completed | skipped
+    const [questions, setQuestions] = useState(() => {
+        const apiQuestions = state?.questions || [];
+        return apiQuestions.map((q, index) => ({
+            ...q,
+            question_id: q.id,
+            question_text: q.question,
+            attempted_status: index === 0 ? "current" : "pending",
+        }));
+    });
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const currentQuestion = questions[currentQuestionIndex];
+    // ref always holds latest handleSubmitAnswer (used by timer auto-submit)
+    const handleSubmitAnswerRef = useRef(null);
     const [loading, setLoading] = useState(false);
 
     const [popup, setPopup] = useState({
@@ -41,26 +80,30 @@ function ScheduledAIInterview() {
     console.log("state", state);
     console.log("clientId", clientId);
     console.log("questions", state?.questions);
+    // transcript = live speech-to-text result
     const {
         transcript,
         resetTranscript,
-        browserSupportsSpeechRecognition,
+
     } = useSpeechRecognition();
 
     /*timer*/
+    // countdown runs only while recording
     useEffect(() => {
         if (!isRecording) return;
 
         const timer = setInterval(() => {
             setTimeLeft((prev) => {
+                // time over -> stop mic and auto submit
                 if (prev <= 1) {
                     clearInterval(timer);
 
                     SpeechRecognition.stopListening();
                     setIsRecording(false);
 
+                    // small delay so last words get captured
                     setTimeout(() => {
-                        handleSubmitAnswer();
+                        handleSubmitAnswerRef.current?.();
                     }, 500);
 
                     return 0;
@@ -70,34 +113,17 @@ function ScheduledAIInterview() {
             });
         }, 1000);
 
+        // cleanup so multiple intervals don't run
         return () => clearInterval(timer);
     }, [isRecording]);
 
+    // random wave scale every 150ms (only visual effect)
     useEffect(() => {
-        if (!apiQuestions?.length) return;
+        if (!isRecording) return;
 
-        const formatted = apiQuestions.map((q, index) => ({
-            ...q,
-            question_id: q.id,
-            question_text: q.question,
-            attempted_status:
-                index === 0 ? "current" : "pending",
-        }));
-
-        setQuestions(formatted);
-        setCurrentQuestionIndex(0);
-    }, [apiQuestions]);
-
-    useEffect(() => {
-        let interval;
-
-        if (isRecording) {
-            interval = setInterval(() => {
-                setWaveScale(Math.random() * 0.8 + 0.6);
-            }, 150);
-        } else {
-            setWaveScale(1);
-        }
+        const interval = setInterval(() => {
+            setWaveScale(Math.random() * 0.8 + 0.6);
+        }, 150);
 
         return () => clearInterval(interval);
     }, [isRecording]);
@@ -105,7 +131,9 @@ function ScheduledAIInterview() {
     const startRecording = () => {
         resetTranscript();
         setTimeLeft(119);
+        setWaveScale(1);
 
+        // continuous: true = keeps listening even after pauses
         SpeechRecognition.startListening({
             continuous: true,
             language: "en-US",
@@ -114,11 +142,13 @@ function ScheduledAIInterview() {
         setIsRecording(true);
     };
 
-    const stopRecording = () => {
+    const stopRecording = useCallback(() => {
         SpeechRecognition.stopListening();
         setIsRecording(false);
-    };
+        setWaveScale(1);
+    }, []);
 
+    // clicking a number in the stepper -> jump to that question
     const handleStepClick = (index) => {
         stopRecording();
         resetTranscript();
@@ -134,6 +164,7 @@ function ScheduledAIInterview() {
         });
 
         // Make the selected question current
+        // (completed / skipped keep their status so colour stays)
         if (
             updatedQuestions[index].attempted_status !== "completed" &&
             updatedQuestions[index].attempted_status !== "skipped"
@@ -145,29 +176,9 @@ function ScheduledAIInterview() {
         setCurrentQuestionIndex(index);
     };
 
-    const Waveform = () => {
-        if (!isRecording) return null;
-
-        const bars = [28, 40, 22, 34, 18, 30, 42];
-
-        return (
-            <div className="flex items-center justify-center gap-1 mt-8 h-15">
-                {bars.map((height, index) => (
-                    <div
-                        key={index}
-                        className="bg-[#3b6934] rounded-full"
-                        style={{
-                            width: "4px",
-                            height: `${height * waveScale}px`,
-                            transition: "height 0.15s ease-in-out",
-                        }}
-                    />
-                ))}
-            </div>
-        );
-    };
-
-    const handleSubmitAnswer = () => {
+    // save transcript as answer, mark completed, go to next question
+    const handleSubmitAnswer = useCallback(() => {
+        // nothing spoken -> show error
         if (!transcript.trim()) {
             setPopup({
                 show: true,
@@ -177,6 +188,7 @@ function ScheduledAIInterview() {
             return;
         }
 
+        // backend expects 1-based question number
         const questionNumber = currentQuestionIndex + 1;
 
         let updatedAnswers = [...answers];
@@ -213,8 +225,7 @@ function ScheduledAIInterview() {
         // Mark current question completed
         updatedQuestions[currentQuestionIndex].attempted_status = "completed";
 
-
-
+        // next question after current which is not completed/skipped
         const nextIndex = updatedQuestions.findIndex(
             (q, i) =>
                 i > currentQuestionIndex &&
@@ -229,11 +240,18 @@ function ScheduledAIInterview() {
 
         setQuestions(updatedQuestions);
 
+        // reset everything for next question
         stopRecording();
         resetTranscript();
         setTimeLeft(119);
-    };
+    }, [answers, currentQuestionIndex, questions, resetTranscript, stopRecording, transcript]);
 
+    // keep ref updated with latest function (avoids stale values in timer)
+    useEffect(() => {
+        handleSubmitAnswerRef.current = handleSubmitAnswer;
+    }, [handleSubmitAnswer]);
+
+    // skip = save empty answer + mark skipped + move next
     const handleSkipQuestion = () => {
         setAnswers(prev => [
             ...prev,
@@ -261,12 +279,14 @@ function ScheduledAIInterview() {
         setQuestions(updatedQuestions);
     };
 
+    // last step: validate all questions, then send all answers to API
     const handleFinishInterview = async () => {
         try {
             setLoading(true);
 
             let finalAnswers = [...answers];
 
+            // if user spoke on last question but didn't press submit, include it
             if (transcript.trim()) {
                 const questionNumber = currentQuestionIndex + 1;
 
@@ -285,6 +305,7 @@ function ScheduledAIInterview() {
             }
 
             // 👇 ADD THIS BLOCK HERE
+            // find first question which has no answer entry
             const unanswered = questions.findIndex((_, index) => {
                 return !finalAnswers.some(
                     answer => answer.question_number === index + 1
@@ -322,6 +343,7 @@ function ScheduledAIInterview() {
 
             const data = await response.json();
 
+            // pick the most specific error message from backend
             if (!response.ok) {
                 let errorMessage = "Submission failed";
 
@@ -338,6 +360,7 @@ function ScheduledAIInterview() {
                 throw new Error(errorMessage);
             }
 
+            // success -> go to feedback page with scorecard
             navigate("/scheduled-interview-feedback", {
                 state: {
                     scorecard: data,
@@ -346,18 +369,21 @@ function ScheduledAIInterview() {
                 },
             });
         } catch (err) {
+            // any error (network / API) shows in popup
             setPopup({
                 show: true,
                 type: "error",
                 message: err.message,
             });
         } finally {
+            // loader always stops
             setLoading(false);
         }
     };
     return (
         <div className="bg-white min-h-screen">
             {/*loader*/}
+            {/* full screen overlay while submitting */}
             {loading && (
                 <div className="fixed inset-0 bg-black/40 z-9999 flex items-center justify-center">
                     <div className="p-6 flex flex-col items-center gap-3">
@@ -417,6 +443,7 @@ function ScheduledAIInterview() {
                             {/* Steps */}
                             <div className="flex-1 flex items-center px-3">
 
+                                {/* one button per question, colour based on attempted_status */}
                                 {questions?.map((_, index) => (
                                     <div
                                         key={index}
@@ -443,6 +470,7 @@ function ScheduledAIInterview() {
                                             `}
                                         >
                                             {index + 1}
+                                            {/* tick badge for completed */}
                                             {questions[index]?.attempted_status === "completed" && (
                                                 <div className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-white border-2 border-[#3b6934] flex items-center justify-center shadow-sm">
                                                     <Check
@@ -454,6 +482,7 @@ function ScheduledAIInterview() {
                                             )}
                                         </button>
 
+                                        {/* line between steps, green for steps before current */}
                                         {index !== questions.length - 1 && (
                                             <div className="flex-1 px-3">
                                                 <div className="relative h-0.5 bg-[#ececec]">
@@ -500,7 +529,7 @@ function ScheduledAIInterview() {
                                 </div>
 
                                 {/* Waveform */}
-                                <Waveform />
+                                <Waveform isRecording={isRecording} waveScale={waveScale} />
 
                                 {/* Timer */}
                                 <div className="mt-12 flex flex-col items-center">
@@ -520,6 +549,7 @@ function ScheduledAIInterview() {
                                     </div>
 
                                     <div className="w-32 h-1 bg-[#f1f4f9] rounded-full overflow-hidden">
+                                        {/* progress bar width based on time left */}
                                         <div
                                             className="h-full bg-[#3b6934] transition-all duration-1000"
                                             style={{
@@ -544,6 +574,7 @@ function ScheduledAIInterview() {
 
                             {/* Buttons */}
                             <div className="flex flex-col sm:flex-row gap-4 mt-6">
+                                {/* toggle: start recording / stop recording */}
                                 <button
                                     onClick={() =>
                                         isRecording
@@ -569,6 +600,7 @@ function ScheduledAIInterview() {
                                     )}
                                 </button>
 
+                                {/* skip works only when this question is the current one */}
                                 <button
                                     onClick={handleSkipQuestion}
                                     disabled={currentQuestion?.attempted_status !== "current"}
@@ -583,6 +615,7 @@ function ScheduledAIInterview() {
                                     Skip Question
                                 </button>
 
+                                {/* last question -> Finish (API call), otherwise -> Submit Answer (local save) */}
                                 {currentQuestionIndex === questions.length - 1 ? (
                                     <button
                                         onClick={handleFinishInterview}
@@ -627,6 +660,7 @@ function ScheduledAIInterview() {
                                     </div>
 
                                     {/* Transcript */}
+                                    {/* live speech text + blinking cursor while recording */}
                                     <div className="space-y-8">
                                         <p className="text-[#3b6934] text-base sm:text-lg leading-7 sm:leading-9 border-b border-[#bcf1ad] pb-3">
                                             {transcript || "Start speaking to see live transcription..."}
@@ -645,6 +679,7 @@ function ScheduledAIInterview() {
                     </div>
                 </div>
             </div>
+            {/* popup for errors / validation messages */}
             {popup.show && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
                     <div className="bg-white rounded-xl shadow-lg p-6 w-80 text-center">

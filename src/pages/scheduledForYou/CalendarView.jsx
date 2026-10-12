@@ -4,7 +4,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import NextSessionCard from "./NextSessionCard";
 import TimelineCard from "./TimelineCard";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const CalendarView = ({
     scheduledInterviews,
@@ -17,6 +17,7 @@ const CalendarView = ({
 
     const [currentTitle, setCurrentTitle] = useState("");
     useEffect(() => {
+        // Initialize the calendar title after the calendar API is available.
         const timer = setTimeout(() => {
             const api = calendarRef.current?.getApi();
             if (api) {
@@ -57,16 +58,12 @@ const CalendarView = ({
         updateTitle();
     };
 
+    // Normalize scheduled interviews into the event format required by FullCalendar.
     const events = useMemo(() => {
         if (!scheduledInterviews) return [];
-
-        let interviews = [];
-
-        if (Array.isArray(scheduledInterviews)) {
-            interviews = scheduledInterviews;
-        } else {
-            interviews = Object.values(scheduledInterviews).flat();
-        }
+        const interviews = Array.isArray(scheduledInterviews)
+            ? scheduledInterviews
+            : Object.values(scheduledInterviews).flat();
 
         return interviews.map((item) => ({
             id: item.interview_id,
@@ -74,7 +71,7 @@ const CalendarView = ({
             start: item.scheduled_at,
             end: item.scheduled_at,
 
-            // Disable completed interviews
+            // Prevent completed interviews from being edited.
             editable: item.status !== "completed",
             extendedProps: {
                 ...item,
@@ -199,6 +196,7 @@ const CalendarView = ({
                     height="auto"
                     eventClick={(info) => {
                         const interview = info.event.extendedProps;
+                        // Do not start interviews that are already completed.
                         if (interview.isCompleted) {
                             return;
                         }

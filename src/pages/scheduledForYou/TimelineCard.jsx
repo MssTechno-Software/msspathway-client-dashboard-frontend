@@ -1,7 +1,5 @@
-import React from "react";
-
+// Display today's scheduled interviews along with their time and status.
 const TimelineCard = ({ timeline }) => {
-
     return (
 
         <div className="bg-white rounded-xl border border-gray-200 shadow p-5">
@@ -12,6 +10,7 @@ const TimelineCard = ({ timeline }) => {
 
             <div className="space-y-4">
 
+                {/* Show an empty-state message when there are no interviews today. */}
                 {timeline.length === 0 && (
 
                     <p className="text-gray-500">
@@ -20,6 +19,7 @@ const TimelineCard = ({ timeline }) => {
 
                 )}
 
+                {/* Render each interview with its time, title, source, and status. */}
                 {timeline.map((item) => (
 
                     <div
@@ -38,6 +38,7 @@ const TimelineCard = ({ timeline }) => {
                             {item.interview_source}
                         </div>
 
+                        {/* Apply badge colors according to the interview status. */}
                         <span
                             className={`inline-block mt-2 px-2 py-1 rounded-full text-xs
                             ${

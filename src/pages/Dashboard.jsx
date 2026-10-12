@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { FiLoader } from "react-icons/fi";
 import StatCard from "../components/StatCard";
 import InterviewTable from "../components/InterviewTable";
@@ -11,41 +11,53 @@ function Dashboard() {
   const clientId = localStorage.getItem("client_id");
   const token = localStorage.getItem("token");
 
-  useEffect(() => {
-    fetchDashboard();
-  }, []);
-
-  const fetchDashboard = async () => {
+ // Fetch dashboard data and memoize the function based on its dependencies.
+ const fetchDashboard = useCallback(async (signal) => {
     try {
-      setLoading(true);
+        setLoading(true);
+        console.log("Client ID:", clientId);
+        console.log("Token:", token);
 
-      console.log("Client ID:", clientId);
-      console.log("Token:", token);
-
-      const response = await axios.get(
-        `${BASE_URL}/api/clients/${clientId}/dashboard`,
-        {
-          params: {
-            recent_limit: 5,
-          },
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        // Request dashboard data with the latest five completed interviews.
+        const response = await axios.get(
+            `${BASE_URL}/api/clients/${clientId}/dashboard`,
+            {
+                params: {
+                    recent_limit: 5,
+                },
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                signal,
+            }
+        );
+        // Skip the state update if the request has been cancelled.
+        if (signal.aborted) return;
+        console.log("Dashboard Response:", response.data);
+        setData(response.data);
+      } catch (error) {
+        // Log errors only when the request has not been aborted.
+        if (!signal.aborted) {
+            console.error("Dashboard Error:", error.response?.data || error.message);
         }
-      );
-
-      console.log("Dashboard Response:", response.data);
-
-      setData(response.data);
-    } catch (error) {
-      console.error(
-        "Dashboard Error:",
-        error.response?.data || error.message
-      );
     } finally {
-      setLoading(false);
+        // Stop loading only if the request is still active.
+        if (!signal.aborted) {
+            setLoading(false);
+        }
     }
-  };
+}, [clientId, token]);
+// Manage the dashboard request lifecycle and cancel it during cleanup.
+useEffect(() => {
+    const controller = new AbortController();
+    Promise.resolve().then(() => {
+        if (!controller.signal.aborted) {
+            fetchDashboard(controller.signal);
+        }
+    });
+    return () => controller.abort();
+}, [fetchDashboard]);
+
   if (loading || !data) {
     return (
       <div className="fixed inset-0 bg-black/40 z-9999 flex items-center justify-center">
@@ -96,7 +108,6 @@ function Dashboard() {
           <InterviewTable
             interviews={data?.recently_completed_interviews ?? []}
           />
-
         </div>
 
         <div className="xl:col-span-4">
